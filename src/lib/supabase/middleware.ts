@@ -28,11 +28,19 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // TODO: Remove this block when app is launched
+  // ── PRE-LAUNCH GATE: block all dashboard routes ──
+  const path = request.nextUrl.pathname;
+  const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes");
+
+  if (isDashboardRoute) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  // ── END PRE-LAUNCH GATE ──
+
   const { data: { user } } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
-  const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes");
 
   // Not logged in → redirect to login
   if (!user && isDashboardRoute) {
