@@ -33,6 +33,14 @@ export default function SignupPage() {
       return;
     }
 
+    // Supabase returns empty identities when email already exists
+    // (instead of an error, to prevent email enumeration)
+    if (data.user && data.user.identities?.length === 0) {
+      setError("An account with this email already exists. Please sign in instead.");
+      setLoading(false);
+      return;
+    }
+
     // If email confirmation is required, user won't have a session yet
     if (!data.session) {
       setError("");
