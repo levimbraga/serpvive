@@ -3,17 +3,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SerpVive — AI Content Decay Monitor",
+  title: "SerpVive — Revive Your Rankings | AI-Powered Content Decay Monitor",
   description:
-    "Detect posts losing traffic, diagnose why with AI, and get actionable refresh briefs with micro-drafts.",
+    "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "SerpVive — AI Content Decay Monitor",
+    title: "SerpVive — Revive Your Rankings | AI-Powered Content Decay Monitor",
     description:
-      "Detect posts losing traffic, diagnose why with AI, and get actionable refresh briefs with micro-drafts.",
+      "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
+    url: "https://serpvive.com",
     images: [{ url: "/og-icon.png", width: 512, height: 512 }],
   },
 };

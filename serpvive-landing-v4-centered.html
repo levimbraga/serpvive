@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SerpVive — Revive Your Rankings</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#07090F;--bg2:#0C0F18;--bg3:#0F1219;
+    --blue:#3B82F6;--blue-hover:#2563EB;--blue-glow:rgba(59,130,246,0.15);
+    --orange:#F97316;--orange-glow:rgba(249,115,22,0.12);
+    --red:#EF4444;--amber:#F59E0B;--green:#22C55E;
+    --text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;--text4:#475569;
+    --border:#1E293B;--card:#0F1219;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  /* Noise texture overlay */
+  body::after{
+    content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:0;
+  }
+  section,nav,footer{position:relative;z-index:1}
+
+  /* ═══════════════════════ NAV ═══════════════════════ */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    padding:0 48px;height:68px;display:flex;align-items:center;justify-content:space-between;
+    background:rgba(7,9,15,0.8);backdrop-filter:blur(24px);
+    border-bottom:1px solid rgba(30,41,59,0.35);
+  }
+  .logo{font-size:26px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;color:#fff}
+  .logo span{color:var(--blue)}
+  .nav-links{display:flex;align-items:center;gap:36px}
+  .nav-links a{color:var(--text2);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:#fff}
+  .nav-cta{
+    background:var(--blue);color:#fff!important;padding:10px 24px;border-radius:8px;
+    font-weight:600;font-size:14px;transition:all .2s;
+  }
+  .nav-cta:hover{background:var(--blue-hover);box-shadow:0 0 30px var(--blue-glow)}
+
+  /* ═══════════════════════ HERO — CENTERED ═══════════════════════ */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:140px 48px 60px;text-align:center;position:relative;overflow:hidden;
+  }
+
+  /* Decorative arcs */
+  .arc{position:absolute;border-radius:50%;border:1px solid rgba(59,130,246,0.05);pointer-events:none}
+  .arc1{top:-350px;left:50%;transform:translateX(-50%);width:1200px;height:1200px}
+  .arc2{top:-150px;left:50%;transform:translateX(-50%);width:800px;height:800px;border-color:rgba(59,130,246,0.04)}
+  .arc3{top:50px;left:50%;transform:translateX(-50%);width:500px;height:500px;border-color:rgba(59,130,246,0.03)}
+  /* Glow */
+  .hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(59,130,246,0.04) 0%,transparent 70%);pointer-events:none}
+  .hero-glow2{position:absolute;top:50%;left:50%;transform:translateX(-50%);width:400px;height:300px;background:radial-gradient(ellipse,rgba(249,115,22,0.025) 0%,transparent 70%);pointer-events:none}
+
+  /* Tag */
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+    background:var(--orange-glow);border:1px solid rgba(249,115,22,0.2);
+    border-radius:100px;font-size:13px;font-weight:500;color:#FB923C;
+    margin-bottom:36px;animation:fadeInUp .6s ease both;
+  }
+  .hero-tag::before{content:'✦';font-size:14px}
+
+  /* H1 — MASSIVE like Surfer */
+  .hero h1{
+    font-size:96px;font-weight:800;line-height:1.02;letter-spacing:-5px;
+    max-width:1000px;margin-bottom:32px;
+    animation:fadeInUp .6s ease .1s both;
+  }
+  .hero h1 .accent{color:var(--blue)}
+
+  /* Subtitle */
+  .hero-sub{
+    font-size:20px;line-height:1.7;color:var(--text2);max-width:600px;margin:0 auto 44px;
+    animation:fadeInUp .6s ease .2s both;
+  }
+  .hero-sub strong{color:var(--text);font-weight:600}
+
+  /* CTA — single big button like Surfer */
+  .hero-cta{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:20px 48px;background:var(--blue);color:#fff;border:none;border-radius:12px;
+    font-size:18px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;
+    transition:all .25s;text-decoration:none;
+    animation:fadeInUp .6s ease .3s both;
+  }
+  .hero-cta:hover{
+    background:var(--blue-hover);box-shadow:0 8px 50px var(--blue-glow);transform:translateY(-2px);
+  }
+  .hero-cta .arrow{font-size:20px;transition:transform .2s}
+  .hero-cta:hover .arrow{transform:translateX(3px)}
+
+  /* Trust badges under CTA */
+  .hero-trust{
+    display:flex;justify-content:center;gap:24px;margin-top:20px;
+    animation:fadeInUp .6s ease .4s both;
+  }
+  .hero-trust span{font-size:13px;color:var(--text3);display:flex;align-items:center;gap:6px}
+  .hero-trust span::before{content:'✓';color:var(--blue);font-weight:700;font-size:12px}
+
+  /* ═══════════════════════ SOCIAL PROOF BAR ═══════════════════════ */
+  .social{
+    padding:48px 48px;background:var(--bg);border-top:1px solid rgba(30,41,59,0.2);
+    text-align:center;position:relative;overflow:hidden;
+  }
+  .social-inner{max-width:900px;margin:0 auto}
+  /* Stars + review count */
+  .stars{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
+  .stars-visual{display:flex;gap:2px}
+  .stars-visual svg{width:20px;height:20px;fill:#FBBF24}
+  .stars-text{font-size:14px;color:var(--text2)}
+  .stars-text strong{color:var(--text)}
+  /* Avatars */
+  .avatars{display:flex;justify-content:center;align-items:center;gap:32px;margin-top:16px}
+  .avatar-stack{display:flex}
+  .avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--bg);margin-left:-10px;background:var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3)}
+  .avatar:first-child{margin-left:0}
+  .avatar.blue{background:rgba(59,130,246,0.15);color:var(--blue)}
+  .avatar.orange{background:rgba(249,115,22,0.15);color:var(--orange)}
+  .avatar.green{background:rgba(34,197,94,0.15);color:var(--green)}
+  .avatar.purple{background:rgba(139,92,246,0.15);color:#8B5CF6}
+  .avatar.red{background:rgba(239,68,68,0.15);color:var(--red)}
+  .sp-text{font-size:14px;color:var(--text3)}
+  .sp-text strong{color:var(--text2)}
+  /* Logo wall */
+  .logo-wall{display:flex;justify-content:center;gap:40px;margin-top:24px;opacity:.35}
+  .logo-wall span{font-size:15px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase}
+
+  /* ═══════════════════════ PRODUCT SHOWCASE ═══════════════════════ */
+  .showcase{padding:0 48px 100px;background:var(--bg);text-align:center;position:relative}
+  .showcase-inner{max-width:1000px;margin:0 auto}
+  .showcase-label{font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:24px}
+
+  /* Dashboard mockup — large, centered */
+  .mockup-lg{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;
+    box-shadow:0 40px 120px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.02) inset;
+    text-align:left;
+  }
+  .mockup-bar{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);background:rgba(7,9,15,0.5)}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .dot-r{background:#EF4444;opacity:.5}.dot-y{background:#F59E0B;opacity:.5}.dot-g{background:#22C55E;opacity:.5}
+  .mockup-url{flex:1;text-align:center;font-size:12px;color:var(--text4);font-family:'JetBrains Mono',monospace}
+
+  .mockup-content{padding:32px;display:grid;grid-template-columns:260px 1fr;gap:28px}
+
+  /* Left: Health Score */
+  .m-left{display:flex;flex-direction:column;align-items:center;padding:24px;background:rgba(7,9,15,.4);border-radius:12px;border:1px solid rgba(30,41,59,.4)}
+  .hr{position:relative;width:120px;height:120px;margin-bottom:12px}
+  .hr svg{transform:rotate(-90deg);width:120px;height:120px}
+  .hr .bg{fill:none;stroke:var(--border);stroke-width:6}
+  .hr .prog{fill:none;stroke:var(--blue);stroke-width:6;stroke-linecap:round;stroke-dasharray:302;stroke-dashoffset:85}
+  .hn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .hn .n{font-size:36px;font-weight:800;color:#fff;display:block;line-height:1}
+  .hn .l{font-size:11px;color:var(--text3)}
+  .m-hl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+  .m-hd{font-size:13px;color:var(--text2);margin-bottom:10px}
+  .m-hd .neg{color:var(--red);font-weight:600}
+  .m-hb{display:flex;gap:6px}
+  .hbg{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600}
+  .hbg.g{background:rgba(34,197,94,.1);color:var(--green)}
+  .hbg.r{background:rgba(239,68,68,.1);color:var(--red)}
+  .hbg.a{background:rgba(245,158,11,.1);color:var(--amber)}
+
+  /* Right: Page list */
+  .m-right{display:flex;flex-direction:column;gap:6px}
+  .m-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .m-header h3{font-size:14px;font-weight:700;color:var(--text)}
+  .m-header .badge{padding:3px 10px;background:rgba(239,68,68,.1);color:var(--red);border-radius:5px;font-size:11px;font-weight:600}
+
+  .pr{display:flex;align-items:center;padding:12px 14px;background:rgba(7,9,15,.5);border-radius:8px;border:1px solid transparent;transition:all .15s}
+  .pr:hover{border-color:var(--border);background:rgba(7,9,15,.8)}
+  .sd{width:7px;height:7px;border-radius:50%;margin-right:12px;flex-shrink:0}
+  .sd.c{background:var(--red)}.sd.w{background:var(--amber)}.sd.h{background:var(--green)}
+  .pu{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)}
+  .pc{font-size:12px;color:var(--text3);margin-right:12px;font-family:'JetBrains Mono',monospace}
+  .pd{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:4px}
+  .pd.r{color:var(--red);background:rgba(239,68,68,.1)}
+  .pd.a{color:var(--amber);background:rgba(245,158,11,.1)}
+  .pd.g{color:var(--green);background:rgba(34,197,94,.06)}
+  .db{margin-left:10px;padding:4px 12px;background:var(--orange);color:#fff;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+  .db:hover{background:#EA580C}
+
+  /* ═══════════════════════ PROBLEM ═══════════════════════ */
+  .problem{padding:100px 48px;background:var(--bg2)}
+  .problem-inner{max-width:1240px;margin:0 auto}
+  .sh2{font-size:48px;font-weight:800;text-align:center;letter-spacing:-2px;line-height:1.1;margin-bottom:12px}
+  .sh2 .dim{color:var(--text4)}
+  .ssub{text-align:center;color:var(--text3);margin-bottom:52px;font-size:16px}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px}
+  .stat-card{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px 32px;text-align:center;
+    transition:all .3s;position:relative;overflow:hidden;
+  }
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;transition:background .3s}
+  .stat-card:hover{border-color:rgba(59,130,246,.3);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+  .stat-card:nth-child(1):hover::before{background:var(--red)}
+  .stat-card:nth-child(2):hover::before{background:var(--orange)}
+  .stat-card:nth-child(3):hover::before{background:var(--red)}
+  .stat-num{font-size:60px;font-weight:800;letter-spacing:-3px;margin-bottom:10px;line-height:1}
+  .stat-num.red{color:var(--red)}.stat-num.orange{color:var(--orange)}
+  .stat-desc{font-size:14px;color:var(--text2);line-height:1.5}
+  .stat-src{font-size:11px;color:var(--text4);margin-top:14px}
+
+  .alert-box{
+    text-align:center;padding:28px 36px;border-radius:14px;background:var(--orange-glow);
+    border:1px solid rgba(249,115,22,.12);font-size:15px;color:var(--text2);line-height:1.7;
+  }
+  .alert-box strong{color:var(--orange)}
+
+  /* ═══════════════════════ 5 STEPS ═══════════════════════ */
+  .steps{padding:100px 48px;background:var(--bg)}
+  .steps-inner{max-width:1240px;margin:0 auto}
+  .steps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:48px}
+  .step{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 18px;
+    text-align:center;transition:all .3s;position:relative;
+  }
+  .step:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  .step.ai{border-color:rgba(249,115,22,.2)}
+  .step.ai:hover{border-color:var(--orange)}
+  .sn{
+    width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin:0 auto 16px;
+  }
+  .step.ai .sn{background:var(--orange)}
+  .step h3{font-size:14px;font-weight:700;margin-bottom:10px;letter-spacing:.5px}
+  .step p{font-size:12px;color:var(--text2);line-height:1.5}
+  .st{display:inline-block;margin-top:14px;padding:4px 10px;border-radius:5px;font-size:10px;font-weight:600}
+  .st.free{background:rgba(34,197,94,.08);color:var(--green)}
+  .st.ai{background:var(--orange-glow);color:#FB923C}
+  .st.auto{background:var(--blue-glow);color:#60A5FA}
+
+  .ctr{text-align:center}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--blue);color:#fff;
+    border:none;border-radius:10px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;
+    cursor:pointer;transition:all .25s;text-decoration:none;
+  }
+  .btn:hover{background:var(--blue-hover);box-shadow:0 8px 40px var(--blue-glow);transform:translateY(-2px)}
+
+  /* ═══════════════════════ EXAMPLE (LIGHT) ═══════════════════════ */
+  .example{padding:100px 48px;background:#FFFFFF}
+  .ex-inner{max-width:900px;margin:0 auto}
+  .example .sh2{color:#0F172A}
+  .example .ssub{color:#64748B}
+
+  .dx{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.07)}
+  .dxh{padding:18px 24px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(239,68,68,.01));border-bottom:1px solid #E2E8F0}
+  .dxbadge{padding:4px 12px;background:var(--red);color:#fff;border-radius:5px;font-size:11px;font-weight:700}
+  .dxu{font-size:13px;color:#64748B;font-family:'JetBrains Mono',monospace}
+  .dxp{margin-left:auto;font-size:16px;color:var(--red);font-weight:700}
+  .dxbody{padding:28px}
+  .dxs{font-size:15px;color:#475569;line-height:1.65;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #E2E8F0}
+
+  .cause{padding:14px 18px;margin-bottom:8px;background:#fff;border-radius:8px;border-left:3px solid var(--red);font-size:13px;color:#475569;line-height:1.5;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .cause.med{border-left-color:var(--amber)}
+  .cause strong{color:#0F172A}
+
+  .brief{margin-top:24px;padding-top:24px;border-top:1px solid #E2E8F0}
+  .brief-t{font-size:14px;font-weight:700;color:var(--orange);margin-bottom:14px}
+  .brief-a{display:flex;align-items:flex-start;gap:8px;padding:7px 0;font-size:13px;color:#475569;line-height:1.4}
+
+  .result{margin-top:24px;padding:20px 24px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:18px;font-size:18px;font-weight:600}
+  .result .o{color:#94A3B8}.result .n{color:var(--green)}.result .d{color:var(--green);font-size:14px}
+  .enote{text-align:center;margin-top:40px;font-size:16px;color:#64748B;line-height:1.6}
+  .enote strong{color:#0F172A}
+
+  /* ═══════════════════════ PRICING ═══════════════════════ */
+  .pricing{padding:100px 48px;background:var(--bg2)}
+  .pricing-inner{max-width:960px;margin:0 auto}
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+  .price-card{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px 28px;
+    text-align:center;transition:all .3s;
+  }
+  .price-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+  .price-card.pop{border-color:var(--blue);position:relative}
+  .price-card.pop::before{content:'MOST POPULAR';position:absolute;top:-13px;left:50%;transform:translateX(-50%);padding:5px 16px;background:var(--blue);color:#fff;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.5px}
+  .pn{font-size:13px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+  .pa{font-size:56px;font-weight:800;letter-spacing:-2px;margin-bottom:2px}
+  .pp{font-size:14px;color:var(--text3);margin-bottom:28px}
+  .pf{list-style:none;text-align:left;margin-bottom:28px}
+  .pf li{padding:8px 0;font-size:14px;color:var(--text2);display:flex;align-items:center;gap:10px}
+  .pf li::before{content:'✓';color:var(--blue);font-weight:700;font-size:13px}
+  .price-card .btn{width:100%;justify-content:center;font-size:14px;padding:14px 0}
+  .pnote{text-align:center;font-size:14px;color:var(--text3)}
+  .pnote a{color:var(--blue);text-decoration:none}
+
+  /* ═══════════════════════ FINAL CTA ═══════════════════════ */
+  .final{padding:100px 48px;background:var(--bg);text-align:center;position:relative;overflow:hidden}
+  .final::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(59,130,246,.04) 0%,transparent 70%);pointer-events:none}
+  .final-inner{position:relative;z-index:1;max-width:620px;margin:0 auto}
+  .final h2{font-size:44px;font-weight:800;letter-spacing:-2px;margin-bottom:12px;line-height:1.1}
+  .final h2 .dim{color:var(--text4)}
+  .final .fsub{color:var(--text2);font-size:17px;margin-bottom:36px;line-height:1.6}
+  .final-form{display:flex;gap:12px;justify-content:center;margin-bottom:16px}
+  .final-form input{
+    width:300px;height:52px;padding:0 20px;background:var(--card);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;
+  }
+  .final-form input::placeholder{color:var(--text4)}
+  .final-form input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+  .final-form button{
+    height:52px;padding:0 28px;background:var(--blue);color:#fff;border:none;border-radius:8px;
+    font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap;
+  }
+  .final-form button:hover{background:var(--blue-hover);box-shadow:0 8px 40px var(--blue-glow);transform:translateY(-1px)}
+  .early{font-size:13px;color:var(--orange);margin-top:8px}
+  .f-trust{display:flex;justify-content:center;gap:20px;margin-top:16px}
+  .f-trust span{font-size:13px;color:var(--text3);display:flex;align-items:center;gap:6px}
+  .f-trust span::before{content:'✓';color:var(--blue);font-weight:700;font-size:12px}
+
+  /* ═══════════════════════ FOOTER ═══════════════════════ */
+  footer{padding:48px;background:#050710;border-top:1px solid rgba(30,41,59,.25)}
+  .fi{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between}
+  .fb .logo{font-size:20px;display:block;margin-bottom:8px}
+  .fb p{font-size:12px;color:var(--text4)}
+  .fl{display:flex;gap:64px}
+  .fc h4{font-size:11px;font-weight:600;color:var(--text4);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .fc a{display:block;font-size:13px;color:var(--text3);text-decoration:none;padding:3px 0;transition:color .2s}
+  .fc a:hover{color:var(--text)}
+
+  /* ═══════════════════════ ANIMATIONS ═══════════════════════ */
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+
+  /* ═══════════════════════ RESPONSIVE ═══════════════════════ */
+  @media(max-width:1024px){
+    .hero h1{font-size:68px;letter-spacing:-3px}
+    .mockup-content{grid-template-columns:1fr;gap:20px}
+    .steps-grid{grid-template-columns:repeat(3,1fr)}
+    .stats-grid{grid-template-columns:1fr}
+    .pricing-grid{grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto}
+  }
+  @media(max-width:640px){
+    .hero h1{font-size:48px;letter-spacing:-2px}
+    .hero-sub{font-size:16px}
+    .sh2{font-size:32px;letter-spacing:-1px}
+    .hero-cta{padding:16px 32px;font-size:15px}
+    .steps-grid{grid-template-columns:1fr}
+    nav{padding:0 16px}
+    .hero,.problem,.steps,.example,.pricing,.final{padding-left:20px;padding-right:20px}
+    .showcase{padding-left:20px;padding-right:20px}
+    .hero-trust,.f-trust{flex-wrap:wrap;gap:12px}
+    .nav-links a:not(.nav-cta){display:none}
+    .logo-wall{gap:20px}
+    .logo-wall span{font-size:12px}
+    .fl{display:none}
+    .final-form{flex-direction:column;align-items:center}
+    .final-form input{width:100%}
+    .final-form button{width:100%}
+    .m-left{display:none}
+    .mockup-content{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Serp<span>Vive</span></a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO — CENTERED -->
+<section class="hero">
+  <div class="arc arc1"></div><div class="arc arc2"></div><div class="arc arc3"></div>
+  <div class="hero-glow"></div><div class="hero-glow2"></div>
+
+  <div class="hero-tag">AI-Powered Content Decay Monitor</div>
+  <h1>Revive your <span class="accent">rankings.</span></h1>
+  <p class="hero-sub">Your content is dying. We detect it, explain <strong>WHY</strong> with AI, and tell you exactly <strong>WHAT</strong> to do — so you can fix it in hours, not weeks.</p>
+  <a href="#waitlist" class="hero-cta">Get early access <span class="arrow">→</span></a>
+  <div class="hero-trust">
+    <span>7-day free trial</span>
+    <span>Cancel anytime</span>
+    <span>First diagnosis free</span>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="social">
+  <div class="social-inner">
+    <div class="stars">
+      <div class="stars-visual">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <span class="stars-text">Built for <strong>SEO professionals</strong> who protect the traffic they've already earned</span>
+    </div>
+    <div class="avatars">
+      <div class="avatar-stack">
+        <div class="avatar blue">JD</div>
+        <div class="avatar orange">MK</div>
+        <div class="avatar green">RS</div>
+        <div class="avatar purple">AL</div>
+        <div class="avatar red">TC</div>
+      </div>
+      <span class="sp-text">Join <strong>early adopters</strong> on the waitlist</span>
+    </div>
+    <div class="logo-wall">
+      <span>SEO Agencies</span>
+      <span>Content Teams</span>
+      <span>SaaS Blogs</span>
+      <span>Publishers</span>
+      <span>Freelancers</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT SHOWCASE -->
+<section class="showcase">
+  <div class="showcase-inner">
+    <div class="showcase-label reveal">What your dashboard looks like</div>
+    <div class="mockup-lg reveal">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span class="mockup-url">serpvive.com/dashboard</span>
+      </div>
+      <div class="mockup-content">
+        <div class="m-left">
+          <div class="hr">
+            <svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="prog" cx="50" cy="50" r="44"/></svg>
+            <div class="hn"><span class="n">72</span><span class="l">/ 100</span></div>
+          </div>
+          <div class="m-hl">Health Score</div>
+          <div class="m-hd"><span class="neg">-5</span> from last week</div>
+          <div class="m-hb">
+            <span class="hbg g">12 Healthy</span>
+            <span class="hbg a">6 Warning</span>
+            <span class="hbg r">4 Critical</span>
+          </div>
+        </div>
+        <div class="m-right">
+          <div class="m-header">
+            <h3>Decaying Pages</h3>
+            <span class="badge">4 need attention</span>
+          </div>
+          <div class="pr"><div class="sd c"></div><span class="pu">/best-crm-software-2024</span><span class="pc">167</span><span class="pd r">-47%</span><span class="db">Diagnose</span></div>
+          <div class="pr"><div class="sd c"></div><span class="pu">/remote-work-tools-guide</span><span class="pc">284</span><span class="pd r">-32%</span><span class="db">Diagnose</span></div>
+          <div class="pr"><div class="sd c"></div><span class="pu">/project-management-tips</span><span class="pc">198</span><span class="pd r">-28%</span><span class="db">Diagnose</span></div>
+          <div class="pr"><div class="sd w"></div><span class="pu">/email-marketing-tips</span><span class="pc">512</span><span class="pd a">-18%</span></div>
+          <div class="pr"><div class="sd w"></div><span class="pu">/content-strategy-2025</span><span class="pc">345</span><span class="pd a">-12%</span></div>
+          <div class="pr"><div class="sd h"></div><span class="pu">/saas-pricing-strategies</span><span class="pc">891</span><span class="pd g">-3%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="problem-inner">
+    <h2 class="sh2 reveal">Your blog is losing traffic right now.<br><span class="dim">You just don't know it yet.</span></h2>
+    <p class="ssub reveal">The numbers don't lie — and they're getting worse with AI Search.</p>
+    <div class="stats-grid">
+      <div class="stat-card reveal"><div class="stat-num red">90.63%</div><div class="stat-desc">of published content gets ZERO traffic from Google</div><div class="stat-src">Source: Ahrefs</div></div>
+      <div class="stat-card reveal"><div class="stat-num orange">-20%</div><div class="stat-desc">organic traffic lost per year when content is neglected</div><div class="stat-src">Source: Conductor</div></div>
+      <div class="stat-card reveal"><div class="stat-num red">-25%</div><div class="stat-desc">drop in search volume predicted by 2026 due to AI Search</div><div class="stat-src">Source: Gartner</div></div>
+    </div>
+    <div class="alert-box reveal"><strong>AI Search is accelerating content decay.</strong> ChatGPT cites content that's 25.7% fresher than traditional Google results. If you're not updating, you're disappearing.</div>
+  </div>
+</section>
+
+<!-- 5 STEPS -->
+<section class="steps" id="features">
+  <div class="steps-inner">
+    <h2 class="sh2 reveal">The complete content rescue system.</h2>
+    <p class="ssub reveal">No other tool does all 5 steps.</p>
+    <div class="steps-grid">
+      <div class="step reveal"><div class="sn">1</div><h3>DETECT</h3><p>Monitor every page daily. Know the moment traffic drops.</p><span class="st free">FREE · AUTOMATIC</span></div>
+      <div class="step ai reveal"><div class="sn">2</div><h3>DIAGNOSE</h3><p>AI analyzes SERP, competitors & your content. Explains WHY.</p><span class="st ai">CLAUDE OPUS 4.6</span></div>
+      <div class="step ai reveal"><div class="sn">3</div><h3>RECOMMEND</h3><p>"Change title to X, add section about Y, fix price Z."</p><span class="st ai">MICRO-DRAFTS</span></div>
+      <div class="step reveal"><div class="sn">4</div><h3>TRACK</h3><p>Mark your post as updated. We snapshot the metrics.</p><span class="st auto">ONE CLICK</span></div>
+      <div class="step reveal"><div class="sn">5</div><h3>PROVE</h3><p>28 days later: automatic before vs after. Did it work?</p><span class="st auto">AUTOMATIC</span></div>
+    </div>
+    <div class="ctr"><a href="#waitlist" class="btn">Join the Waitlist →</a></div>
+  </div>
+</section>
+
+<!-- EXAMPLE (LIGHT) -->
+<section class="example">
+  <div class="ex-inner">
+    <h2 class="sh2 reveal">See a real diagnosis in action.</h2>
+    <p class="ssub reveal">This is the level of detail you get. Not "optimize your content."</p>
+    <div class="dx reveal">
+      <div class="dxh">
+        <span class="dxbadge">CRITICAL</span>
+        <span class="dxu">/best-project-management-tools-2024</span>
+        <span class="dxp">-47%</span>
+      </div>
+      <div class="dxbody">
+        <div class="dxs">This post lost 47% of its traffic because the content is outdated, 3 new competitors appeared with fresher information, and the search intent shifted to comparison-style content.</div>
+        <div class="cause"><strong>1. Title says "2024"</strong> — all top 3 competitors say "2026". Google prefers current content.</div>
+        <div class="cause"><strong>2. Missing AI section</strong> — top 3 results cover "AI features in PM tools." Your post doesn't mention AI once.</div>
+        <div class="cause"><strong>3. Wrong pricing</strong> — Monday.com listed at $8/seat. Actual price is $12/seat since March 2025.</div>
+        <div class="cause med"><strong>4. No comparison table</strong> — 6 of 10 SERP results use comparison tables. Your post is text-only.</div>
+        <div class="brief">
+          <div class="brief-t">🔶 REFRESH BRIEF — 6 actions · ~2.5 hours</div>
+          <div class="brief-a">🔴 Update title → "Best PM Tools in 2026 (Compared)"</div>
+          <div class="brief-a">🔴 Add ~400 word section about AI features in PM tools</div>
+          <div class="brief-a">🔴 Fix Monday.com pricing: $8 → $12/seat</div>
+          <div class="brief-a">🟡 Add comparison table (12 tools × 6 columns)</div>
+          <div class="brief-a">🟡 Fix 2 broken external links</div>
+          <div class="brief-a">🟢 Update meta description with 2026 keywords</div>
+        </div>
+        <div class="result">
+          <span class="o">167 clicks/mo</span><span style="color:#94A3B8">→</span>
+          <span class="n">298 clicks/mo</span><span class="d">(+78%) ✅</span>
+        </div>
+      </div>
+    </div>
+    <p class="enote reveal"><strong>Specific issues. Specific fixes. Measurable results.</strong></p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <h2 class="sh2 reveal">Simple pricing. Powerful results.</h2>
+    <p class="ssub reveal">All plans include 7-day free trial. Cancel anytime.</p>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="pn">Starter</div><div class="pa">$29</div><div class="pp">/month</div>
+        <ul class="pf"><li>1 site</li><li>100 pages monitored</li><li>10 AI diagnoses/month</li><li>Weekly email digest</li></ul>
+        <a href="#waitlist" class="btn">Join Waitlist</a>
+      </div>
+      <div class="price-card pop reveal">
+        <div class="pn">Pro</div><div class="pa">$59</div><div class="pp">/month</div>
+        <ul class="pf"><li>3 sites</li><li>500 pages monitored</li><li>50 AI diagnoses/month</li><li>Velocity alerts</li><li>CSV export</li></ul>
+        <a href="#waitlist" class="btn">Join Waitlist</a>
+      </div>
+      <div class="price-card reveal">
+        <div class="pn">Agency</div><div class="pa">$99</div><div class="pp">/month</div>
+        <ul class="pf"><li>10 sites</li><li>2,000 pages monitored</li><li>150 AI diagnoses/month</li><li>Client dashboards</li><li>Priority support</li></ul>
+        <a href="#waitlist" class="btn">Join Waitlist</a>
+      </div>
+    </div>
+    <p class="pnote">Need more than 10 sites? <a href="mailto:hello@serpvive.com">hello@serpvive.com</a></p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="waitlist">
+  <div class="final-inner">
+    <h2>Your content is decaying right now.<br><span class="dim">Do you know which posts?</span></h2>
+    <p class="fsub">Join the waitlist. Be first to revive your rankings.</p>
+    <div class="final-form">
+      <input type="email" placeholder="you@company.com"/>
+      <button>Join Waitlist →</button>
+    </div>
+    <div class="early">🔥 Early subscribers get 14-day trial (instead of 7)</div>
+    <div class="f-trust">
+      <span>No spam</span>
+      <span>Cancel anytime</span>
+      <span>First diagnosis free</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fi">
+    <div class="fb">
+      <a href="#" class="logo">Serp<span>Vive</span></a>
+      <p>Revive your rankings.</p>
+      <p style="margin-top:16px">© 2026 SerpVive. All rights reserved.</p>
+    </div>
+    <div class="fl">
+      <div class="fc"><h4>Product</h4><a href="#">Features</a><a href="#">Pricing</a><a href="#">Changelog</a></div>
+      <div class="fc"><h4>Company</h4><a href="#">Blog</a><a href="mailto:hello@serpvive.com">Contact</a></div>
+      <div class="fc"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(e=>{e.isIntersecting&&e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));
+</script>
+</body>
+</html>
