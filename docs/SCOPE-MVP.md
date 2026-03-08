@@ -12,7 +12,7 @@ MVP needs ONLY enough to make a user PAY $29 and NOT CANCEL next month.
 - Select site to monitor
 - Import 16 months of historical data (polling every 3s, show partial data)
 - First report within 24h
-- First AI diagnosis auto-generated for most critical post (FREE, doesn't count against limit)
+- First AI diagnosis auto-generated for most critical post (FREE, doesn't count against limit — ONE TIME only during onboarding)
 
 ### Dashboard
 - Health Score (0-100) with delta vs last week, ring gauge animated
@@ -38,10 +38,10 @@ MVP needs ONLY enough to make a user PAY $29 and NOT CANCEL next month.
 
 ### AI Diagnosis (THE differentiator)
 - On-demand: user clicks "Diagnose" on a decaying page
-- Auto: top 3 most critical new posts diagnosed via batch cron
+- Alert: batch-alert cron flags new critical posts daily (badge in dashboard + digest email). NO auto-diagnosis — user must click "Diagnose" manually
 - Process: fetch SERP (Serper) → fetch competitor content → fetch user content → send to Opus 4.6
 - Output: structured JSON with causes, evidence, severity
-- Limits: 10/mo Starter, 30/mo Pro, 100/mo Agency
+- Limits: 10/mo Starter, 50/mo Pro, 150/mo Agency
 
 ### Refresh Brief with Micro-Drafts
 - Generated alongside diagnosis (second Opus call)

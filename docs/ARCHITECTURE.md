@@ -231,7 +231,7 @@ src/
 |------|----------|-------------|
 | sync-gsc | 3AM UTC daily | Pull new GSC data for all active sites |
 | run-engine | 4AM UTC daily | Run decay scoring, velocity, classification |
-| batch-diagnose | 5AM UTC daily | Auto-diagnose top 3 new critical posts |
+| batch-alert | 5AM UTC daily | Identify new critical posts and flag for user (alert only, NO auto-diagnosis) |
 | measure-results | 6AM UTC Sunday | Measure refresh results (28+ days after) |
 | send-digests | 9AM UTC Monday | Send weekly email digest |
 
@@ -258,8 +258,8 @@ CRON_SECRET=
 export const PLAN_LIMITS = {
   trial:   { sites: 1, pages: 100, diagnoses_per_month: 3,   team_members: 1 },
   starter: { sites: 1, pages: 100, diagnoses_per_month: 10,  team_members: 1 },
-  pro:     { sites: 3, pages: 500, diagnoses_per_month: 30,  team_members: 3 },
-  agency:  { sites: 10, pages: 2000, diagnoses_per_month: 100, team_members: 10 },
+  pro:     { sites: 3, pages: 500, diagnoses_per_month: 50,  team_members: 3 },
+  agency:  { sites: 10, pages: 2000, diagnoses_per_month: 150, team_members: 10 },
 };
 ```
 

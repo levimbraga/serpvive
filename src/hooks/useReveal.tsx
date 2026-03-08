@@ -18,7 +18,7 @@ export function useReveal(threshold = 0.1) {
           }
         });
       },
-      { threshold }
+      { threshold },
     );
 
     observer.observe(el);
@@ -38,13 +38,10 @@ export function Reveal({
   threshold?: number;
 }) {
   const { ref, visible } = useReveal(threshold);
-
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-      } ${className}`}
+      className={`transition-all duration-700 ease-out ${visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"} ${className}`}
     >
       {children}
     </div>

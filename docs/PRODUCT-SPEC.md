@@ -5,7 +5,7 @@
 - **Domain**: serpvive.com
 - **Tagline**: "Revive your rankings."
 - **One-liner**: AI-powered content decay monitor that detects posts losing traffic, diagnoses WHY with evidence, tells you exactly WHAT to fix, and proves it worked.
-- **Email**: hello@serpvive.com
+- **Email**: serpvive@gmail.com
 - **Twitter**: @serpvive
 
 ## Vision
@@ -56,7 +56,7 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 | **Preço** | **$29/mês** | **$59/mês** | **$99/mês** |
 | Sites | 1 | 3 | 10 |
 | Páginas monitoradas | 100 | 500 | 2.000 |
-| Diagnósticos AI/mês | 10 | 30 | 100 |
+| Diagnósticos AI/mês | 10 | 50 | 150 |
 | Team members | 1 | 3 | 10 |
 | Email digest | Semanal | Semanal | Semanal/site |
 | Velocity Alerts | ❌ | ✅ | ✅ |
@@ -69,7 +69,7 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 - **Nada ilimitado** — limites generosos mas controlados
 - **Overage no MVP:** Hard block com CTA de upgrade
 - Self-service checkout via Stripe. Sem "contact us".
-- "Need more than 10 sites? hello@serpvive.com"
+- "Need more than 10 sites? serpvive@gmail.com"
 - Primeiro diagnóstico gratuito e automático (não conta no limite)
 
 ## AI Model: Claude Opus 4.6

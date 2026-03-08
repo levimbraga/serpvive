@@ -1,6 +1,6 @@
 const COLUMNS = [
-  { title: "Product", links: [{ label: "Features", href: "#" }, { label: "Pricing", href: "#" }, { label: "Changelog", href: "#" }] },
-  { title: "Company", links: [{ label: "Blog", href: "#" }, { label: "Contact", href: "mailto:hello@serpvive.com" }] },
+  { title: "Product", links: [{ label: "Features", href: "#features" }, { label: "Pricing", href: "#pricing" }, { label: "Changelog", href: "#" }] },
+  { title: "Company", links: [{ label: "Blog", href: "#" }, { label: "Contact", href: "mailto:serpvive@gmail.com" }] },
   { title: "Legal", links: [{ label: "Privacy Policy", href: "#" }, { label: "Terms of Service", href: "#" }] },
 ];
 
@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer
       className="px-5 py-[48px] sm:px-[48px]"
-      style={{ background: "#050710", borderTop: "1px solid rgba(30,41,59,0.3)" }}
+      style={{ background: "#050710", borderTop: "1px solid rgba(30,41,59,0.25)" }}
     >
       <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-8 sm:flex-row">
         {/* Brand */}
@@ -20,7 +20,7 @@ export default function Footer() {
           <p className="mt-[16px] text-[12px] text-[#475569]">© 2026 SerpVive. All rights reserved.</p>
         </div>
 
-        {/* Links — hidden on mobile per reference */}
+        {/* Links — hidden on mobile */}
         <div className="hidden gap-[64px] sm:flex">
           {COLUMNS.map((col) => (
             <div key={col.title}>

@@ -243,7 +243,7 @@ const RefreshBriefSchema = z.object({
 |------|---------|-----------|
 | sync-gsc | 3AM UTC diário | Puxa dados GSC pra todos os sites ativos |
 | run-engine | 4AM UTC diário | Roda decay scoring, velocity, seasonal, classifier, health score |
-| batch-diagnose | 5AM UTC diário | Auto-diagnóstico dos top 3 posts NOVOS em critical (não conta no limite do user) |
+| batch-alert | 5AM UTC diário | Identifica posts NOVOS em critical e flag pra user (alerta, SEM diagnóstico automático). Diagnóstico é sempre manual e conta no limite. |
 | measure-results | 6AM UTC domingo | Mede resultados de refreshes com 28+ dias |
 | send-digests | 9AM UTC segunda | Envia email digest semanal |
 

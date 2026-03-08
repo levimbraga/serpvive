@@ -26,7 +26,7 @@ NÃO oferecer desconto permanente — desvaloriza o produto.
 □ Deploy landing page (waitlist version) via Claude Code
 □ Configurar email capture → Supabase (tabela waitlist: email, source, created_at)
 □ Configurar analytics (PostHog ou Plausible)
-□ Criar email hello@serpvive.com (Zoho Mail free ou Resend)
+□ Criar email serpvive@gmail.com (Zoho Mail free ou Resend)
 □ Criar conta Twitter/X: @serpvive
 □ Criar conta Reddit (se não tem uma "limpa" pra usar)
 ```
