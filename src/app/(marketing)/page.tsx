@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/marketing/navbar";
-import HeroSection from "@/components/marketing/hero-section";
-import ProblemSection from "@/components/marketing/problem-section";
-import HowItWorksSection from "@/components/marketing/how-it-works-section";
-import DiagnosisExampleSection from "@/components/marketing/diagnosis-example-section";
-import PricingSection from "@/components/marketing/pricing-section";
-import FinalCTASection from "@/components/marketing/final-cta-section";
-import Footer from "@/components/marketing/footer";
+import Navbar from "@/components/marketing/Navbar";
+import HeroSection from "@/components/marketing/HeroSection";
+import SocialProofBar from "@/components/marketing/SocialProofBar";
+import ProblemSection from "@/components/marketing/ProblemSection";
+import StepsSection from "@/components/marketing/StepsSection";
+import ExampleSection from "@/components/marketing/ExampleSection";
+import PricingSection from "@/components/marketing/PricingSection";
+import FinalCTA from "@/components/marketing/FinalCTA";
+import Footer from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
-  title: "SerpVive — AI Content Decay Monitor | Revive Your Rankings",
+  title: "SerpVive — Revive Your Rankings",
   description:
     "Detect posts losing traffic, diagnose WHY with AI, and get actionable refresh briefs with micro-drafts. The complete content rescue system.",
   openGraph: {
@@ -34,11 +35,12 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
+        <SocialProofBar />
         <ProblemSection />
-        <HowItWorksSection />
-        <DiagnosisExampleSection />
+        <StepsSection />
+        <ExampleSection />
         <PricingSection />
-        <FinalCTASection />
+        <FinalCTA />
       </main>
       <Footer />
     </>
