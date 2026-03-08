@@ -9,6 +9,7 @@ import ExampleSection from "@/components/marketing/ExampleSection";
 import PricingSection from "@/components/marketing/PricingSection";
 import FinalCTA from "@/components/marketing/FinalCTA";
 import Footer from "@/components/marketing/Footer";
+import RevealObserver from "@/components/marketing/RevealObserver";
 
 export const metadata: Metadata = {
   title: "SerpVive — Revive Your Rankings | AI Content Decay Monitor",
@@ -44,6 +45,7 @@ export default function MarketingPage() {
       <PricingSection />
       <FinalCTA />
       <Footer />
+      <RevealObserver />
     </>
   );
 }
