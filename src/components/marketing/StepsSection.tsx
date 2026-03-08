@@ -22,7 +22,7 @@ export default function StepsSection() {
     <section id="features" className="px-5 py-[100px] sm:px-[48px]" style={{ background: "#0C0F18" }}>
       <div className="mx-auto max-w-[1240px]">
         <Reveal>
-          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] sm:text-[48px] sm:tracking-[-2px]">
+          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] text-[#F1F5F9] sm:text-[48px] sm:tracking-[-2px]">
             The complete content rescue system.
           </h2>
         </Reveal>
@@ -48,7 +48,7 @@ export default function StepsSection() {
                 >
                   {step.num}
                 </div>
-                <h3 className="mb-[10px] text-[14px] font-bold tracking-[0.5px]">{step.title}</h3>
+                <h3 className="mb-[10px] text-[14px] font-bold tracking-[0.5px] text-[#F1F5F9]">{step.title}</h3>
                 <p className="text-[12px] leading-[1.5] text-[#94A3B8]">{step.desc}</p>
                 <span className={`mt-[14px] inline-block rounded-[5px] px-[10px] py-[4px] text-[10px] font-semibold ${step.tagStyle}`}>
                   {step.tag}

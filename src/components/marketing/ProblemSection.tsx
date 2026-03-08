@@ -11,7 +11,7 @@ export default function ProblemSection() {
     <section className="px-5 py-[100px] sm:px-[48px]" style={{ background: "#07090F" }}>
       <div className="mx-auto max-w-[1240px]">
         <Reveal>
-          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] sm:text-[48px] sm:tracking-[-2px]">
+          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] text-[#F1F5F9] sm:text-[48px] sm:tracking-[-2px]">
             Your blog is losing traffic right now.
             <br />
             <span className="text-[#475569]">You just don&apos;t know it yet.</span>

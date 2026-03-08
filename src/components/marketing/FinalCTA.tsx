@@ -25,7 +25,7 @@ export default function FinalCTA() {
       />
 
       <div className="relative z-[1] mx-auto max-w-[600px]">
-        <h2 className="mb-[12px] text-[32px] font-[800] leading-[1.1] tracking-[-1px] sm:text-[44px] sm:tracking-[-2px]">
+        <h2 className="mb-[12px] text-[32px] font-[800] leading-[1.1] tracking-[-1px] text-[#F1F5F9] sm:text-[44px] sm:tracking-[-2px]">
           Your content is decaying right now.
           <br />
           <span className="text-[#475569]">Do you know which posts?</span>

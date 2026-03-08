@@ -31,7 +31,7 @@ export default function PricingSection() {
     <section id="pricing" className="px-5 py-[100px] sm:px-[48px]" style={{ background: "#07090F" }}>
       <div className="mx-auto max-w-[960px]">
         <Reveal>
-          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] sm:text-[48px] sm:tracking-[-2px]">
+          <h2 className="mb-[12px] text-center text-[32px] font-[800] leading-[1.1] tracking-[-1px] text-[#F1F5F9] sm:text-[48px] sm:tracking-[-2px]">
             Simple pricing. Powerful results.
           </h2>
         </Reveal>
@@ -56,9 +56,9 @@ export default function PricingSection() {
                   </div>
                 )}
                 <div className="mb-[16px] text-[13px] font-semibold uppercase tracking-[1px] text-[#64748B]">{plan.name}</div>
-                <div className="mb-[2px] text-[52px] font-[800] tracking-[-2px]">{plan.price}</div>
+                <div className="mb-[2px] text-[52px] font-[800] tracking-[-2px] text-[#F1F5F9]">{plan.price}</div>
                 <div className="mb-[28px] text-[14px] text-[#64748B]">/month</div>
-                <ul className="mb-[28px] text-left">
+                <ul className="mb-[28px] list-none text-left">
                   {plan.features.map((feat) => (
                     <li key={feat} className="flex items-center gap-[10px] py-[8px] text-[14px] text-[#94A3B8]">
                       <span className="text-[13px] font-bold text-[#3B82F6]">✓</span>
