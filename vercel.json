@@ -1,0 +1,24 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-gsc",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/run-engine",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/batch-diagnose",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/measure-results",
+      "schedule": "0 6 * * 0"
+    },
+    {
+      "path": "/api/cron/send-digests",
+      "schedule": "0 9 * * 1"
+    }
+  ]
+}
