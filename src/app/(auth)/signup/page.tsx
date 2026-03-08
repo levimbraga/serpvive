@@ -33,12 +33,17 @@ export default function SignupPage() {
       return;
     }
 
-    // Supabase returns empty identities when email already exists
-    // (instead of an error, to prevent email enumeration)
-    if (data.user && data.user.identities?.length === 0) {
-      setError("An account with this email already exists. Please sign in instead.");
-      setLoading(false);
-      return;
+    // Detect duplicate email: Supabase returns user without error but
+    // either empty identities OR a user whose created_at is old (not just created)
+    if (data.user) {
+      const hasNoIdentities = data.user.identities?.length === 0;
+      const createdAt = new Date(data.user.created_at).getTime();
+      const isOldUser = Date.now() - createdAt > 5000; // created more than 5s ago
+      if (hasNoIdentities || isOldUser) {
+        setError("An account with this email already exists. Please sign in instead.");
+        setLoading(false);
+        return;
+      }
     }
 
     // If email confirmation is required, user won't have a session yet
