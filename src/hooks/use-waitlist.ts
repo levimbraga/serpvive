@@ -35,7 +35,7 @@ export function useWaitlist() {
 
       setState({
         status: "success",
-        message: "You're on the list! We'll notify you at launch.",
+        message: "You're on the list! 🎉",
       });
     } catch {
       setState({

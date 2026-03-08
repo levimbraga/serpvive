@@ -10,6 +10,7 @@ const WaitlistSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as unknown;
+    const referer = request.headers.get("referer") ?? undefined;
     const parsed = WaitlistSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -17,21 +18,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const { email, source } = parsed.data;
+    const { email } = parsed.data;
+    const source = parsed.data.source || referer || "landing";
 
     const supabase = getSupabaseAdmin();
     const { error } = await supabase
       .from("waitlist")
-      .insert({ email, source })
-      .select()
-      .single();
+      .insert({ email, source });
 
     if (error) {
+      // Duplicate email — return success anyway (idempotent)
       if (error.code === "23505") {
-        return NextResponse.json(
-          { error: "This email is already on the waitlist." },
-          { status: 409 }
-        );
+        return NextResponse.json({ success: true });
       }
       console.error("[waitlist] Supabase error:", error);
       return NextResponse.json({ error: "Failed to join waitlist." }, { status: 500 });
