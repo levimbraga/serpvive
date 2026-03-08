@@ -43,21 +43,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-[400px]">
-      <div className="text-center mb-8">
-        <h1 className="text-[26px] font-extrabold tracking-tight text-white">
+    <div className="w-full max-w-[480px]">
+      <div className="text-center mb-10">
+        <h1 className="text-[32px] font-extrabold tracking-tight text-white">
           Serp<span className="text-[#3B82F6]">Vive</span>
         </h1>
-        <p className="text-[#94A3B8] text-sm mt-2">Sign in to your account</p>
+        <p className="text-[#94A3B8] text-base mt-3">Sign in to your account</p>
       </div>
 
-      <div className="bg-[#0F1219] border border-[#1E293B] rounded-xl p-6">
+      <div className="bg-[#0F1219] border border-[#1E293B] rounded-2xl p-8">
         <button
           type="button"
           onClick={handleGoogle}
-          className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-[#1E293B] bg-[#0F1219] text-white text-sm font-medium hover:bg-[#1E293B] transition-colors"
+          className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border border-[#1E293B] bg-[#0F1219] text-white text-[15px] font-medium hover:bg-[#1E293B] transition-colors"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18">
+          <svg viewBox="0 0 24 24" width="20" height="20">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -66,53 +66,53 @@ export default function LoginPage() {
           Continue with Google
         </button>
 
-        <div className="flex items-center gap-3 my-5">
+        <div className="flex items-center gap-4 my-6">
           <div className="flex-1 h-px bg-[#1E293B]" />
-          <span className="text-xs text-[#64748B]">or</span>
+          <span className="text-sm text-[#64748B]">or</span>
           <div className="flex-1 h-px bg-[#1E293B]" />
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-[#94A3B8] mb-1.5">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-[#94A3B8] mb-2">Email</label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full h-10 px-3 rounded-lg bg-[#07090F] border border-[#1E293B] text-white text-sm placeholder:text-[#475569] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors"
+              className="w-full h-12 px-4 rounded-xl bg-[#07090F] border border-[#1E293B] text-white text-[15px] placeholder:text-[#475569] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors"
               placeholder="you@company.com"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-[#94A3B8] mb-1.5">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-[#94A3B8] mb-2">Password</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full h-10 px-3 rounded-lg bg-[#07090F] border border-[#1E293B] text-white text-sm placeholder:text-[#475569] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors"
+              className="w-full h-12 px-4 rounded-xl bg-[#07090F] border border-[#1E293B] text-white text-[15px] placeholder:text-[#475569] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors"
               placeholder="Your password"
             />
           </div>
 
           {error && (
-            <p className="text-xs text-[#EF4444]">{error}</p>
+            <p className="text-sm text-[#EF4444]">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-10 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold hover:bg-[#2563EB] disabled:opacity-50 transition-colors"
+            className="w-full h-12 rounded-xl bg-[#3B82F6] text-white text-[15px] font-semibold hover:bg-[#2563EB] disabled:opacity-50 transition-colors"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
       </div>
 
-      <p className="text-center text-sm text-[#64748B] mt-5">
+      <p className="text-center text-[15px] text-[#64748B] mt-6">
         Don&apos;t have an account?{" "}
         <Link href="/signup" className="text-[#3B82F6] hover:underline">Sign up</Link>
       </p>
