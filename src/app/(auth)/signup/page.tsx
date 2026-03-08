@@ -10,6 +10,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = getSupabaseBrowser();
 
@@ -18,7 +19,7 @@ export default function SignupPage() {
     setError("");
     setLoading(true);
 
-    const { error: err } = await supabase.auth.signUp({
+    const { data, error: err } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -29,6 +30,14 @@ export default function SignupPage() {
     if (err) {
       setError(err.message);
       setLoading(false);
+      return;
+    }
+
+    // If email confirmation is required, user won't have a session yet
+    if (!data.session) {
+      setError("");
+      setLoading(false);
+      setSuccess(true);
       return;
     }
 
@@ -55,6 +64,12 @@ export default function SignupPage() {
       </div>
 
       <div className="bg-[#0F1219] border border-[#1E293B] rounded-xl p-6">
+        {success ? (
+          <div className="text-center py-4">
+            <p className="text-[#22C55E] font-semibold mb-2">Check your email!</p>
+            <p className="text-[#94A3B8] text-sm">We sent a confirmation link to <span className="text-white">{email}</span>. Click it to activate your account.</p>
+          </div>
+        ) : (<>
         <button
           type="button"
           onClick={handleGoogle}
@@ -114,6 +129,7 @@ export default function SignupPage() {
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
+        </>)}
       </div>
 
       <p className="text-center text-sm text-[#64748B] mt-5">
