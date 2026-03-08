@@ -34,21 +34,29 @@ export default function FinalCTA() {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="final-form">
-            <input
-              type="email"
-              name="email"
-              placeholder="you@company.com"
-              required
-            />
-            <button type="submit" disabled={status === "loading"}>
-              {status === "loading" ? "Joining..." : "Join Waitlist →"}
-            </button>
-          </form>
-        )}
+          <>
+            <form onSubmit={handleSubmit} className="final-form">
+              <input
+                type="email"
+                name="email"
+                placeholder="you@company.com"
+                required
+              />
+              <button type="submit" disabled={status === "loading"}>
+                {status === "loading" ? "Joining..." : "Join Waitlist →"}
+              </button>
+            </form>
 
-        {status === "error" && (
-          <p style={{ fontSize: 13, color: "#EF4444", marginBottom: 8 }}>{message}</p>
+            {status === "duplicate" && (
+              <p style={{ fontSize: 13, color: "#F59E0B", marginTop: 8, marginBottom: 8 }}>
+                ⚠️ {message}
+              </p>
+            )}
+
+            {status === "error" && (
+              <p style={{ fontSize: 13, color: "#EF4444", marginTop: 8, marginBottom: 8 }}>{message}</p>
+            )}
+          </>
         )}
 
         <div className="early">🔥 Early subscribers get 14-day trial (instead of 7)</div>

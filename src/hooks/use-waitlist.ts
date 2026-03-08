@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 type WaitlistState = {
-  status: "idle" | "loading" | "success" | "error";
+  status: "idle" | "loading" | "success" | "error" | "duplicate";
   message: string;
 };
 
@@ -23,9 +23,16 @@ export function useWaitlist() {
         body: JSON.stringify({ email, source }),
       });
 
-      const data = (await res.json()) as { success?: boolean; error?: string };
+      const data = (await res.json()) as { success?: boolean; error?: string; code?: string };
 
       if (!res.ok) {
+        if (res.status === 409 && data.code === "DUPLICATE") {
+          setState({
+            status: "duplicate",
+            message: "This email is already on the waitlist!",
+          });
+          return;
+        }
         setState({
           status: "error",
           message: data.error ?? "Something went wrong.",

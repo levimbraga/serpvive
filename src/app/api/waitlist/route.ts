@@ -27,9 +27,11 @@ export async function POST(request: Request) {
       .insert({ email, source });
 
     if (error) {
-      // Duplicate email — return success anyway (idempotent)
       if (error.code === "23505") {
-        return NextResponse.json({ success: true });
+        return NextResponse.json(
+          { error: "This email is already on the waitlist.", code: "DUPLICATE" },
+          { status: 409 }
+        );
       }
       console.error("[waitlist] Supabase error:", error);
       return NextResponse.json({ error: "Failed to join waitlist." }, { status: 500 });
