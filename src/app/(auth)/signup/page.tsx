@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,14 +13,17 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = getSupabaseBrowser();
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const { error: err } = await supabase.auth.signInWithPassword({
+    const { error: err } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/callback`,
+      },
     });
 
     if (err) {
@@ -48,7 +51,7 @@ export default function LoginPage() {
         <h1 className="text-[26px] font-extrabold tracking-tight text-white">
           Serp<span className="text-[#3B82F6]">Vive</span>
         </h1>
-        <p className="text-[#94A3B8] text-sm mt-2">Sign in to your account</p>
+        <p className="text-[#94A3B8] text-sm mt-2">Create your account</p>
       </div>
 
       <div className="bg-[#0F1219] border border-[#1E293B] rounded-xl p-6">
@@ -72,7 +75,7 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-[#1E293B]" />
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-[#94A3B8] mb-1.5">Email</label>
             <input
@@ -93,8 +96,9 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full h-10 px-3 rounded-lg bg-[#07090F] border border-[#1E293B] text-white text-sm placeholder:text-[#475569] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors"
-              placeholder="Your password"
+              placeholder="Min. 6 characters"
             />
           </div>
 
@@ -107,14 +111,14 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full h-10 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold hover:bg-[#2563EB] disabled:opacity-50 transition-colors"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
       </div>
 
       <p className="text-center text-sm text-[#64748B] mt-5">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-[#3B82F6] hover:underline">Sign up</Link>
+        Already have an account?{" "}
+        <Link href="/login" className="text-[#3B82F6] hover:underline">Sign in</Link>
       </p>
     </div>
   );
