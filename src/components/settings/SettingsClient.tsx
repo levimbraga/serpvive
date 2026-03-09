@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
-  CheckCircle2, Crown, Zap,
+  CheckCircle2, Crown, Zap, Globe, FileText, Users, BarChart3,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import type { PlanName } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: string }> = {
   trial:   { label: "Trial", price: "Free", color: "#6B7280" },
@@ -15,6 +15,8 @@ const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: stri
   pro:     { label: "Pro", price: "$59/mo", color: "#2563EB" },
   agency:  { label: "Agency", price: "$99/mo", color: "#7C3AED" },
 };
+
+const PLAN_ORDER: PlanName[] = ["trial", "starter", "pro", "agency"];
 
 const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features: string[] }[] = [
   {
@@ -64,6 +66,7 @@ export default function SettingsClient({
   const [error, setError] = useState("");
 
   const planInfo = PLAN_DISPLAY[plan];
+  const limits = PLAN_LIMITS[plan];
   const usagePercent = diagnosesLimit > 0 ? Math.min(100, (diagnosesUsed / diagnosesLimit) * 100) : 0;
 
   // Trial expired check
@@ -71,6 +74,13 @@ export default function SettingsClient({
   const trialDaysLeft = plan === "trial" && trialEndsAt
     ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
+
+  // Plans available for upgrade (only show plans above current)
+  const currentPlanIndex = PLAN_ORDER.indexOf(plan);
+  const upgradePlans = PLANS_FOR_UPGRADE.filter((p) => {
+    const targetIndex = PLAN_ORDER.indexOf(p.key);
+    return targetIndex > currentPlanIndex;
+  });
 
   async function handleUpgrade(planKey: PlanName) {
     setLoadingPlan(planKey);
@@ -202,11 +212,44 @@ export default function SettingsClient({
           </p>
         )}
 
+        {/* Plan limits grid */}
+        <div className="grid grid-cols-4 gap-4 mb-5">
+          <div className="bg-[#F9FAFB] rounded-lg p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Globe size={12} strokeWidth={1.5} className="text-[#6B7280]" />
+              <p className="text-xs text-[#6B7280]">Sites</p>
+            </div>
+            <p className="text-lg font-bold text-[#111827] tabular-nums">{limits.sites}</p>
+          </div>
+          <div className="bg-[#F9FAFB] rounded-lg p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <FileText size={12} strokeWidth={1.5} className="text-[#6B7280]" />
+              <p className="text-xs text-[#6B7280]">Pages</p>
+            </div>
+            <p className="text-lg font-bold text-[#111827] tabular-nums">{limits.pages.toLocaleString()}</p>
+          </div>
+          <div className="bg-[#F9FAFB] rounded-lg p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Zap size={12} strokeWidth={1.5} className="text-[#7C3AED]" />
+              <p className="text-xs text-[#6B7280]">Diagnoses/mo</p>
+            </div>
+            <p className="text-lg font-bold text-[#111827] tabular-nums">{limits.diagnoses_per_month}</p>
+          </div>
+          <div className="bg-[#F9FAFB] rounded-lg p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Users size={12} strokeWidth={1.5} className="text-[#6B7280]" />
+              <p className="text-xs text-[#6B7280]">Team</p>
+            </div>
+            <p className="text-lg font-bold text-[#111827] tabular-nums">{limits.team_members}</p>
+          </div>
+        </div>
+
+        {/* Usage meter */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-[#6B7280] flex items-center gap-1.5">
-              <Zap size={14} strokeWidth={1.5} className="text-[#7C3AED]" />
-              AI Diagnoses
+              <BarChart3 size={14} strokeWidth={1.5} className="text-[#7C3AED]" />
+              AI Diagnoses used
             </span>
             <span className="text-[#111827] tabular-nums">{diagnosesUsed} / {diagnosesLimit}</span>
           </div>
@@ -216,11 +259,11 @@ export default function SettingsClient({
 
         {/* Manage billing button (for paying customers) */}
         {hasStripeCustomer && plan !== "trial" && (
-          <div className="mt-4 pt-4 border-t border-[#F3F4F6]">
+          <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
             <button
               onClick={handleManageBilling}
               disabled={portalLoading}
-              className="flex items-center gap-2 text-sm text-[#3B82F6] hover:text-[#1D4ED8] transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
             >
               {portalLoading ? (
                 <Loader2 size={14} strokeWidth={1.5} className="animate-spin" />
@@ -228,24 +271,21 @@ export default function SettingsClient({
                 <CreditCard size={14} strokeWidth={1.5} />
               )}
               Manage Billing
-              <ExternalLink size={12} strokeWidth={1.5} />
+              <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
             </button>
           </div>
         )}
       </div>
 
-      {/* Upgrade plans (show for trial or if user wants to upgrade) */}
-      {(plan === "trial" || plan === "starter") && (
+      {/* Upgrade plans (show whenever there's a higher plan available) */}
+      {upgradePlans.length > 0 && (
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
           <h2 className="text-sm font-semibold text-[#111827] mb-4">
             {plan === "trial" ? "Choose a plan" : "Upgrade"}
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {PLANS_FOR_UPGRADE.filter((p) => {
-              if (plan === "starter") return p.key !== "starter";
-              return true;
-            }).map((p) => (
+          <div className={`grid grid-cols-1 ${upgradePlans.length >= 3 ? "sm:grid-cols-3" : upgradePlans.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-1 max-w-sm"} gap-4`}>
+            {upgradePlans.map((p) => (
               <div
                 key={p.key}
                 className="border border-[#E5E7EB] rounded-xl p-4 flex flex-col"
@@ -270,7 +310,7 @@ export default function SettingsClient({
                   {loadingPlan === p.key ? (
                     <Loader2 size={14} strokeWidth={1.5} className="animate-spin" />
                   ) : (
-                    "Get Started"
+                    "Upgrade"
                   )}
                 </button>
               </div>
