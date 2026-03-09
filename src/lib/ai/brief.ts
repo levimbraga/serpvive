@@ -19,10 +19,10 @@ export const RefreshBriefSchema = z.object({
         "title_suggestions", "topics_to_cover", "corrected_data",
         "format_suggestion", "meta_text", "general_guidance",
       ]),
-      suggestions: z.array(z.string()).min(1).max(5),
+      suggestions: z.array(z.string()).default([]),
       competitor_references: z.array(z.string()).optional(),
     }),
-  })).min(2).max(8),
+  })).min(1).max(8),
 });
 
 export type RefreshBriefResult = z.infer<typeof RefreshBriefSchema>;
@@ -66,7 +66,7 @@ RULES:
 - Each action must be SPECIFIC. Not "update content" but "Change title from 'X' to 'Y'"
 - Include effort estimate in minutes for each action
 - Prioritize: "urgent" (directly causing decay) / "important" (competitive gap) / "nice_to_have"
-- Maximum 8 actions, minimum 2
+- You MUST return between 2 and 8 actions. Never fewer than 2. If the page has only one issue, add a secondary improvement action.
 - Include word count estimates for new sections
 - Reference specific competitors when relevant
 
@@ -77,6 +77,12 @@ MICRO-DRAFT RULES (the key differentiator):
 - For FORMAT changes (tables, lists): suggest specific columns/rows
 - For META/TECHNICAL: write the exact meta description or tag to use
 - The user should be able to sit down and WRITE without researching anything else
+
+CRITICAL RULES FOR OUTPUT:
+- Every action MUST have: priority, title, description, effort_minutes, category, and micro_draft.
+- Every micro_draft MUST have: type and suggestions (array with at least 1 item).
+- competitor_references in micro_draft is OPTIONAL — include only when relevant.
+- Return the COMPLETE JSON in a single response. Do not stop mid-response.
 
 Return ONLY valid JSON matching this schema:
 {
@@ -108,24 +114,32 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
     .map((b) => b.text)
     .join("");
 
+  console.log("[brief] Response:", {
+    tokens_output: response.usage?.output_tokens,
+    stop_reason: response.stop_reason,
+  });
+
   let json = extractJson(text);
   let parsed = RefreshBriefSchema.safeParse(json);
 
-  // Retry 1x if invalid
+  // Retry 1x with lightweight prompt if invalid
   if (!parsed.success) {
-    console.warn("[brief] JSON parse failed, retrying...", {
+    console.warn("[brief] Zod validation failed, retrying...", {
       tokens_used: response.usage?.output_tokens,
       stop_reason: response.stop_reason,
-      error: parsed.error.message,
+      issues: JSON.stringify(parsed.error.issues),
     });
 
     response = await anthropic.messages.create({
       model: "claude-opus-4-6",
       max_tokens: 8192,
       messages: [
-        { role: "user", content: prompt },
+        { role: "user", content: "Return valid JSON for an SEO refresh brief." },
         { role: "assistant", content: text },
-        { role: "user", content: `The JSON was invalid. Error: ${parsed.error.message}\n\nReturn ONLY valid JSON.` },
+        {
+          role: "user",
+          content: `Your previous JSON had validation errors:\n${JSON.stringify(parsed.error.issues, null, 2)}\n\nFix these issues and return the COMPLETE valid JSON. Start with { and end with }.`,
+        },
       ],
     });
 
@@ -134,10 +148,16 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
       .map((b) => b.text)
       .join("");
 
+    console.log("[brief] Retry response:", {
+      tokens_output: response.usage?.output_tokens,
+      stop_reason: response.stop_reason,
+    });
+
     json = extractJson(text);
     parsed = RefreshBriefSchema.safeParse(json);
 
     if (!parsed.success) {
+      console.error("[brief] Retry also failed:", JSON.stringify(parsed.error.issues));
       throw new Error(`Brief JSON invalid after retry: ${parsed.error.message}`);
     }
   }
@@ -153,4 +173,3 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
     costUsd: Math.round(costUsd * 10000) / 10000,
   };
 }
-

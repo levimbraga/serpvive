@@ -25,8 +25,8 @@ export const DiagnosisSchema = z.object({
     top_competitors: z.array(z.object({
       url: z.string(),
       title: z.string(),
-      strengths: z.array(z.string()),
-    })),
+      strengths: z.array(z.string()).default([]),
+    })).default([]),
     intent_type: z.enum(["informational", "commercial", "transactional", "navigational"]),
     content_format_trend: z.string(),
   }),
@@ -81,6 +81,12 @@ RULES:
 - Identify: new competitors, outdated info, intent shifts, missing topics, format gaps, technical issues.
 - Maximum 5 causes, minimum 1.
 
+CRITICAL RULES FOR OUTPUT:
+- Every cause MUST have: title, description, severity, evidence, and category.
+- serp_analysis MUST have: intent_type and content_format_trend.
+- top_competitors is an array of objects with url, title, and strengths (array of strings).
+- Return the COMPLETE JSON in a single response. Do not stop mid-response.
+
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string (max 300 chars)",
@@ -126,6 +132,12 @@ ANALYZE:
 4. What format gaps exist (tables, lists, images, video)?
 5. What specific improvements would help this page rank higher?
 
+CRITICAL RULES FOR OUTPUT:
+- Every cause MUST have: title, description, severity, evidence, and category.
+- serp_analysis MUST have: intent_type and content_format_trend.
+- top_competitors is an array of objects with url, title, and strengths (array of strings).
+- Return the COMPLETE JSON in a single response. Do not stop mid-response.
+
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string (max 300 chars)",
@@ -164,7 +176,7 @@ export type DiagnoseResult = {
 /**
  * Runs AI diagnosis via Claude Opus 4.6.
  * Uses decay prompt for established pages, content analysis prompt for new pages.
- * Retries 1x if JSON is invalid.
+ * Retries 1x with lightweight prompt if JSON is invalid.
  */
 export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResult> {
   const prompt = params.isNewPage
@@ -204,26 +216,34 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     .map((b) => b.text)
     .join("");
 
-  // Extract JSON from response (handle markdown code blocks)
+  console.log("[diagnose] Response:", {
+    tokens_output: response.usage?.output_tokens,
+    stop_reason: response.stop_reason,
+    page_url: params.url,
+  });
+
   let json = extractJson(text);
   let parsed = DiagnosisSchema.safeParse(json);
 
-  // Retry 1x if invalid
+  // Retry 1x with lightweight prompt if invalid
   if (!parsed.success) {
-    console.warn("[diagnose] JSON parse failed, retrying...", {
+    console.warn("[diagnose] Zod validation failed, retrying...", {
       tokens_used: response.usage?.output_tokens,
       stop_reason: response.stop_reason,
       page_url: params.url,
-      error: parsed.error.message,
+      issues: JSON.stringify(parsed.error.issues),
     });
 
     response = await anthropic.messages.create({
       model: "claude-opus-4-6",
       max_tokens: 8192,
       messages: [
-        { role: "user", content: prompt },
+        { role: "user", content: "Return valid JSON for an SEO diagnosis." },
         { role: "assistant", content: text },
-        { role: "user", content: `The JSON you returned was invalid. Error: ${parsed.error.message}\n\nPlease fix the JSON and return ONLY valid JSON matching the schema.` },
+        {
+          role: "user",
+          content: `Your previous JSON had validation errors:\n${JSON.stringify(parsed.error.issues, null, 2)}\n\nFix these issues and return the COMPLETE valid JSON. Start with { and end with }.`,
+        },
       ],
     });
 
@@ -232,13 +252,16 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
       .map((b) => b.text)
       .join("");
 
+    console.log("[diagnose] Retry response:", {
+      tokens_output: response.usage?.output_tokens,
+      stop_reason: response.stop_reason,
+    });
+
     json = extractJson(text);
     parsed = DiagnosisSchema.safeParse(json);
 
     if (!parsed.success) {
-      // Save raw response for debugging instead of throwing
-      console.error("[diagnose] Retry also failed:", parsed.error.message);
-      console.error("[diagnose] Raw response:", text.slice(0, 500));
+      console.error("[diagnose] Retry also failed:", JSON.stringify(parsed.error.issues));
       throw new Error(`Diagnosis JSON invalid after retry: ${parsed.error.message}`);
     }
   }
@@ -255,4 +278,3 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     costUsd: Math.round(costUsd * 10000) / 10000,
   };
 }
-

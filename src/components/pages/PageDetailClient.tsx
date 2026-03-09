@@ -671,7 +671,7 @@ export default function PageDetailClient({
             }
           </p>
           <p className="text-xs text-[#9CA3AF] mt-2">
-            Uses 1 of your {diagnosesLimit} monthly diagnoses ({diagnosesUsed} used). Cost: ~$0.12
+            Uses 1 of your {diagnosesLimit} monthly diagnoses ({diagnosesUsed} used)
           </p>
         </div>
       )}
