@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
+import { extractJson } from "./json-extract";
 
 const anthropic = new Anthropic();
 
@@ -92,7 +93,9 @@ Return ONLY valid JSON matching this schema:
       "competitor_references": ["string"] (optional)
     }
   }]
-}`;
+}
+
+CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory text before or after the JSON. Start with { and end with }. Ensure all strings are properly escaped — no unescaped quotes, newlines, or special characters inside string values.`;
 
   let response = await anthropic.messages.create({
     model: "claude-opus-4-6",
@@ -147,17 +150,3 @@ Return ONLY valid JSON matching this schema:
   };
 }
 
-function extractJson(text: string): unknown {
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const jsonStr = codeBlockMatch ? codeBlockMatch[1]!.trim() : text.trim();
-
-  try {
-    return JSON.parse(jsonStr);
-  } catch {
-    const objMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (objMatch) {
-      return JSON.parse(objMatch[0]);
-    }
-    throw new Error("No valid JSON found in response");
-  }
-}

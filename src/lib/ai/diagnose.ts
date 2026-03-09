@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
+import { extractJson } from "./json-extract";
 
 const anthropic = new Anthropic();
 
@@ -85,7 +86,9 @@ Return ONLY valid JSON matching this schema:
   "summary": "string (max 300 chars)",
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "outdated_content|new_competitors|intent_shift|missing_topic|format_gap|technical_issue|cannibalization|thin_content" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
-}`;
+}
+
+CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory text before or after the JSON. Start with { and end with }. Ensure all strings are properly escaped — no unescaped quotes, newlines, or special characters inside string values.`;
 }
 
 function buildNewPagePrompt(params: {
@@ -128,7 +131,9 @@ Return ONLY valid JSON matching this schema:
   "summary": "string (max 300 chars)",
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "content_gap|format_gap|thin_content|title_meta|internal_linking|content_structure" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
-}`;
+}
+
+CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory text before or after the JSON. Start with { and end with }. Ensure all strings are properly escaped — no unescaped quotes, newlines, or special characters inside string values.`;
 }
 
 // ── Main Diagnosis Function ──
@@ -226,6 +231,9 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     parsed = DiagnosisSchema.safeParse(json);
 
     if (!parsed.success) {
+      // Save raw response for debugging instead of throwing
+      console.error("[diagnose] Retry also failed:", parsed.error.message);
+      console.error("[diagnose] Raw response:", text.slice(0, 500));
       throw new Error(`Diagnosis JSON invalid after retry: ${parsed.error.message}`);
     }
   }
@@ -243,19 +251,3 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   };
 }
 
-function extractJson(text: string): unknown {
-  // Try to find JSON in markdown code blocks
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const jsonStr = codeBlockMatch ? codeBlockMatch[1]!.trim() : text.trim();
-
-  try {
-    return JSON.parse(jsonStr);
-  } catch {
-    // Try to find JSON object in the text
-    const objMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (objMatch) {
-      return JSON.parse(objMatch[0]);
-    }
-    throw new Error("No valid JSON found in response");
-  }
-}
