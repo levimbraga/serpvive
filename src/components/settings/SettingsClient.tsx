@@ -12,8 +12,8 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: string }> = {
   trial:   { label: "Trial", price: "Free", color: "#6B7280" },
   starter: { label: "Starter", price: "$29/mo", color: "#0D9488" },
-  pro:     { label: "Pro", price: "$59/mo", color: "#2563EB" },
-  agency:  { label: "Agency", price: "$99/mo", color: "#7C3AED" },
+  pro:     { label: "Pro", price: "$69/mo", color: "#2563EB" },
+  agency:  { label: "Agency", price: "$129/mo", color: "#7C3AED" },
 };
 
 const PLAN_ORDER: PlanName[] = ["trial", "starter", "pro", "agency"];
@@ -28,14 +28,14 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features
   {
     key: "pro",
     label: "Pro",
-    price: 59,
-    features: ["3 sites", "500 pages", "50 diagnoses/mo", "Velocity alerts", "CSV export"],
+    price: 69,
+    features: ["3 sites", "500 pages", "40 diagnoses/mo", "Velocity alerts", "CSV export"],
   },
   {
     key: "agency",
     label: "Agency",
-    price: 99,
-    features: ["10 sites", "2,000 pages", "150 diagnoses/mo", "Client dashboards", "Priority support"],
+    price: 129,
+    features: ["10 sites", "2,000 pages", "120 diagnoses/mo", "Client dashboards", "Priority support"],
   },
 ];
 

@@ -26,12 +26,12 @@ export const STRIPE_PLANS = {
   },
   pro: {
     name: "Pro",
-    price: 59,
+    price: 69,
     priceId: process.env.STRIPE_PRICE_PRO ?? "",
   },
   agency: {
     name: "Agency",
-    price: 99,
+    price: 129,
     priceId: process.env.STRIPE_PRICE_AGENCY ?? "",
   },
 } as const;

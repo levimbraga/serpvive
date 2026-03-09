@@ -23,12 +23,12 @@ export default function PricingSection() {
 
           <div className="price-card pop reveal">
             <div className="pn">Pro</div>
-            <div className="pa">$59</div>
+            <div className="pa">$69</div>
             <div className="pp">/month</div>
             <ul className="pf">
               <li>3 sites</li>
               <li>500 pages monitored</li>
-              <li>50 AI diagnoses/month</li>
+              <li>40 AI diagnoses/month</li>
               <li>Velocity alerts</li>
               <li>CSV export</li>
             </ul>
@@ -37,12 +37,12 @@ export default function PricingSection() {
 
           <div className="price-card reveal">
             <div className="pn">Agency</div>
-            <div className="pa">$99</div>
+            <div className="pa">$129</div>
             <div className="pp">/month</div>
             <ul className="pf">
               <li>10 sites</li>
               <li>2,000 pages monitored</li>
-              <li>150 AI diagnoses/month</li>
+              <li>120 AI diagnoses/month</li>
               <li>Client dashboards</li>
               <li>Priority support</li>
             </ul>
