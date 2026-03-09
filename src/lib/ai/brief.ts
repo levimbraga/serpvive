@@ -178,7 +178,8 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
 
   const tokensInput = response.usage.input_tokens;
   const tokensOutput = response.usage.output_tokens;
-  const costUsd = (tokensInput * 15 + tokensOutput * 75) / 1_000_000;
+  // Opus 4.6 pricing: $5/M input, $25/M output
+  const costUsd = (tokensInput * 5 + tokensOutput * 25) / 1_000_000;
 
   return {
     brief: parsed.data,

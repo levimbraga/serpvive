@@ -282,8 +282,8 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
 
   const tokensInput = response.usage.input_tokens;
   const tokensOutput = response.usage.output_tokens;
-  // Opus 4.6 pricing: $15/M input, $75/M output
-  const costUsd = (tokensInput * 15 + tokensOutput * 75) / 1_000_000;
+  // Opus 4.6 pricing: $5/M input, $25/M output
+  const costUsd = (tokensInput * 5 + tokensOutput * 25) / 1_000_000;
 
   return {
     diagnosis: parsed.data,
