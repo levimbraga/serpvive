@@ -124,10 +124,12 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
 
   // Retry 1x with lightweight prompt if invalid
   if (!parsed.success) {
-    console.warn("[brief] Zod validation failed, retrying...", {
+    console.error("[brief] Zod validation FAILED — details:", {
       tokens_used: response.usage?.output_tokens,
       stop_reason: response.stop_reason,
-      issues: JSON.stringify(parsed.error.issues),
+      raw_json_keys: json ? Object.keys(json) : "NULL_JSON",
+      raw_json_preview: JSON.stringify(json).slice(0, 500),
+      zod_issues: JSON.stringify(parsed.error.issues, null, 2),
     });
 
     response = await anthropic.messages.create({
@@ -157,7 +159,11 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
     parsed = RefreshBriefSchema.safeParse(json);
 
     if (!parsed.success) {
-      console.error("[brief] Retry also failed:", JSON.stringify(parsed.error.issues));
+      console.error("[brief] Retry also FAILED — details:", {
+        raw_json_keys: json ? Object.keys(json) : "NULL_JSON",
+        raw_json_preview: JSON.stringify(json).slice(0, 500),
+        zod_issues: JSON.stringify(parsed.error.issues, null, 2),
+      });
       throw new Error(`Brief JSON invalid after retry: ${parsed.error.message}`);
     }
   }

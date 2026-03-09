@@ -227,11 +227,13 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
 
   // Retry 1x with lightweight prompt if invalid
   if (!parsed.success) {
-    console.warn("[diagnose] Zod validation failed, retrying...", {
+    console.error("[diagnose] Zod validation FAILED — details:", {
       tokens_used: response.usage?.output_tokens,
       stop_reason: response.stop_reason,
       page_url: params.url,
-      issues: JSON.stringify(parsed.error.issues),
+      raw_json_keys: json ? Object.keys(json) : "NULL_JSON",
+      raw_json_preview: JSON.stringify(json).slice(0, 500),
+      zod_issues: JSON.stringify(parsed.error.issues, null, 2),
     });
 
     response = await anthropic.messages.create({
@@ -261,7 +263,11 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     parsed = DiagnosisSchema.safeParse(json);
 
     if (!parsed.success) {
-      console.error("[diagnose] Retry also failed:", JSON.stringify(parsed.error.issues));
+      console.error("[diagnose] Retry also FAILED — details:", {
+        raw_json_keys: json ? Object.keys(json) : "NULL_JSON",
+        raw_json_preview: JSON.stringify(json).slice(0, 500),
+        zod_issues: JSON.stringify(parsed.error.issues, null, 2),
+      });
       throw new Error(`Diagnosis JSON invalid after retry: ${parsed.error.message}`);
     }
   }
