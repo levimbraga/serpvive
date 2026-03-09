@@ -99,7 +99,7 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
 
   let response = await anthropic.messages.create({
     model: "claude-opus-4-6",
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -113,11 +113,15 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
 
   // Retry 1x if invalid
   if (!parsed.success) {
-    console.warn("[brief] First attempt invalid, retrying...", parsed.error.message);
+    console.warn("[brief] JSON parse failed, retrying...", {
+      tokens_used: response.usage?.output_tokens,
+      stop_reason: response.stop_reason,
+      error: parsed.error.message,
+    });
 
     response = await anthropic.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         { role: "user", content: prompt },
         { role: "assistant", content: text },

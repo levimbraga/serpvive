@@ -195,7 +195,7 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   // First attempt
   let response = await anthropic.messages.create({
     model: "claude-opus-4-6",
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -210,11 +210,16 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
 
   // Retry 1x if invalid
   if (!parsed.success) {
-    console.warn("[diagnose] First attempt JSON invalid, retrying...", parsed.error.message);
+    console.warn("[diagnose] JSON parse failed, retrying...", {
+      tokens_used: response.usage?.output_tokens,
+      stop_reason: response.stop_reason,
+      page_url: params.url,
+      error: parsed.error.message,
+    });
 
     response = await anthropic.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         { role: "user", content: prompt },
         { role: "assistant", content: text },

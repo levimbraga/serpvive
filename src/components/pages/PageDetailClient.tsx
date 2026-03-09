@@ -6,7 +6,7 @@ import Link from "next/link";
 import confetti from "canvas-confetti";
 import {
   ArrowLeft, Loader2, Zap, ExternalLink,
-  ChevronDown, ChevronUp, Clock, Check,
+  ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -499,16 +499,9 @@ export default function PageDetailClient({
                   {isNew ? "Content Analysis" : "Decay Diagnosis"}
                 </h2>
               </div>
-              <div className="flex items-center gap-3 text-xs text-[#9CA3AF]">
-                <span>{new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
-                {diagnosis.cost_usd !== null && <span>${diagnosis.cost_usd.toFixed(4)}</span>}
-                {diagnosis.processing_time_ms !== null && (
-                  <span className="flex items-center gap-1">
-                    <Clock size={12} strokeWidth={1.5} />
-                    {(diagnosis.processing_time_ms / 1000).toFixed(0)}s
-                  </span>
-                )}
-              </div>
+              <span className="text-xs text-[#9CA3AF]">
+                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </span>
             </div>
 
             {/* Summary */}
