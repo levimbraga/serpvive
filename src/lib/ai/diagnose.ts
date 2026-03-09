@@ -222,7 +222,8 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     page_url: params.url,
   });
 
-  let json = extractJson(text);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let json = extractJson(text) as any;
 
   // Truncate causes if Opus returned more than 5 (avoids unnecessary retry)
   if (json?.causes && Array.isArray(json.causes) && json.causes.length > 5) {

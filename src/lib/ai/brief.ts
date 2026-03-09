@@ -119,7 +119,8 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
     stop_reason: response.stop_reason,
   });
 
-  let json = extractJson(text);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let json = extractJson(text) as any;
 
   // Truncate actions if Opus returned more than 8 (avoids unnecessary retry)
   if (json?.actions && Array.isArray(json.actions) && json.actions.length > 8) {
