@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "Dashboard — SerpVive",
 };
 
+// Revalidate dashboard data every 60 seconds
+export const revalidate = 60;
+
 export default async function DashboardPage() {
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
