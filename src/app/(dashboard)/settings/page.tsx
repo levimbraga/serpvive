@@ -25,6 +25,13 @@ export default async function SettingsPage() {
   const plan = (profile.plan ?? "trial") as PlanName;
   const limits = PLAN_LIMITS[plan];
 
+  // Fetch user's sites
+  const { data: sites } = await supabase
+    .from("sites")
+    .select("id, domain, status, pages_count, health_score")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+
   return (
     <SettingsClient
       email={profile.email}
@@ -35,6 +42,8 @@ export default async function SettingsPage() {
       diagnosesLimit={limits.diagnoses_per_month}
       trialEndsAt={profile.trial_ends_at}
       hasStripeCustomer={!!profile.stripe_customer_id}
+      sites={sites ?? []}
+      sitesLimit={limits.sites}
     />
   );
 }

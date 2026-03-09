@@ -5,18 +5,22 @@ import { exchangeCodeForTokens } from "@/lib/gsc/client";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const state = searchParams.get("state"); // user ID
+  const state = searchParams.get("state"); // userId or userId:redirect
   const error = searchParams.get("error");
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const redirectUri = process.env.GOOGLE_REDIRECT_URI!;
 
+  // Parse state: "userId" or "userId:settings"
+  const [stateUserId, redirectTarget] = (state ?? "").split(":");
+
   // User denied access
   if (error) {
-    return NextResponse.redirect(`${appUrl}/onboarding?error=access_denied`);
+    const fallback = redirectTarget === "settings" ? "/settings" : "/onboarding";
+    return NextResponse.redirect(`${appUrl}${fallback}?error=access_denied`);
   }
 
-  if (!code || !state) {
+  if (!code || !stateUserId) {
     return NextResponse.redirect(`${appUrl}/onboarding?error=missing_params`);
   }
 
@@ -24,7 +28,7 @@ export async function GET(request: Request) {
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || user.id !== state) {
+  if (!user || user.id !== stateUserId) {
     return NextResponse.redirect(`${appUrl}/onboarding?error=auth_mismatch`);
   }
 
@@ -38,7 +42,10 @@ export async function GET(request: Request) {
 
     // Store tokens temporarily in a cookie for the select-site step
     // (we don't have a site yet to save to the sites table)
-    const response = NextResponse.redirect(`${appUrl}/onboarding/select-site`);
+    const selectSiteUrl = redirectTarget
+      ? `${appUrl}/onboarding/select-site?redirect=${redirectTarget}`
+      : `${appUrl}/onboarding/select-site`;
+    const response = NextResponse.redirect(selectSiteUrl);
 
     response.cookies.set("gsc_access_token", tokens.access_token, {
       httpOnly: true,

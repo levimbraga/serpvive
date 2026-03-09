@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Globe, Star } from "lucide-react";
 
 type GscProperty = {
@@ -18,6 +18,8 @@ export default function SelectSitePage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get("redirect");
 
   useEffect(() => {
     async function fetchProperties() {
@@ -66,7 +68,10 @@ export default function SelectSitePage() {
         return;
       }
 
-      router.push(`/onboarding/importing?siteId=${data.data!.siteId}`);
+      const importUrl = redirectTarget
+        ? `/onboarding/importing?siteId=${data.data!.siteId}&redirect=${redirectTarget}`
+        : `/onboarding/importing?siteId=${data.data!.siteId}`;
+      router.push(importUrl);
     } catch {
       setError("Network error. Please try again.");
       setSubmitting(false);

@@ -8,6 +8,7 @@ import {
   getTopQueriesByPage,
 } from "@/lib/gsc/client";
 import { isContentUrl } from "@/lib/engine/url-filter";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 const ImportSchema = z.object({
   siteUrl: z.string().min(1),
@@ -39,8 +40,30 @@ export async function POST(request: Request) {
 
   const { siteUrl, domain } = parsed.data;
 
-  // Create the site record
+  // Check plan site limit
   const admin = getSupabaseAdmin();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+
+  const plan = (profile?.plan ?? "trial") as PlanName;
+  const siteLimit = PLAN_LIMITS[plan].sites;
+
+  const { count: currentSites } = await admin
+    .from("sites")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if ((currentSites ?? 0) >= siteLimit) {
+    return NextResponse.json(
+      { error: `Your ${plan} plan allows ${siteLimit} site${siteLimit > 1 ? "s" : ""}. Upgrade to add more.` },
+      { status: 403 },
+    );
+  }
+
+  // Create the site record
   const { data: site, error: siteError } = await admin
     .from("sites")
     .insert({

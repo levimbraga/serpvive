@@ -1,13 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
   CheckCircle2, Crown, Zap, Globe, FileText, Users, BarChart3,
+  Unlink, Plus, ArrowUpRight,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+
+type SiteInfo = {
+  id: string;
+  domain: string;
+  status: string;
+  pages_count: number;
+  health_score: number | null;
+};
+
+const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> = {
+  active:    { label: "Active",    bg: "bg-[#F0FDF4]", text: "text-[#16A34A]" },
+  importing: { label: "Importing", bg: "bg-[#FEF3C7]", text: "text-[#D97706]" },
+  paused:    { label: "Paused",    bg: "bg-[#F3F4F6]", text: "text-[#6B7280]" },
+  error:     { label: "Error",     bg: "bg-[#FEF2F2]", text: "text-[#DC2626]" },
+};
 
 const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: string }> = {
   trial:   { label: "Trial", price: "Free", color: "#6B7280" },
@@ -48,6 +72,8 @@ export default function SettingsClient({
   diagnosesLimit,
   trialEndsAt,
   hasStripeCustomer,
+  sites,
+  sitesLimit,
 }: {
   email: string;
   fullName: string | null;
@@ -57,13 +83,20 @@ export default function SettingsClient({
   diagnosesLimit: number;
   trialEndsAt: string | null;
   hasStripeCustomer: boolean;
+  sites: SiteInfo[];
+  sitesLimit: number;
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const checkoutStatus = searchParams.get("checkout");
 
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Disconnect site state
+  const [disconnectSite, setDisconnectSite] = useState<SiteInfo | null>(null);
+  const [disconnecting, setDisconnecting] = useState(false);
 
   const planInfo = PLAN_DISPLAY[plan];
   const limits = PLAN_LIMITS[plan];
@@ -81,6 +114,8 @@ export default function SettingsClient({
     const targetIndex = PLAN_ORDER.indexOf(p.key);
     return targetIndex > currentPlanIndex;
   });
+
+  const canAddSite = sites.length < sitesLimit;
 
   async function handleUpgrade(planKey: PlanName) {
     setLoadingPlan(planKey);
@@ -136,6 +171,45 @@ export default function SettingsClient({
     }
   }
 
+  async function handleDisconnect() {
+    if (!disconnectSite) return;
+    setDisconnecting(true);
+    setError("");
+
+    try {
+      const res = await fetch(`/api/sites/${disconnectSite.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const json = (await res.json()) as { error?: string };
+        setError(json.error ?? "Failed to disconnect site");
+        setDisconnecting(false);
+        setDisconnectSite(null);
+        return;
+      }
+
+      setDisconnectSite(null);
+      setDisconnecting(false);
+
+      // If it was the last site, redirect to onboarding
+      if (sites.length <= 1) {
+        router.push("/onboarding");
+      } else {
+        router.refresh();
+      }
+    } catch {
+      setError("Network error");
+      setDisconnecting(false);
+      setDisconnectSite(null);
+    }
+  }
+
+  function handleAddSite() {
+    // Start OAuth flow — callback redirects to select-site → import → back to settings
+    router.push("/api/auth/google-gsc?redirect=settings");
+  }
+
   return (
     <div className="max-w-3xl space-y-6">
       <h1 className="text-xl font-semibold text-[#111827]">Settings</h1>
@@ -175,6 +249,122 @@ export default function SettingsClient({
           {error}
         </div>
       )}
+
+      {/* Connected Sites */}
+      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-[#111827]">Connected Sites</h2>
+          <span className="text-xs text-[#9CA3AF] tabular-nums">{sites.length} / {sitesLimit}</span>
+        </div>
+
+        {sites.length === 0 ? (
+          <div className="text-center py-6">
+            <Globe size={32} strokeWidth={1.5} className="text-[#D1D5DB] mx-auto mb-3" />
+            <p className="text-sm text-[#6B7280] mb-3">No sites connected yet.</p>
+            <button
+              onClick={handleAddSite}
+              className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+            >
+              <Plus size={14} strokeWidth={1.5} />
+              Connect Google Search Console
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {sites.map((site) => {
+              const badge = STATUS_BADGE[site.status] ?? { label: "Unknown", bg: "bg-[#F3F4F6]", text: "text-[#6B7280]" };
+              return (
+                <div
+                  key={site.id}
+                  className="flex items-center gap-4 p-4 rounded-lg border border-[#F3F4F6] bg-[#F9FAFB]"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center flex-shrink-0">
+                    <Globe size={16} strokeWidth={1.5} className="text-[#6B7280]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#111827] truncate">{site.domain}</p>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.bg} ${badge.text}`}>
+                        {badge.label}
+                      </span>
+                      <span className="text-xs text-[#9CA3AF]">{site.pages_count} pages</span>
+                      {site.health_score !== null && (
+                        <span className="text-xs text-[#9CA3AF]">Health: {site.health_score}</span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setDisconnectSite(site)}
+                    className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#FECACA] text-xs font-medium text-[#DC2626] hover:bg-[#FEF2F2] transition-colors flex-shrink-0"
+                  >
+                    <Unlink size={12} strokeWidth={1.5} />
+                    Disconnect
+                  </button>
+                </div>
+              );
+            })}
+
+            {/* Add site button */}
+            <div className="pt-2">
+              {canAddSite ? (
+                <button
+                  onClick={handleAddSite}
+                  className="flex items-center gap-2 h-9 px-4 rounded-lg border border-dashed border-[#D1D5DB] text-sm text-[#6B7280] hover:border-[#0D9488] hover:text-[#0D9488] transition-colors"
+                >
+                  <Plus size={14} strokeWidth={1.5} />
+                  Add site
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
+                  <span>Site limit reached ({sitesLimit}/{sitesLimit}).</span>
+                  {upgradePlans.length > 0 && (
+                    <button
+                      onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
+                      className="text-[#0D9488] hover:underline inline-flex items-center gap-0.5"
+                    >
+                      Upgrade to add more
+                      <ArrowUpRight size={10} strokeWidth={1.5} />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Disconnect confirmation dialog */}
+      <Dialog open={!!disconnectSite} onOpenChange={(open) => !open && setDisconnectSite(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Disconnect {disconnectSite?.domain}?</DialogTitle>
+            <DialogDescription>
+              All data (pages, diagnoses, refreshes) will be permanently deleted. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              onClick={() => setDisconnectSite(null)}
+              disabled={disconnecting}
+              className="h-9 px-4 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDisconnect}
+              disabled={disconnecting}
+              className="h-9 px-4 rounded-lg bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {disconnecting ? (
+                <Loader2 size={14} strokeWidth={1.5} className="animate-spin" />
+              ) : (
+                <Unlink size={14} strokeWidth={1.5} />
+              )}
+              Yes, disconnect
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Account info */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
@@ -279,7 +469,7 @@ export default function SettingsClient({
 
       {/* Upgrade plans (show whenever there's a higher plan available) */}
       {upgradePlans.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div id="upgrade-section" className="bg-white rounded-xl border border-[#E5E7EB] p-6">
           <h2 className="text-sm font-semibold text-[#111827] mb-4">
             {plan === "trial" ? "Choose a plan" : "Upgrade"}
           </h2>

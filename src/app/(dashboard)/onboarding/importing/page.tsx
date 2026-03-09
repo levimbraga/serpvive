@@ -13,6 +13,7 @@ type ImportStatus = {
 export default function ImportingPage() {
   const searchParams = useSearchParams();
   const siteId = searchParams.get("siteId");
+  const redirectTarget = searchParams.get("redirect");
   const router = useRouter();
   const [data, setData] = useState<ImportStatus | null>(null);
   const [error, setError] = useState("");
@@ -34,7 +35,8 @@ export default function ImportingPage() {
 
         if (json.data.status === "active") {
           // Import complete — redirect after a short delay
-          setTimeout(() => router.push("/dashboard"), 2000);
+          const dest = redirectTarget === "settings" ? "/settings" : "/dashboard";
+          setTimeout(() => router.push(dest), 2000);
         }
       }
     } catch {
@@ -92,7 +94,9 @@ export default function ImportingPage() {
               Found <span className="font-semibold text-[#111827]">{pagesCount} pages</span> on{" "}
               <span className="font-semibold text-[#111827]">{data?.domain}</span>.
             </p>
-            <p className="text-sm text-[#9CA3AF]">Redirecting to dashboard...</p>
+            <p className="text-sm text-[#9CA3AF]">
+              Redirecting to {redirectTarget === "settings" ? "settings" : "dashboard"}...
+            </p>
           </>
         ) : (
           <>
