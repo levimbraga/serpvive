@@ -41,7 +41,8 @@ export async function POST(request: Request) {
   }
 
   const stripe = getStripe();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = origin.replace(/\/$/, "");
 
   // Create or reuse Stripe customer
   let customerId = profile.stripe_customer_id;
