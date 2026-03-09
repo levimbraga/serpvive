@@ -1,1 +1,8 @@
-// Google Search Console API client, OAuth, transforms
+export {
+  exchangeCodeForTokens,
+  refreshAccessToken,
+  listProperties,
+  getSearchAnalyticsByPage,
+  getSearchAnalyticsByPageAndDate,
+  getTopQueriesByPage,
+} from "./client";

@@ -32,10 +32,10 @@ export default async function DashboardLayout({
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const diagnosesLimit = PLAN_LIMITS[plan] ?? 3;
 
-  // Get active site name
+  // Get active site
   const { data: site } = await supabase
     .from("sites")
-    .select("domain")
+    .select("domain, status")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)

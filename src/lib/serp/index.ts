@@ -1,1 +1,2 @@
-// Serper.dev client, SERP fetcher, content extractor (Cheerio)
+export { searchGoogle, type SerpResult } from "./client";
+export { fetchPageContent, formatContentForPrompt, type PageContent } from "./fetcher";
