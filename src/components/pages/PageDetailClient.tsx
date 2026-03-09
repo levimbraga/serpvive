@@ -476,7 +476,7 @@ export default function PageDetailClient({
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
           <Loader2 size={32} strokeWidth={1.5} className="text-[#7C3AED] animate-spin mx-auto mb-4" />
           <p className="text-[#111827] font-medium">Analyzing your page...</p>
-          <p className="text-sm text-[#6B7280] mt-1">This takes about 20 seconds. Searching Google, fetching competitors, running AI analysis.</p>
+          <p className="text-sm text-[#6B7280] mt-1">This usually takes about 2 minutes. Searching Google, fetching competitors, running AI analysis.</p>
         </div>
       )}
 

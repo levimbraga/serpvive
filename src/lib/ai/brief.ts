@@ -22,7 +22,7 @@ export const RefreshBriefSchema = z.object({
       suggestions: z.array(z.string()).default([]),
       competitor_references: z.array(z.string()).optional(),
     }),
-  })).min(1).max(8),
+  })).min(1).max(15),
 });
 
 export type RefreshBriefResult = z.infer<typeof RefreshBriefSchema>;
@@ -120,6 +120,13 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
   });
 
   let json = extractJson(text);
+
+  // Truncate actions if Opus returned more than 8 (avoids unnecessary retry)
+  if (json?.actions && Array.isArray(json.actions) && json.actions.length > 8) {
+    console.warn("[brief] Opus returned", json.actions.length, "actions, truncating to 8");
+    json.actions = json.actions.slice(0, 8);
+  }
+
   let parsed = RefreshBriefSchema.safeParse(json);
 
   // Retry 1x with lightweight prompt if invalid

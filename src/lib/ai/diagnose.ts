@@ -20,7 +20,7 @@ export const DiagnosisSchema = z.object({
       // Additional categories for new page analysis
       "content_gap", "title_meta", "internal_linking", "content_structure",
     ]),
-  })).min(1).max(5),
+  })).min(1).max(10),
   serp_analysis: z.object({
     top_competitors: z.array(z.object({
       url: z.string(),
@@ -223,6 +223,13 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   });
 
   let json = extractJson(text);
+
+  // Truncate causes if Opus returned more than 5 (avoids unnecessary retry)
+  if (json?.causes && Array.isArray(json.causes) && json.causes.length > 5) {
+    console.warn("[diagnose] Opus returned", json.causes.length, "causes, truncating to 5");
+    json.causes = json.causes.slice(0, 5);
+  }
+
   let parsed = DiagnosisSchema.safeParse(json);
 
   // Retry 1x with lightweight prompt if invalid

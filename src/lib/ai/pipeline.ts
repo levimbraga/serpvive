@@ -20,7 +20,7 @@ export type PipelineResult = {
  * 4. Run Claude Opus diagnosis (~$0.07)
  * 5. Run Claude Opus refresh brief (~$0.05)
  * 6. Save everything to DB
- * Total: ~$0.12 per diagnosis, ~20 seconds
+ * Total: ~$0.12 per diagnosis, ~2 minutes
  */
 export async function runDiagnosisPipeline(
   admin: SupabaseClient,
