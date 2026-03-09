@@ -8,6 +8,7 @@ import StatsRow from "@/components/dashboard/StatsRow";
 import UsageMeter from "@/components/dashboard/UsageMeter";
 import DecayList from "@/components/dashboard/DecayList";
 import RunEngineButton from "@/components/dashboard/RunEngineButton";
+import RecentResults from "@/components/dashboard/RecentResults";
 import { Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -64,12 +65,23 @@ export default async function DashboardPage() {
     ? healthScore - (site.health_score_prev ?? 0)
     : null;
 
-  // Fetch pages for decay list
-  const { data: pagesData } = await supabase
-    .from("pages")
-    .select("id, path, url, status, current_clicks_28d, decay_score, decay_velocity_7d")
-    .eq("site_id", site.id)
-    .order("decay_score", { ascending: false });
+  // Fetch pages for decay list + recent refresh results in parallel
+  const [pagesRes, refreshesRes] = await Promise.all([
+    supabase
+      .from("pages")
+      .select("id, path, url, status, current_clicks_28d, decay_score, decay_velocity_7d")
+      .eq("site_id", site.id)
+      .order("decay_score", { ascending: false }),
+    supabase
+      .from("refreshes")
+      .select("id, page_id, result_status, clicks_delta_pct, refreshed_at, result_calculated_at")
+      .eq("user_id", user.id)
+      .in("result_status", ["success", "partial", "no_change", "declined"])
+      .order("result_calculated_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const pagesData = pagesRes.data;
 
   const pages = (pagesData ?? []).map((p) => ({
     id: p.id,
@@ -139,6 +151,23 @@ export default async function DashboardPage() {
           warning={site.pages_warning}
           critical={site.pages_critical}
           dead={site.pages_dead}
+        />
+      )}
+
+      {/* Recent Results */}
+      {(refreshesRes.data ?? []).length > 0 && (
+        <RecentResults
+          results={(refreshesRes.data ?? []).map((r) => {
+            const pg = pages.find((p) => p.id === r.page_id);
+            return {
+              id: r.id,
+              pageId: r.page_id,
+              pagePath: pg?.path ?? "Unknown page",
+              resultStatus: r.result_status as "success" | "partial" | "no_change" | "declined",
+              clicksDeltaPct: r.clicks_delta_pct,
+              resultCalculatedAt: r.result_calculated_at,
+            };
+          })}
         />
       )}
 

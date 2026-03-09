@@ -9,7 +9,7 @@
       "schedule": "0 4 * * *"
     },
     {
-      "path": "/api/cron/batch-diagnose",
+      "path": "/api/cron/batch-alert",
       "schedule": "0 5 * * *"
     },
     {

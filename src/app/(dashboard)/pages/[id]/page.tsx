@@ -36,30 +36,38 @@ export default async function PageDetailPage({
 
   if (!site || site.user_id !== user.id) notFound();
 
-  // Fetch latest diagnosis if exists
-  const { data: latestDiagnosis } = await supabase
-    .from("diagnoses")
-    .select("id, diagnosis, refresh_brief, cost_usd, processing_time_ms, created_at")
-    .eq("page_id", id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  // Fetch plan limits
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("plan, diagnoses_used_this_month")
-    .eq("id", user.id)
-    .single();
+  // Fetch latest diagnosis + latest refresh + profile in parallel
+  const [diagnosisRes, refreshRes, profileRes] = await Promise.all([
+    supabase
+      .from("diagnoses")
+      .select("id, diagnosis, refresh_brief, cost_usd, processing_time_ms, created_at")
+      .eq("page_id", id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("refreshes")
+      .select("id, refreshed_at, result_status, actions_completed, before_clicks_28d, before_impressions_28d, before_ctr, before_avg_position, after_clicks_28d, after_impressions_28d, after_ctr, after_avg_position, clicks_delta, clicks_delta_pct, result_calculated_at")
+      .eq("page_id", id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("plan, diagnoses_used_this_month")
+      .eq("id", user.id)
+      .single(),
+  ]);
 
   return (
     <PageDetailClient
       page={page}
       siteDomain={site.domain}
-      latestDiagnosis={latestDiagnosis}
-      diagnosesUsed={profile?.diagnoses_used_this_month ?? 0}
+      latestDiagnosis={diagnosisRes.data}
+      latestRefresh={refreshRes.data}
+      diagnosesUsed={profileRes.data?.diagnoses_used_this_month ?? 0}
       diagnosesLimit={
-        ({ trial: 3, starter: 10, pro: 50, agency: 150 } as Record<string, number>)[profile?.plan ?? "trial"] ?? 3
+        ({ trial: 3, starter: 10, pro: 50, agency: 150 } as Record<string, number>)[profileRes.data?.plan ?? "trial"] ?? 3
       }
     />
   );

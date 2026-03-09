@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import confetti from "canvas-confetti";
 import {
   ArrowLeft, Loader2, Zap, ExternalLink,
-  ChevronDown, ChevronUp, Clock,
+  ChevronDown, ChevronUp, Clock, Check,
+  PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type PageData = {
   id: string;
@@ -71,6 +74,24 @@ type DiagnosisRecord = {
   created_at: string;
 };
 
+type RefreshRecord = {
+  id: string;
+  refreshed_at: string;
+  result_status: string;
+  actions_completed: string[];
+  before_clicks_28d: number | null;
+  before_impressions_28d: number | null;
+  before_ctr: number | null;
+  before_avg_position: number | null;
+  after_clicks_28d: number | null;
+  after_impressions_28d: number | null;
+  after_ctr: number | null;
+  after_avg_position: number | null;
+  clicks_delta: number | null;
+  clicks_delta_pct: number | null;
+  result_calculated_at: string | null;
+};
+
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
   healthy:  { color: "#16A34A", bg: "#F0FDF4", label: "Healthy" },
   warning:  { color: "#D97706", bg: "#FFFBEB", label: "Warning" },
@@ -92,28 +113,50 @@ const PRIORITY_CONFIG: Record<string, { emoji: string; label: string }> = {
   nice_to_have: { emoji: "🟢", label: "Nice to have" },
 };
 
+const RESULT_CONFIG: Record<string, { color: string; bg: string; icon: typeof TrendingUp; label: string }> = {
+  success:   { color: "#16A34A", bg: "#F0FDF4", icon: TrendingUp, label: "Success" },
+  partial:   { color: "#D97706", bg: "#FFFBEB", icon: TrendingUp, label: "Partial improvement" },
+  no_change: { color: "#6B7280", bg: "#F9FAFB", icon: Minus, label: "No change" },
+  declined:  { color: "#DC2626", bg: "#FEF2F2", icon: TrendingDown, label: "Declined" },
+};
+
 export default function PageDetailClient({
   page,
   siteDomain,
   latestDiagnosis,
+  latestRefresh,
   diagnosesUsed,
   diagnosesLimit,
 }: {
   page: PageData;
   siteDomain: string;
   latestDiagnosis: DiagnosisRecord | null;
+  latestRefresh: RefreshRecord | null;
   diagnosesUsed: number;
   diagnosesLimit: number;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [refreshLoading, setRefreshLoading] = useState(false);
   const [error, setError] = useState("");
   const [diagnosis, setDiagnosis] = useState<DiagnosisRecord | null>(latestDiagnosis);
+  const [refresh, setRefresh] = useState<RefreshRecord | null>(latestRefresh);
   const [expandedActions, setExpandedActions] = useState<Set<number>>(new Set());
+  const [checkedActions, setCheckedActions] = useState<Set<number>>(new Set());
+  const [showConfettiMsg, setShowConfettiMsg] = useState(false);
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const atLimit = diagnosesUsed >= diagnosesLimit;
+
+  const fireConfetti = useCallback(() => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ["#16A34A", "#0D9488", "#2563EB", "#7C3AED"],
+    });
+  }, []);
 
   async function handleDiagnose() {
     setLoading(true);
@@ -142,6 +185,9 @@ export default function PageDetailClient({
           processing_time_ms: json.data.processingTimeMs,
           created_at: new Date().toISOString(),
         });
+        // Reset refresh state when new diagnosis is run
+        setRefresh(null);
+        setCheckedActions(new Set());
       }
 
       router.refresh();
@@ -149,6 +195,65 @@ export default function PageDetailClient({
       setError("Network error");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleMarkAsUpdated() {
+    if (!diagnosis) return;
+    setRefreshLoading(true);
+    setError("");
+
+    const actionsCompleted = diagnosis.refresh_brief
+      ? diagnosis.refresh_brief.actions
+          .filter((_, i) => checkedActions.has(i))
+          .map((a) => a.title)
+      : [];
+
+    try {
+      const res = await fetch("/api/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pageId: page.id,
+          diagnosisId: diagnosis.id,
+          actionsCompleted,
+        }),
+      });
+
+      const json = (await res.json()) as { data?: { refreshId: string; refreshedAt: string }; error?: string };
+
+      if (!res.ok) {
+        setError(json.error ?? "Failed to mark as updated");
+        return;
+      }
+
+      if (json.data) {
+        setRefresh({
+          id: json.data.refreshId,
+          refreshed_at: json.data.refreshedAt,
+          result_status: "pending",
+          actions_completed: actionsCompleted,
+          before_clicks_28d: page.current_clicks_28d,
+          before_impressions_28d: page.current_impressions_28d,
+          before_ctr: page.current_ctr,
+          before_avg_position: page.current_avg_position,
+          after_clicks_28d: null,
+          after_impressions_28d: null,
+          after_ctr: null,
+          after_avg_position: null,
+          clicks_delta: null,
+          clicks_delta_pct: null,
+          result_calculated_at: null,
+        });
+        setShowConfettiMsg(true);
+        fireConfetti();
+      }
+
+      router.refresh();
+    } catch {
+      setError("Network error");
+    } finally {
+      setRefreshLoading(false);
     }
   }
 
@@ -160,6 +265,22 @@ export default function PageDetailClient({
       return next;
     });
   }
+
+  function toggleCheckedAction(index: number) {
+    setCheckedActions((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  // Calculate days remaining for pending refresh
+  const daysRemaining = refresh?.result_status === "pending"
+    ? Math.max(0, 28 - Math.floor((Date.now() - new Date(refresh.refreshed_at).getTime()) / (1000 * 60 * 60 * 24)))
+    : null;
+
+  const hasResult = refresh && refresh.result_status && refresh.result_status !== "pending";
 
   return (
     <div className="space-y-6">
@@ -258,6 +379,98 @@ export default function PageDetailClient({
         </div>
       </div>
 
+      {/* Refresh tracking card */}
+      {refresh && !loading && (
+        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+          {/* Confetti success message */}
+          {showConfettiMsg && refresh.result_status === "pending" && (
+            <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-4">
+              <PartyPopper size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-[#16A34A]">Great! We&apos;ll measure your results in 28 days.</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">Keep making great content!</p>
+              </div>
+            </div>
+          )}
+
+          {/* Pending state */}
+          {refresh.result_status === "pending" && !showConfettiMsg && (
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+                <Timer size={20} strokeWidth={1.5} className="text-[#2563EB]" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[#111827]">Refresh tracked</p>
+                <p className="text-xs text-[#6B7280]">
+                  Marked as updated on {new Date(refresh.refreshed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  {" — "}
+                  Measuring... {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Result state */}
+          {hasResult && (() => {
+            const resultCfg = RESULT_CONFIG[refresh.result_status] ?? RESULT_CONFIG["no_change"]!;
+            const ResultIcon = resultCfg.icon;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: resultCfg.bg }}
+                  >
+                    <ResultIcon size={20} strokeWidth={1.5} style={{ color: resultCfg.color }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#111827]">Refresh Result: {resultCfg.label}</p>
+                    <p className="text-xs text-[#6B7280]">
+                      Measured on {refresh.result_calculated_at
+                        ? new Date(refresh.result_calculated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Before vs After comparison */}
+                <div className="grid grid-cols-4 gap-4 bg-[#F9FAFB] rounded-lg p-4">
+                  <div>
+                    <p className="text-xs text-[#9CA3AF] mb-1">Clicks (28d)</p>
+                    <p className="text-sm text-[#6B7280]">{refresh.before_clicks_28d ?? 0}</p>
+                    <p className="text-sm font-semibold text-[#111827]">{refresh.after_clicks_28d ?? 0}</p>
+                    {refresh.clicks_delta_pct !== null && (
+                      <p className={`text-xs font-medium mt-0.5 ${
+                        refresh.clicks_delta_pct > 0 ? "text-[#16A34A]" :
+                        refresh.clicks_delta_pct < 0 ? "text-[#DC2626]" :
+                        "text-[#6B7280]"
+                      }`}>
+                        {refresh.clicks_delta_pct > 0 ? "+" : ""}{refresh.clicks_delta_pct.toFixed(1)}%
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#9CA3AF] mb-1">Impressions</p>
+                    <p className="text-sm text-[#6B7280]">{refresh.before_impressions_28d ?? 0}</p>
+                    <p className="text-sm font-semibold text-[#111827]">{refresh.after_impressions_28d ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#9CA3AF] mb-1">CTR</p>
+                    <p className="text-sm text-[#6B7280]">{((refresh.before_ctr ?? 0) * 100).toFixed(1)}%</p>
+                    <p className="text-sm font-semibold text-[#111827]">{((refresh.after_ctr ?? 0) * 100).toFixed(1)}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#9CA3AF] mb-1">Avg Position</p>
+                    <p className="text-sm text-[#6B7280]">#{(refresh.before_avg_position ?? 0).toFixed(1)}</p>
+                    <p className="text-sm font-semibold text-[#111827]">#{(refresh.after_avg_position ?? 0).toFixed(1)}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
       {/* Loading state */}
       {loading && (
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
@@ -350,26 +563,45 @@ export default function PageDetailClient({
                 {diagnosis.refresh_brief.actions.map((action, i) => {
                   const pri = PRIORITY_CONFIG[action.priority] ?? PRIORITY_CONFIG["important"]!;
                   const isExpanded = expandedActions.has(i);
+                  const isChecked = checkedActions.has(i);
 
                   return (
                     <div key={i} className="border border-[#E5E7EB] rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => toggleAction(i)}
-                        className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
-                      >
-                        <span>{pri.emoji}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-[#111827]">{action.title}</p>
-                          <p className="text-xs text-[#9CA3AF] mt-0.5">
-                            {pri.label} · {action.effort_minutes}min · {action.category}
-                          </p>
-                        </div>
-                        {isExpanded ? (
-                          <ChevronUp size={16} strokeWidth={1.5} className="text-[#9CA3AF]" />
-                        ) : (
-                          <ChevronDown size={16} strokeWidth={1.5} className="text-[#9CA3AF]" />
+                      <div className="flex items-center">
+                        {/* Checkbox — only show if no pending/completed refresh */}
+                        {!refresh && (
+                          <div className="pl-4 flex items-center">
+                            <Checkbox
+                              checked={isChecked}
+                              onCheckedChange={() => toggleCheckedAction(i)}
+                              className="data-[state=checked]:bg-[#16A34A] data-[state=checked]:border-[#16A34A]"
+                            />
+                          </div>
                         )}
-                      </button>
+                        {/* Show check icon for completed actions */}
+                        {refresh && refresh.actions_completed.includes(action.title) && (
+                          <div className="pl-4 flex items-center">
+                            <Check size={16} strokeWidth={2} className="text-[#16A34A]" />
+                          </div>
+                        )}
+                        <button
+                          onClick={() => toggleAction(i)}
+                          className="flex-1 flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
+                        >
+                          <span>{pri.emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-[#111827]">{action.title}</p>
+                            <p className="text-xs text-[#9CA3AF] mt-0.5">
+                              {pri.label} · {action.effort_minutes}min · {action.category}
+                            </p>
+                          </div>
+                          {isExpanded ? (
+                            <ChevronUp size={16} strokeWidth={1.5} className="text-[#9CA3AF]" />
+                          ) : (
+                            <ChevronDown size={16} strokeWidth={1.5} className="text-[#9CA3AF]" />
+                          )}
+                        </button>
+                      </div>
 
                       {isExpanded && (
                         <div className="px-4 pb-4 pt-0 border-t border-[#F3F4F6]">
@@ -402,6 +634,34 @@ export default function PageDetailClient({
                   );
                 })}
               </div>
+
+              {/* Mark as Updated button */}
+              {!refresh && (
+                <div className="mt-6 pt-4 border-t border-[#E5E7EB]">
+                  <button
+                    onClick={handleMarkAsUpdated}
+                    disabled={refreshLoading}
+                    className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {refreshLoading ? (
+                      <>
+                        <Loader2 size={18} strokeWidth={1.5} className="animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Check size={18} strokeWidth={2} />
+                        Mark as Updated
+                      </>
+                    )}
+                  </button>
+                  {checkedActions.size > 0 && (
+                    <p className="text-xs text-[#6B7280] text-center mt-2">
+                      {checkedActions.size} action{checkedActions.size !== 1 ? "s" : ""} completed
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </>

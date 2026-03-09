@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   // Check plan limits
   const { data: profile } = await admin
     .from("profiles")
-    .select("plan, diagnoses_used_this_month")
+    .select("plan, plan_status, diagnoses_used_this_month, trial_ends_at")
     .eq("id", user.id)
     .single();
 
@@ -61,6 +61,23 @@ export async function POST(request: Request) {
   }
 
   const plan = profile.plan as PlanName;
+
+  // Block if trial expired and no active subscription
+  if (plan === "trial" && profile.trial_ends_at && new Date(profile.trial_ends_at) < new Date()) {
+    return NextResponse.json(
+      { error: "Trial expired. Upgrade to continue using AI diagnoses." },
+      { status: 403 },
+    );
+  }
+
+  // Block if subscription canceled or past due
+  if (profile.plan_status === "canceled" && plan !== "trial") {
+    return NextResponse.json(
+      { error: "Subscription canceled. Resubscribe to use AI diagnoses." },
+      { status: 403 },
+    );
+  }
+
   const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 3;
 
   if (profile.diagnoses_used_this_month >= limit) {
