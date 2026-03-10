@@ -16,7 +16,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_status, diagnoses_used_this_month, trial_ends_at, stripe_customer_id, email, full_name")
+    .select("plan, plan_status, diagnoses_used_this_month, trial_ends_at, stripe_customer_id, email, full_name, timezone, digest_day")
     .eq("id", user.id)
     .single();
 
@@ -32,6 +32,9 @@ export default async function SettingsPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
+  // Detect auth provider (google = no password change)
+  const authProvider = user.app_metadata?.provider ?? "email";
+
   return (
     <SettingsClient
       email={profile.email}
@@ -44,6 +47,9 @@ export default async function SettingsPage() {
       hasStripeCustomer={!!profile.stripe_customer_id}
       sites={sites ?? []}
       sitesLimit={limits.sites}
+      timezone={profile.timezone ?? "UTC"}
+      digestDay={profile.digest_day ?? "monday"}
+      authProvider={authProvider}
     />
   );
 }
