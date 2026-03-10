@@ -54,13 +54,13 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features
     key: "pro",
     label: "Pro",
     price: 69,
-    features: ["3 sites", "500 pages", "40 diagnoses/mo", "Velocity alerts", "CSV export"],
+    features: ["3 sites", "1,000 pages", "40 diagnoses/mo", "Velocity alerts", "CSV export"],
   },
   {
     key: "agency",
     label: "Agency",
     price: 129,
-    features: ["10 sites", "2,000 pages", "120 diagnoses/mo", "Client dashboards", "Priority support"],
+    features: ["10 sites", "5,000 pages", "120 diagnoses/mo", "Client dashboards", "Priority support"],
   },
 ];
 

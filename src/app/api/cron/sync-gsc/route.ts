@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { refreshAccessToken, getSearchAnalyticsByPageAndDate, getTopQueriesByPage } from "@/lib/gsc/client";
 import { isContentUrl } from "@/lib/engine/url-filter";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 export async function GET(request: Request) {
   if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
   // Get all active sites
   const { data: sites, error: sitesErr } = await admin
     .from("sites")
-    .select("id, gsc_property, gsc_refresh_token")
+    .select("id, user_id, gsc_property, gsc_refresh_token")
     .eq("status", "active");
 
   if (sitesErr || !sites) {
@@ -55,13 +56,26 @@ export async function GET(request: Request) {
         continue;
       }
 
-      // Upsert new pages
+      // Check plan page limit before adding new pages
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("plan")
+        .eq("id", site.user_id)
+        .single();
+
+      const plan = (profile?.plan ?? "trial") as PlanName;
+      const pageLimit = PLAN_LIMITS[plan].pages;
+
+      // Upsert new pages (only if under limit)
       const { data: existingPages } = await admin
         .from("pages")
         .select("url")
         .eq("site_id", site.id);
 
       const existingUrls = new Set((existingPages ?? []).map((p) => p.url));
+      const currentPageCount = existingUrls.size;
+      const slotsAvailable = Math.max(0, pageLimit - currentPageCount);
+
       const newPages: { site_id: string; url: string; path: string; title: string | null }[] = [];
 
       for (const row of rows) {
@@ -74,9 +88,19 @@ export async function GET(request: Request) {
         }
       }
 
-      if (newPages.length > 0) {
-        await admin.from("pages").upsert(newPages, { onConflict: "site_id,url", ignoreDuplicates: true });
-        console.log(`[cron/sync-gsc] Site ${site.id}: ${newPages.length} new pages`);
+      if (newPages.length > 0 && slotsAvailable > 0) {
+        // Sort new pages by clicks (highest traffic first) to prioritize valuable content
+        const clicksMap = new Map<string, number>();
+        for (const row of rows) {
+          clicksMap.set(row.page, (clicksMap.get(row.page) ?? 0) + row.clicks);
+        }
+        newPages.sort((a, b) => (clicksMap.get(b.url) ?? 0) - (clicksMap.get(a.url) ?? 0));
+
+        const pagesToAdd = newPages.slice(0, slotsAvailable);
+        await admin.from("pages").upsert(pagesToAdd, { onConflict: "site_id,url", ignoreDuplicates: true });
+        console.log(`[cron/sync-gsc] Site ${site.id}: ${pagesToAdd.length} new pages (${newPages.length - pagesToAdd.length} skipped, at limit ${pageLimit})`);
+      } else if (newPages.length > 0) {
+        console.log(`[cron/sync-gsc] Site ${site.id}: skipped ${newPages.length} new pages (at limit ${pageLimit})`);
       }
 
       // Map URLs to IDs

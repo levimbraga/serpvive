@@ -10,6 +10,7 @@ import UsageMeter from "@/components/dashboard/UsageMeter";
 import DecayList from "@/components/dashboard/DecayList";
 import RunEngineButton from "@/components/dashboard/RunEngineButton";
 import RecentResults from "@/components/dashboard/RecentResults";
+import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import { Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -40,7 +41,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, status")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, status")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -97,12 +98,22 @@ export default async function DashboardPage() {
   }));
 
   const hasEngineRun = site.last_engine_run_at !== null;
+  const totalContentPages = site.total_content_pages ?? site.pages_count ?? 0;
+  const pageLimit = PLAN_LIMITS[plan]?.pages ?? 100;
 
   // Detect "all new" site — all pages are "new" status
   const allPagesNew = hasEngineRun && pages.length > 0 && pages.every((p) => p.status === "new");
 
   return (
     <div className="space-y-6">
+      {/* Upgrade banner when site has more pages than plan allows */}
+      <UpgradeBanner
+        totalContentPages={totalContentPages}
+        monitoredPages={site.pages_count ?? 0}
+        plan={plan}
+        pageLimit={pageLimit}
+      />
+
       {/* Top section: Health Score + Usage */}
       <div className="grid grid-cols-[1fr_300px] gap-6">
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">

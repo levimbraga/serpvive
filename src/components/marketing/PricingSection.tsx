@@ -27,7 +27,7 @@ export default function PricingSection() {
             <div className="pp">/month</div>
             <ul className="pf">
               <li>3 sites</li>
-              <li>500 pages monitored</li>
+              <li>1,000 pages monitored</li>
               <li>40 AI diagnoses/month</li>
               <li>Velocity alerts</li>
               <li>CSV export</li>
@@ -41,7 +41,7 @@ export default function PricingSection() {
             <div className="pp">/month</div>
             <ul className="pf">
               <li>10 sites</li>
-              <li>2,000 pages monitored</li>
+              <li>5,000 pages monitored</li>
               <li>120 AI diagnoses/month</li>
               <li>Client dashboards</li>
               <li>Priority support</li>

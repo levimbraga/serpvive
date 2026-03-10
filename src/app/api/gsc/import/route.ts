@@ -86,8 +86,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to create site" }, { status: 500 });
   }
 
+  const pageLimit = PLAN_LIMITS[plan].pages;
+
   // Start import in background (non-blocking)
-  runImport(admin, site.id, accessToken, siteUrl).catch((err) => {
+  runImport(admin, site.id, accessToken, siteUrl, pageLimit).catch((err) => {
     console.error("[gsc/import] Background import failed:", err);
   });
 
@@ -106,6 +108,7 @@ async function runImport(
   siteId: string,
   accessToken: string,
   siteUrl: string,
+  pageLimit: number,
 ) {
   try {
     // Import 16 months of daily data in chunks (per month)
@@ -204,6 +207,59 @@ async function runImport(
         console.log(`[gsc/import] Progress: ${knownPages.size} pages, ${totalMetrics} metrics`);
       } catch (err) {
         console.error(`[gsc/import] Error importing ${start} - ${end}:`, err);
+      }
+    }
+
+    // ── Prune to top X pages by traffic ──
+    // Aggregate total clicks per page, keep only the top `pageLimit` pages
+    const { data: allPages } = await admin
+      .from("pages")
+      .select("id, url")
+      .eq("site_id", siteId);
+
+    const totalContentPages = allPages?.length ?? 0;
+
+    // Save total discovered pages (before pruning)
+    await admin
+      .from("sites")
+      .update({ total_content_pages: totalContentPages })
+      .eq("id", siteId);
+
+    if (allPages && allPages.length > pageLimit) {
+      console.log(`[gsc/import] Site has ${allPages.length} pages, pruning to top ${pageLimit}`);
+
+      // Get total clicks per page from metrics
+      const pageClicks: { id: string; clicks: number }[] = [];
+      for (const page of allPages) {
+        const { data: agg } = await admin
+          .from("page_metrics_daily")
+          .select("clicks")
+          .eq("page_id", page.id);
+        const total = (agg ?? []).reduce((sum, r) => sum + (r.clicks ?? 0), 0);
+        pageClicks.push({ id: page.id, clicks: total });
+      }
+
+      // Sort by clicks DESC, keep top pageLimit
+      pageClicks.sort((a, b) => b.clicks - a.clicks);
+      const keepIds = new Set(pageClicks.slice(0, pageLimit).map((p) => p.id));
+      const deleteIds = pageClicks.filter((p) => !keepIds.has(p.id)).map((p) => p.id);
+
+      if (deleteIds.length > 0) {
+        // Delete metrics first, then pages (CASCADE should handle this, but be explicit)
+        for (let i = 0; i < deleteIds.length; i += 100) {
+          const batch = deleteIds.slice(i, i + 100);
+          await admin.from("page_metrics_daily").delete().in("page_id", batch);
+          await admin.from("pages").delete().in("id", batch);
+        }
+        console.log(`[gsc/import] Pruned ${deleteIds.length} low-traffic pages`);
+
+        // Update knownPages count
+        knownPages.clear();
+        const { data: remaining } = await admin
+          .from("pages")
+          .select("url")
+          .eq("site_id", siteId);
+        for (const p of remaining ?? []) knownPages.add(p.url);
       }
     }
 
