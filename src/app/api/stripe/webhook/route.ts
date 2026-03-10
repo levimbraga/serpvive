@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe, STRIPE_PLANS } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogServer } from "@/lib/posthog/server";
 import type Stripe from "stripe";
 
 // Reverse lookup: price_id → plan name
@@ -80,6 +81,7 @@ export async function POST(request: Request) {
         .eq("user_id", userId)
         .eq("status", "paused");
 
+      getPostHogServer().capture({ distinctId: userId, event: "plan_upgraded", properties: { plan } });
       console.log(`[stripe/webhook] checkout.session.completed: user=${userId}, plan=${plan}`);
       break;
     }
@@ -169,6 +171,7 @@ export async function POST(request: Request) {
         })
         .eq("id", userId);
 
+      getPostHogServer().capture({ distinctId: userId, event: "plan_downgraded", properties: { plan: "free" } });
       console.log(`[stripe/webhook] subscription.deleted: user=${userId}, downgraded to free`);
       break;
     }
@@ -202,6 +205,7 @@ export async function POST(request: Request) {
       console.log(`[stripe/webhook] Unhandled event: ${event.type}`);
   }
 
+  await getPostHogServer().shutdown();
   return NextResponse.json({ received: true });
 }
 

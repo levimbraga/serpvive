@@ -1,3 +1,7 @@
+"use client";
+
+import posthog from "posthog-js";
+
 export default function HeroSection() {
   return (
     <section className="hero">
@@ -15,7 +19,7 @@ export default function HeroSection() {
         Your content is dying. We detect it, explain <strong>WHY</strong> with AI, and tell you exactly <strong>WHAT</strong> to do — so you can fix it in hours, not weeks.
       </p>
 
-      <a href="/signup" className="hero-cta">
+      <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "hero" })} className="hero-cta">
         Get Started Free <span className="arrow">→</span>
       </a>
 

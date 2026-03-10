@@ -1,3 +1,6 @@
+"use client";
+
+import posthog from "posthog-js";
 import { Reveal } from "@/hooks/useReveal";
 
 export default function PricingSection() {
@@ -19,7 +22,7 @@ export default function PricingSection() {
               <li>Weekly monitoring</li>
               <li>Health Score + decay detection</li>
             </ul>
-            <a href="/signup" className="btn btn-outline">Get Started Free</a>
+            <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "pricing", plan: "free" })} className="btn btn-outline">Get Started Free</a>
           </div>
 
           <div className="price-card reveal">
@@ -33,7 +36,7 @@ export default function PricingSection() {
               <li>Daily monitoring</li>
               <li>Weekly email digest</li>
             </ul>
-            <a href="/signup" className="btn">Choose Starter</a>
+            <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "pricing", plan: "starter" })} className="btn">Choose Starter</a>
           </div>
 
           <div className="price-card pop reveal">
@@ -47,7 +50,7 @@ export default function PricingSection() {
               <li>Daily monitoring</li>
               <li>Weekly email digest</li>
             </ul>
-            <a href="/signup" className="btn">Choose Pro</a>
+            <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "pricing", plan: "pro" })} className="btn">Choose Pro</a>
           </div>
 
           <div className="price-card reveal">
@@ -61,7 +64,7 @@ export default function PricingSection() {
               <li>Daily monitoring</li>
               <li>Priority support</li>
             </ul>
-            <a href="/signup" className="btn">Choose Agency</a>
+            <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "pricing", plan: "agency" })} className="btn">Choose Agency</a>
           </div>
         </div>
 

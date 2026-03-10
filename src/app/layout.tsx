@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PostHogProvider } from "@/lib/posthog/provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <TooltipProvider>{children}</TooltipProvider>
+        <PostHogProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

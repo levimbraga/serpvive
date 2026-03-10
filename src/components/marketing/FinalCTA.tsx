@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useWaitlist } from "@/hooks/use-waitlist";
 
 export default function FinalCTA() {
@@ -10,6 +11,7 @@ export default function FinalCTA() {
     const form = e.currentTarget;
     const email = new FormData(form).get("email") as string;
     if (email) {
+      posthog.capture("cta_clicked", { location: "final" });
       void submit(email, "final-cta");
     }
   }

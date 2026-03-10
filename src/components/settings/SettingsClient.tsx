@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
@@ -237,6 +238,7 @@ export default function SettingsClient({
   // ── Billing actions ──
 
   async function handleUpgrade(planKey: PlanName) {
+    posthog.capture("upgrade_clicked", { from: "settings", current_plan: plan, target_plan: planKey });
     setLoadingPlan(planKey);
     setError("");
     try {

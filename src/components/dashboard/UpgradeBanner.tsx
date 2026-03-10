@@ -2,6 +2,7 @@
 
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 
 type UpgradeBannerProps = {
   totalContentPages: number;
@@ -27,6 +28,7 @@ export default function UpgradeBanner({ totalContentPages, monitoredPages, plan,
       </div>
       <Link
         href="/settings"
+        onClick={() => posthog.capture("upgrade_clicked", { from: "dashboard_banner", current_plan: plan })}
         className="flex items-center gap-1 text-sm font-medium text-[#92400E] hover:text-[#78350F] whitespace-nowrap"
       >
         Upgrade

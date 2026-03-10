@@ -3,6 +3,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 import { getActiveSiteId } from "@/lib/active-site";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
+import { PostHogIdentify } from "@/lib/posthog/identify";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 export default async function DashboardLayout({
@@ -40,6 +41,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
+      <PostHogIdentify userId={user.id} email={user.email ?? ""} plan={plan} />
       <Sidebar
         diagnosesUsed={diagnosesUsed}
         diagnosesLimit={diagnosesLimit}

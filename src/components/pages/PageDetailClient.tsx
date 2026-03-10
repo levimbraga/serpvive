@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import posthog from "posthog-js";
 import confetti from "canvas-confetti";
 import {
   ArrowLeft, Loader2, Zap, ExternalLink,
@@ -189,9 +190,13 @@ export default function PageDetailClient({
           processing_time_ms: json.data.processingTimeMs,
           created_at: new Date().toISOString(),
         });
-        // Reset refresh state when new diagnosis is run
         setRefresh(null);
         setCheckedActions(new Set());
+        posthog.capture("diagnosis_run", {
+          page_url: page.url,
+          triggered_by: "manual",
+          cost_usd: json.data.costUsd,
+        });
       }
 
       router.refresh();
@@ -251,6 +256,7 @@ export default function PageDetailClient({
         });
         setShowConfettiMsg(true);
         fireConfetti();
+        posthog.capture("refresh_marked", { page_url: page.url });
       }
 
       router.refresh();

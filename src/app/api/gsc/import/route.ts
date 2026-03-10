@@ -8,6 +8,7 @@ import {
   getTopQueriesByPage,
 } from "@/lib/gsc/client";
 import { isContentUrl } from "@/lib/engine/url-filter";
+import { getPostHogServer } from "@/lib/posthog/server";
 import { runEngine } from "@/lib/engine/run-engine";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
@@ -325,6 +326,7 @@ async function runImport(
       .eq("id", siteId);
 
     console.log(`[gsc/import] Done! ${knownPages.size} pages, ${totalMetrics} metrics`);
+    getPostHogServer().capture({ distinctId: userId, event: "site_imported", properties: { domain: siteUrl, pages_count: knownPages.size } });
 
     // ── Run engine to calculate decay scores ──
     console.log("[gsc/import] Running decay engine...");
