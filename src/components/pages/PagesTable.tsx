@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, X } from "lucide-react";
 
 type PageData = {
   id: string;
@@ -22,6 +22,7 @@ type PageData = {
 
 type SortKey = "decay_score" | "current_clicks_28d" | "status" | "peak_clicks_monthly" | "decay_velocity_7d";
 type SortDir = "asc" | "desc";
+type SortPreset = "most_critical" | "most_traffic_lost" | "status" | "recent";
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; order: number }> = {
   critical: { color: "#DC2626", bg: "#FEF2F2", label: "Critical", order: 0 },
@@ -32,12 +33,43 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; 
   unknown:  { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown", order: 5 },
 };
 
+const SORT_PRESETS: { key: SortPreset; label: string }[] = [
+  { key: "most_critical", label: "Most Critical" },
+  { key: "most_traffic_lost", label: "Most Traffic Lost" },
+  { key: "status", label: "Status" },
+  { key: "recent", label: "Recent" },
+];
+
 export default function PagesTable({ pages }: { pages: PageData[] }) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("decay_score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [activePreset, setActivePreset] = useState<SortPreset>("most_critical");
+
+  function applyPreset(preset: SortPreset) {
+    setActivePreset(preset);
+    switch (preset) {
+      case "most_critical":
+        setSortKey("decay_score");
+        setSortDir("desc");
+        break;
+      case "most_traffic_lost":
+        setSortKey("peak_clicks_monthly");
+        setSortDir("desc");
+        break;
+      case "status":
+        setSortKey("status");
+        setSortDir("asc");
+        break;
+      case "recent":
+        setSortKey("decay_score");
+        setSortDir("desc");
+        break;
+    }
+  }
 
   function toggleSort(key: SortKey) {
+    setActivePreset("most_critical"); // Clear preset highlight when manual sort
     if (sortKey === key) {
       setSortDir(sortDir === "desc" ? "asc" : "desc");
     } else {
@@ -52,11 +84,26 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (p) => p.path.toLowerCase().includes(q) || p.url.toLowerCase().includes(q),
+        (p) => p.path.toLowerCase().includes(q) || p.url.toLowerCase().includes(q)
+          || (p.primary_keyword && p.primary_keyword.toLowerCase().includes(q)),
       );
     }
 
     result = [...result].sort((a, b) => {
+      // Special sort for "Most Traffic Lost" preset
+      if (activePreset === "most_traffic_lost") {
+        const aLost = a.peak_clicks_monthly - a.current_clicks_28d;
+        const bLost = b.peak_clicks_monthly - b.current_clicks_28d;
+        return sortDir === "desc" ? bLost - aLost : aLost - bLost;
+      }
+
+      // Special sort for "Recent" preset
+      if (activePreset === "recent") {
+        const aDate = a.last_diagnosis_at ? new Date(a.last_diagnosis_at).getTime() : 0;
+        const bDate = b.last_diagnosis_at ? new Date(b.last_diagnosis_at).getTime() : 0;
+        return sortDir === "desc" ? bDate - aDate : aDate - bDate;
+      }
+
       let av: number, bv: number;
 
       if (sortKey === "status") {
@@ -71,7 +118,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
     });
 
     return result;
-  }, [pages, search, sortKey, sortDir]);
+  }, [pages, search, sortKey, sortDir, activePreset]);
 
   const columns: { key: SortKey; label: string; className: string }[] = [
     { key: "status", label: "Status", className: "w-[100px]" },
@@ -83,16 +130,42 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
 
   return (
     <div className="space-y-3">
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
-        <input
-          type="text"
-          placeholder="Search pages..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full h-10 pl-9 pr-4 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
-        />
+      {/* Search + Sort presets row */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative max-w-sm flex-1">
+          <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
+          <input
+            type="text"
+            placeholder="Search by URL..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280]"
+            >
+              <X size={14} strokeWidth={1.5} />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-lg p-1">
+          {SORT_PRESETS.map((preset) => (
+            <button
+              key={preset.key}
+              onClick={() => applyPreset(preset.key)}
+              className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
+                activePreset === preset.key
+                  ? "bg-white text-[#111827] shadow-sm"
+                  : "text-[#6B7280] hover:text-[#111827]"
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Table */}

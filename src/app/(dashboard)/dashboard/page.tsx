@@ -11,6 +11,7 @@ import DecayList from "@/components/dashboard/DecayList";
 import RunEngineButton from "@/components/dashboard/RunEngineButton";
 import RecentResults from "@/components/dashboard/RecentResults";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
+import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import { Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -70,7 +71,7 @@ export default async function DashboardPage() {
     : null;
 
   // Fetch pages for decay list + recent refresh results in parallel
-  const [pagesRes, refreshesRes] = await Promise.all([
+  const [pagesRes, refreshesRes, measuringRes] = await Promise.all([
     supabase
       .from("pages")
       .select("id, path, url, status, current_clicks_28d, decay_score, decay_velocity_7d")
@@ -82,6 +83,13 @@ export default async function DashboardPage() {
       .eq("user_id", user.id)
       .in("result_status", ["success", "partial", "no_change", "declined"])
       .order("result_calculated_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("refreshes")
+      .select("id, page_id, refreshed_at")
+      .eq("user_id", user.id)
+      .in("result_status", ["pending", "measuring"])
+      .order("refreshed_at", { ascending: false })
       .limit(5),
   ]);
 
@@ -116,7 +124,7 @@ export default async function DashboardPage() {
 
       {/* Top section: Health Score + Usage */}
       <div className="grid grid-cols-[1fr_300px] gap-6">
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">
+        <div data-tour="health-score" className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">
           {hasEngineRun ? (
             <div className="flex flex-col items-center gap-4">
               <HealthScoreRing score={healthScore} delta={healthDelta} />
@@ -168,32 +176,42 @@ export default async function DashboardPage() {
         />
       )}
 
-      {/* Recent Results */}
-      {(refreshesRes.data ?? []).length > 0 && (
-        <RecentResults
-          results={(refreshesRes.data ?? []).map((r) => {
-            const pg = pages.find((p) => p.id === r.page_id);
-            return {
-              id: r.id,
-              pageId: r.page_id,
-              pagePath: pg?.path ?? "Unknown page",
-              resultStatus: r.result_status as "success" | "partial" | "no_change" | "declined",
-              clicksDeltaPct: r.clicks_delta_pct,
-              resultCalculatedAt: r.result_calculated_at,
-            };
-          })}
-        />
-      )}
-
       {/* Decay list */}
       {hasEngineRun && (
-        <div>
+        <div data-tour="decay-list">
           <h2 className="text-lg font-semibold text-[#111827] mb-3">
             {allPagesNew ? "Your pages" : "Pages by urgency"}
           </h2>
           <DecayList pages={pages} isNewSite={allPagesNew} />
         </div>
       )}
+
+      {/* Recent Results — after decay list */}
+      <RecentResults
+        results={(refreshesRes.data ?? []).map((r) => {
+          const pg = pages.find((p) => p.id === r.page_id);
+          return {
+            id: r.id,
+            pageId: r.page_id,
+            pagePath: pg?.path ?? "Unknown page",
+            resultStatus: r.result_status as "success" | "partial" | "no_change" | "declined",
+            clicksDeltaPct: r.clicks_delta_pct,
+            resultCalculatedAt: r.result_calculated_at,
+          };
+        })}
+        measuring={(measuringRes.data ?? []).map((m) => {
+          const pg = pages.find((p) => p.id === m.page_id);
+          return {
+            id: m.id,
+            pageId: m.page_id,
+            pagePath: pg?.path ?? "Unknown page",
+            refreshedAt: m.refreshed_at,
+          };
+        })}
+      />
+
+      {/* Onboarding tour — shows once on first visit */}
+      <OnboardingTour />
     </div>
   );
 }

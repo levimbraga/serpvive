@@ -11,7 +11,7 @@ export default function UsageMeter({ used, limit, plan }: UsageMeterProps) {
   const barColor = pct >= 90 ? "#DC2626" : pct >= 70 ? "#D97706" : "#3B82F6";
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-5">
+    <div data-tour="usage-meter" className="bg-white rounded-xl border border-[#E5E7EB] p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Zap size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
