@@ -483,7 +483,7 @@ export default function SettingsClient({
           </div>
 
           {/* Name (editable) */}
-          <div className="flex items-center justify-between gap-4 py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 py-3">
             <span className="text-sm text-[#6B7280] flex-shrink-0">Name</span>
             <div className="flex items-center gap-2">
               <input
@@ -491,7 +491,7 @@ export default function SettingsClient({
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Your name"
-                className="h-8 w-48 px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
+                className="h-8 w-full sm:w-48 px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
               />
               <button
                 onClick={handleSaveName}
@@ -592,7 +592,7 @@ export default function SettingsClient({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           {[
             { icon: Globe, label: "Sites", value: limits.sites },
             { icon: FileText, label: "Pages", value: limits.pages.toLocaleString() },

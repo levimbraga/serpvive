@@ -305,8 +305,8 @@ export default function PageDetailClient({
 
       {/* Page header */}
       <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="min-w-0 w-full sm:w-auto">
             <div className="flex items-center gap-3 mb-2">
               <span
                 className="text-xs font-medium px-2.5 py-1 rounded-full"
@@ -357,7 +357,7 @@ export default function PageDetailClient({
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#F3F4F6]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#F3F4F6]">
           <div>
             <p className="text-xs text-[#9CA3AF]">Clicks (28d)</p>
             <p className="text-lg font-bold text-[#111827] tabular-nums">{page.current_clicks_28d}</p>
@@ -453,7 +453,7 @@ export default function PageDetailClient({
                 </div>
 
                 {/* Before vs After comparison */}
-                <div className="grid grid-cols-4 gap-4 bg-[#F9FAFB] rounded-lg p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#F9FAFB] rounded-lg p-4">
                   <div>
                     <p className="text-xs text-[#9CA3AF] mb-1">Clicks (28d)</p>
                     <p className="text-sm text-[#6B7280]">{refresh.before_clicks_28d ?? 0}</p>

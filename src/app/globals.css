@@ -551,16 +551,19 @@ section, nav, footer { position: relative; z-index: 1; }
   .pricing-grid { grid-template-columns: repeat(2,1fr); max-width: 720px; margin-left: auto; margin-right: auto; }
 }
 @media (max-width: 640px) {
-  .hero h1 { font-size: 48px; letter-spacing: -2px; }
+  .hero h1 { font-size: 40px; letter-spacing: -2px; }
   .hero-sub { font-size: 16px; }
-  .sh2 { font-size: 32px; letter-spacing: -1px; }
+  .hero { padding-top: 100px; padding-bottom: 40px; min-height: auto; }
+  .sh2 { font-size: 28px; letter-spacing: -1px; }
   .hero-cta { padding: 16px 32px; font-size: 15px; }
   .steps-grid { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
   .sv-nav { padding: 0 16px; }
   .hero, .problem, .steps, .example, .pricing, .final { padding-left: 20px; padding-right: 20px; }
+  .problem, .steps, .example, .pricing, .final { padding-top: 60px; padding-bottom: 60px; }
   .showcase { padding-left: 20px; padding-right: 20px; }
-  .hero-trust, .f-trust { flex-wrap: wrap; gap: 12px; }
+  .hero-trust, .f-trust { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .hero-trust span, .f-trust span { font-size: 12px; }
   .nav-links a:not(.nav-cta) { display: none; }
   .logo-wall { gap: 20px; }
   .logo-wall span { font-size: 12px; }
@@ -568,6 +571,13 @@ section, nav, footer { position: relative; z-index: 1; }
   .final-form { flex-direction: column; align-items: center; }
   .final-form input { width: 100%; }
   .final-form button { width: 100%; }
+  .final h2 { font-size: 32px; }
   .m-left { display: none; }
-  .mockup-content { grid-template-columns: 1fr; }
+  .mockup-content { grid-template-columns: 1fr; padding: 20px; }
+  .stat-num { font-size: 40px; letter-spacing: -2px; }
+  .stat-card { padding: 28px 20px; }
+  .pa { font-size: 44px; }
+  .price-card { padding: 32px 20px; }
+  .social { padding: 32px 20px; }
+  .avatars { gap: 16px; flex-wrap: wrap; }
 }

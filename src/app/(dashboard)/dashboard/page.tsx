@@ -169,7 +169,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Top section: Health Score + Usage */}
-      <div className="grid grid-cols-[1fr_300px] gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_300px] gap-6">
         <div data-tour="health-score" className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">
           {hasEngineRun ? (
             <div className="flex flex-col items-center gap-4">

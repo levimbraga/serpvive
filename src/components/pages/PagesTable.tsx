@@ -131,7 +131,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
   return (
     <div className="space-y-3">
       {/* Search + Sort presets row */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <div className="relative max-w-sm flex-1">
           <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
           <input
@@ -151,7 +151,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
           )}
         </div>
 
-        <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-lg p-1 overflow-x-auto">
           {SORT_PRESETS.map((preset) => (
             <button
               key={preset.key}
@@ -207,7 +207,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
                     <td className="px-5 py-3">
                       <Link
                         href={`/pages/${page.id}`}
-                        className="text-sm text-[#111827] hover:text-[#3B82F6] truncate block max-w-[400px]"
+                        className="text-sm text-[#111827] hover:text-[#3B82F6] truncate block max-w-[200px] sm:max-w-[400px]"
                         style={{ fontFamily: "var(--font-mono, monospace)" }}
                       >
                         {page.path}
