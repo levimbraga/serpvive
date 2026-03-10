@@ -483,7 +483,7 @@ section, nav, footer { position: relative; z-index: 1; }
 /* ═══════════════════════ PRICING ═══════════════════════ */
 .pricing { padding: 100px 48px; background: var(--bg2); }
 .pricing-inner { max-width: 960px; margin: 0 auto; }
-.pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 32px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 32px; }
 .price-card {
   background: var(--sv-card); border: 1px solid var(--sv-border); border-radius: 14px; padding: 40px 28px;
   text-align: center; transition: all .3s;
@@ -498,6 +498,8 @@ section, nav, footer { position: relative; z-index: 1; }
 .pf li { padding: 8px 0; font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 10px; }
 .pf li::before { content: '✓'; color: var(--sv-blue); font-weight: 700; font-size: 13px; }
 .price-card .btn { width: 100%; justify-content: center; font-size: 14px; padding: 14px 0; }
+.price-card .btn-outline { background: transparent; border: 1.5px solid var(--sv-border); color: var(--text2); }
+.price-card .btn-outline:hover { border-color: var(--sv-teal); color: var(--sv-teal); }
 .pnote { text-align: center; font-size: 14px; color: var(--text3); }
 .pnote a { color: var(--sv-blue); text-decoration: none; }
 
@@ -546,7 +548,7 @@ section, nav, footer { position: relative; z-index: 1; }
   .mockup-content { grid-template-columns: 1fr; gap: 20px; }
   .steps-grid { grid-template-columns: repeat(3,1fr); }
   .stats-grid { grid-template-columns: 1fr; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .pricing-grid { grid-template-columns: repeat(2,1fr); max-width: 720px; margin-left: auto; margin-right: auto; }
 }
 @media (max-width: 640px) {
   .hero h1 { font-size: 48px; letter-spacing: -2px; }
@@ -554,6 +556,7 @@ section, nav, footer { position: relative; z-index: 1; }
   .sh2 { font-size: 32px; letter-spacing: -1px; }
   .hero-cta { padding: 16px 32px; font-size: 15px; }
   .steps-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
   .sv-nav { padding: 0 16px; }
   .hero, .problem, .steps, .example, .pricing, .final { padding-left: 20px; padding-right: 20px; }
   .showcase { padding-left: 20px; padding-right: 20px; }

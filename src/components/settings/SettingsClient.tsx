@@ -637,17 +637,29 @@ export default function SettingsClient({
         </div>
 
         {hasStripeCustomer && (
-          <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
+          <div className="mt-5 pt-4 border-t border-[#F3F4F6] space-y-3">
             {plan !== "free" ? (
-              <button
-                onClick={handleManageBilling}
-                disabled={portalLoading}
-                className="w-full flex items-center justify-center gap-2 h-10 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
-              >
-                {portalLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <CreditCard size={14} strokeWidth={1.5} />}
-                Manage Billing
-                <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
-              </button>
+              <>
+                <button
+                  onClick={handleManageBilling}
+                  disabled={portalLoading}
+                  className="w-full flex items-center justify-center gap-2 h-10 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+                >
+                  {portalLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <CreditCard size={14} strokeWidth={1.5} />}
+                  Manage Billing
+                  <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
+                </button>
+                <button
+                  onClick={handleManageBilling}
+                  disabled={portalLoading}
+                  className="w-full text-center text-xs text-[#9CA3AF] hover:text-[#DC2626] transition-colors disabled:opacity-50"
+                >
+                  Cancel subscription
+                </button>
+                <p className="text-[10px] text-[#D1D5DB] text-center">
+                  If you cancel, you&apos;ll keep access on the free plan with weekly syncs.
+                </p>
+              </>
             ) : (
               <button
                 onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
@@ -657,6 +669,18 @@ export default function SettingsClient({
                 Reactivate — Choose a Plan
               </button>
             )}
+          </div>
+        )}
+
+        {!hasStripeCustomer && plan === "free" && (
+          <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
+            <button
+              onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+            >
+              <Zap size={14} strokeWidth={1.5} />
+              Choose a Plan
+            </button>
           </div>
         )}
       </div>

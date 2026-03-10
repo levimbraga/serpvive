@@ -9,6 +9,20 @@ export default function PricingSection() {
 
         <div className="pricing-grid">
           <div className="price-card reveal">
+            <div className="pn">Free</div>
+            <div className="pa">$0</div>
+            <div className="pp">forever</div>
+            <ul className="pf">
+              <li>1 site</li>
+              <li>100 pages monitored</li>
+              <li>1 free AI diagnosis</li>
+              <li>Weekly monitoring</li>
+              <li>Health Score + decay detection</li>
+            </ul>
+            <a href="/signup" className="btn btn-outline">Get Started Free</a>
+          </div>
+
+          <div className="price-card reveal">
             <div className="pn">Starter</div>
             <div className="pa">$29</div>
             <div className="pp">/month</div>
@@ -23,7 +37,7 @@ export default function PricingSection() {
           </div>
 
           <div className="price-card pop reveal">
-            <div className="pn">Pro <span className="pop-badge">POPULAR</span></div>
+            <div className="pn">Pro</div>
             <div className="pa">$69</div>
             <div className="pp">/month</div>
             <ul className="pf">
