@@ -1,14 +1,9 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { getActiveSiteId } from "@/lib/active-site";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
-
-const PLAN_LIMITS: Record<string, number> = {
-  trial: 3,
-  starter: 10,
-  pro: 50,
-  agency: 150,
-};
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 export default async function DashboardLayout({
   children,
@@ -22,31 +17,34 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("plan, diagnoses_used_this_month")
-    .eq("id", user.id)
-    .single();
+  const [profileRes, sitesRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("plan, diagnoses_used_this_month")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("sites")
+      .select("id, domain, status, health_score")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true }),
+  ]);
 
-  const plan = profile?.plan ?? "trial";
+  const profile = profileRes.data;
+  const plan = (profile?.plan ?? "trial") as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
-  const diagnosesLimit = PLAN_LIMITS[plan] ?? 3;
+  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 3;
+  const sites = sitesRes.data ?? [];
 
-  // Get active site
-  const { data: site } = await supabase
-    .from("sites")
-    .select("domain, status")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const activeSiteId = await getActiveSiteId(supabase, user.id);
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       <Sidebar diagnosesUsed={diagnosesUsed} diagnosesLimit={diagnosesLimit} />
       <div className="ml-[60px]">
         <DashboardHeader
-          siteName={site?.domain ?? ""}
+          sites={sites}
+          activeSiteId={activeSiteId}
           userEmail={user.email ?? ""}
         />
         <main className="p-6 max-w-[1200px] mx-auto">

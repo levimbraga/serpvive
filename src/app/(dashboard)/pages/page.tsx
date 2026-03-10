@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getActiveSiteId } from "@/lib/active-site";
 import PagesTable from "@/components/pages/PagesTable";
 
 export const metadata: Metadata = {
@@ -17,15 +18,9 @@ export default async function PagesListPage() {
     redirect("/login");
   }
 
-  // Get user's active site
-  const { data: site } = await supabase
-    .from("sites")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Get active site from cookie
+  const activeSiteId = await getActiveSiteId(supabase, user.id);
+  const site = activeSiteId ? { id: activeSiteId } : null;
 
   if (!site) {
     return (

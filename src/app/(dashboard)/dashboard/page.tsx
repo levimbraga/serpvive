@@ -3,6 +3,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
+import { getActiveSiteId } from "@/lib/active-site";
 import HealthScoreRing from "@/components/dashboard/HealthScoreRing";
 import StatsRow from "@/components/dashboard/StatsRow";
 import UsageMeter from "@/components/dashboard/UsageMeter";
@@ -26,21 +27,23 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Fetch profile + site in parallel
+  // Resolve active site from cookie
+  const activeSiteId = await getActiveSiteId(supabase, user.id);
+
+  // Fetch profile + active site in parallel
   const [profileRes, siteRes] = await Promise.all([
     supabase
       .from("profiles")
       .select("plan, diagnoses_used_this_month")
       .eq("id", user.id)
       .single(),
-    supabase
-      .from("sites")
-      .select("id, domain, health_score, health_score_prev, pages_count, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, status")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    activeSiteId
+      ? supabase
+          .from("sites")
+          .select("id, domain, health_score, health_score_prev, pages_count, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, status")
+          .eq("id", activeSiteId)
+          .single()
+      : Promise.resolve({ data: null }),
   ]);
 
   const profile = profileRes.data;

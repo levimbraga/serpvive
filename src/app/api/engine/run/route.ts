@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { runEngine } from "@/lib/engine/run-engine";
+import { getActiveSiteId } from "@/lib/active-site";
 
 export async function POST() {
   const supabase = await getSupabaseServer();
@@ -13,17 +14,23 @@ export async function POST() {
 
   const admin = getSupabaseAdmin();
 
-  // Get user's active site
+  // Get active site from cookie
+  const activeSiteId = await getActiveSiteId(supabase, user.id);
+
+  if (!activeSiteId) {
+    return NextResponse.json(
+      { error: "No active site found. Complete onboarding first." },
+      { status: 404 },
+    );
+  }
+
   const { data: site, error: siteErr } = await admin
     .from("sites")
     .select("id, status, last_engine_run_at")
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .eq("id", activeSiteId)
+    .single();
 
-  if (siteErr || !site) {
+  if (siteErr || !site || site.status !== "active") {
     return NextResponse.json(
       { error: "No active site found. Complete onboarding first." },
       { status: 404 },
