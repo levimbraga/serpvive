@@ -125,6 +125,7 @@ export default function PageDetailClient({
   siteDomain,
   latestDiagnosis,
   latestRefresh,
+  plan,
   diagnosesUsed,
   diagnosesLimit,
 }: {
@@ -132,6 +133,7 @@ export default function PageDetailClient({
   siteDomain: string;
   latestDiagnosis: DiagnosisRecord | null;
   latestRefresh: RefreshRecord | null;
+  plan: string;
   diagnosesUsed: number;
   diagnosesLimit: number;
 }) {
@@ -147,7 +149,8 @@ export default function PageDetailClient({
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
-  const atLimit = diagnosesUsed >= diagnosesLimit;
+  const isFree = plan === "free";
+  const atLimit = isFree || diagnosesUsed >= diagnosesLimit;
 
   const fireConfetti = useCallback(() => {
     confetti({
@@ -671,7 +674,10 @@ export default function PageDetailClient({
             }
           </p>
           <p className="text-xs text-[#9CA3AF] mt-2">
-            Uses 1 of your {diagnosesLimit} monthly diagnoses ({diagnosesUsed} used)
+            {isFree
+              ? "Upgrade to a paid plan to run AI diagnoses."
+              : `Uses 1 of your ${diagnosesLimit} monthly diagnoses (${diagnosesUsed} used)`
+            }
           </p>
         </div>
       )}

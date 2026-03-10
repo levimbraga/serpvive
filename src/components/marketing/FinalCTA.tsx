@@ -59,12 +59,12 @@ export default function FinalCTA() {
           </>
         )}
 
-        <div className="early">🔥 Early subscribers get 14-day trial (instead of 7)</div>
+        <div className="early">🔥 Get started free — no credit card required</div>
 
         <div className="f-trust">
           <span>No spam</span>
           <span>Cancel anytime</span>
-          <span>First diagnosis free</span>
+          <span>First AI diagnosis included</span>
         </div>
       </div>
     </section>

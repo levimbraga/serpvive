@@ -4,9 +4,9 @@ export type Profile = {
   full_name: string | null;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
-  plan: "trial" | "starter" | "pro" | "agency";
-  plan_status: "trialing" | "active" | "canceled" | "past_due";
-  trial_ends_at: string | null;
+  plan: "free" | "starter" | "pro" | "agency";
+  plan_status: "active" | "canceled" | "past_due";
+  trial_ends_at: string | null; // deprecated, kept for DB compat
   diagnoses_used_this_month: number;
   diagnoses_reset_at: string;
   digest_day: string;

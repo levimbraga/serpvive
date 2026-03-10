@@ -5,7 +5,7 @@ export default function PricingSection() {
     <section className="pricing" id="pricing">
       <div className="pricing-inner">
         <Reveal><h2 className="sh2">Simple pricing. Powerful results.</h2></Reveal>
-        <Reveal><p className="ssub">All plans include 7-day free trial. Cancel anytime.</p></Reveal>
+        <Reveal><p className="ssub">Get started free. 1 AI diagnosis included. Cancel anytime.</p></Reveal>
 
         <div className="pricing-grid">
           <div className="price-card reveal">

@@ -12,12 +12,13 @@ export async function GET(request: Request) {
   const admin = getSupabaseAdmin();
   const today = DAY_NAMES[new Date().getDay()];
 
-  // Find users whose digest day matches today and have active subscriptions
+  // Find users whose digest day matches today, have active subscriptions, and are on paid plans
   const { data: profiles } = await admin
     .from("profiles")
-    .select("id, digest_day, plan_status")
+    .select("id, digest_day, plan_status, plan")
     .eq("digest_day", today)
-    .in("plan_status", ["trialing", "active"]);
+    .eq("plan_status", "active")
+    .neq("plan", "free");
 
   if (!profiles || profiles.length === 0) {
     console.log(`[cron/send-digests] No users with digest_day=${today}`);

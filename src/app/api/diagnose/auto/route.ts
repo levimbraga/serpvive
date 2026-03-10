@@ -9,6 +9,7 @@ import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
  * Retry the free auto-diagnosis if it failed during import.
  * Only runs once per site (has_free_diagnosis = false).
  * Does NOT count against usage limit.
+ * Max 3 attempts — after that, gives up and marks has_free_diagnosis = true.
  */
 export async function POST() {
   const supabase = await getSupabaseServer();
@@ -45,6 +46,45 @@ export async function POST() {
     return NextResponse.json({ data: { status: "not_ready" } });
   }
 
+  // Check if an auto diagnosis already exists (pipeline completed but flag wasn't set)
+  const { data: existingAuto } = await admin
+    .from("diagnoses")
+    .select("id, page_id")
+    .eq("user_id", user.id)
+    .eq("triggered_by", "auto")
+    .limit(1)
+    .maybeSingle();
+
+  if (existingAuto) {
+    // Pipeline succeeded before but flag wasn't set — fix it
+    await admin
+      .from("sites")
+      .update({ has_free_diagnosis: true })
+      .eq("id", site.id);
+    console.log(`[diagnose/auto] Found existing auto diagnosis, marked has_free_diagnosis=true`);
+    return NextResponse.json({ data: { status: "already_done", pageId: existingAuto.page_id } });
+  }
+
+  // Check attempt count — max 3 retries, then give up
+  const { count: attemptCount } = await admin
+    .from("diagnoses")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("triggered_by", "auto");
+
+  // If we already have auto diagnoses (even failed), check attempts via a different signal
+  // Use a simpler approach: count how many times this endpoint has been effectively called
+  // by checking if there's already a running pipeline (no diagnosis record yet = might be running)
+  // For safety, just limit: if attemptCount >= 3, stop trying
+  if ((attemptCount ?? 0) >= 3) {
+    await admin
+      .from("sites")
+      .update({ has_free_diagnosis: true })
+      .eq("id", site.id);
+    console.log(`[diagnose/auto] Max attempts (3) reached for site ${site.id}, giving up`);
+    return NextResponse.json({ data: { status: "max_attempts" } });
+  }
+
   // Pick the best page
   const { data: candidates } = await admin
     .from("pages")
@@ -54,6 +94,11 @@ export async function POST() {
     .limit(50);
 
   if (!candidates || candidates.length === 0) {
+    // No pages to diagnose — mark as done so we don't loop
+    await admin
+      .from("sites")
+      .update({ has_free_diagnosis: true })
+      .eq("id", site.id);
     return NextResponse.json({ data: { status: "no_pages" } });
   }
 
@@ -69,6 +114,10 @@ export async function POST() {
   }
 
   if (!bestPage) {
+    await admin
+      .from("sites")
+      .update({ has_free_diagnosis: true })
+      .eq("id", site.id);
     return NextResponse.json({ data: { status: "no_candidate" } });
   }
 
@@ -81,8 +130,15 @@ export async function POST() {
         .eq("id", site.id);
       console.log(`[diagnose/auto] Free diagnosis complete for site ${site.id}`);
     })
-    .catch((err) => {
+    .catch(async (err) => {
       console.error(`[diagnose/auto] Failed for site ${site.id}:`, err);
+      // Mark as done after failure to prevent infinite retries from UI polling
+      // The user can still manually trigger a diagnosis later
+      await admin
+        .from("sites")
+        .update({ has_free_diagnosis: true })
+        .eq("id", site.id);
+      console.log(`[diagnose/auto] Marked has_free_diagnosis=true after failure for site ${site.id}`);
     });
 
   return NextResponse.json({ data: { status: "started", pageId: bestPage.id } });

@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   ]);
 
   const profile = profileRes.data;
-  const plan = (profile?.plan ?? "trial") as PlanName;
+  const plan = (profile?.plan ?? "free") as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 3;
   const sites = sitesRes.data ?? [];

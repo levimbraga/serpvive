@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import WeeklyDigest from "./templates/weekly-digest";
 import OnboardingDay0 from "./templates/onboarding-day0";
 import OnboardingDay2 from "./templates/onboarding-day2";
-import OnboardingDay5 from "./templates/onboarding-day5";
+import OnboardingDay3 from "./templates/onboarding-day3";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://serpvive.com";
 
@@ -181,40 +181,43 @@ export async function sendOnboardingDay2(userId: string) {
   }
 }
 
-export async function sendOnboardingDay5(userId: string) {
+export async function sendOnboardingDay3(userId: string) {
   const admin = getSupabaseAdmin();
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("email, full_name, plan, diagnoses_used_this_month, trial_ends_at")
+    .select("email, full_name")
     .eq("id", userId)
     .single();
   if (!profile?.email) return;
 
-  const trialEndsAt = profile.trial_ends_at
-    ? new Date(profile.trial_ends_at).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "soon";
+  // Get first active site
+  const { data: site } = await admin
+    .from("sites")
+    .select("id, domain, pages_count, pages_critical, pages_dead")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (!site) return;
 
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: profile.email,
-    subject: "Your SerpVive trial ends in 2 days",
-    react: OnboardingDay5({
+    subject: `Unlock AI diagnoses for ${site.domain}`,
+    react: OnboardingDay3({
       userName: profile.full_name ?? "there",
-      trialEndsAt,
-      diagnosesUsed: profile.diagnoses_used_this_month ?? 0,
-      diagnosesLimit: 3,
+      siteDomain: site.domain,
+      pagesMonitored: site.pages_count ?? 0,
+      criticalCount: (site.pages_critical ?? 0) + (site.pages_dead ?? 0),
       dashboardUrl: `${APP_URL}/dashboard`,
     }),
   });
 
   if (error) {
-    console.error("[email] Onboarding day 5 error:", error);
+    console.error("[email] Onboarding day 3 error:", error);
   } else {
-    console.log("[email] Onboarding day 5 sent to", profile.email);
+    console.log("[email] Onboarding day 3 sent to", profile.email);
   }
 }

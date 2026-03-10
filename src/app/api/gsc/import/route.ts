@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
-  const plan = (profile?.plan ?? "trial") as PlanName;
+  const plan = (profile?.plan ?? "free") as PlanName;
   const siteLimit = PLAN_LIMITS[plan].sites;
 
   const { count: currentSites } = await admin
@@ -155,6 +155,13 @@ async function runImport(
               // Invalid URL, skip
             }
           }
+        }
+
+        // Log filter stats for this batch
+        const uniqueUrlsInBatch = new Set(rows.map((r) => r.page));
+        const filteredOut = [...uniqueUrlsInBatch].filter((u) => !knownPages.has(u) && !isContentUrl(u)).length;
+        if (filteredOut > 0) {
+          console.log(`[gsc/import] ${filteredOut} URLs filtered out by URL filter in ${start}`);
         }
 
         // Upsert any new pages found in this month
@@ -374,7 +381,13 @@ async function runImport(
         }
       }
     } catch (err) {
-      console.error("[gsc/import] Auto-diagnosis failed (will retry on next login):", err);
+      console.error("[gsc/import] Auto-diagnosis failed:", err);
+      // Mark as done to prevent infinite retry loop from the UI
+      await admin
+        .from("sites")
+        .update({ has_free_diagnosis: true })
+        .eq("id", siteId);
+      console.log("[gsc/import] Marked has_free_diagnosis=true after failure");
     }
 
     // ── Send onboarding day 0 email ──

@@ -35,13 +35,13 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> 
 };
 
 const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: string }> = {
-  trial:   { label: "Trial", price: "Free", color: "#6B7280" },
+  free:    { label: "Free", price: "Free", color: "#6B7280" },
   starter: { label: "Starter", price: "$29/mo", color: "#0D9488" },
   pro:     { label: "Pro", price: "$69/mo", color: "#2563EB" },
   agency:  { label: "Agency", price: "$129/mo", color: "#7C3AED" },
 };
 
-const PLAN_ORDER: PlanName[] = ["trial", "starter", "pro", "agency"];
+const PLAN_ORDER: PlanName[] = ["free", "starter", "pro", "agency"];
 
 const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features: string[] }[] = [
   {
@@ -96,7 +96,6 @@ export default function SettingsClient({
   planStatus,
   diagnosesUsed,
   diagnosesLimit,
-  trialEndsAt,
   hasStripeCustomer,
   sites,
   sitesLimit,
@@ -110,7 +109,6 @@ export default function SettingsClient({
   planStatus: string;
   diagnosesUsed: number;
   diagnosesLimit: number;
-  trialEndsAt: string | null;
   hasStripeCustomer: boolean;
   sites: SiteInfo[];
   sitesLimit: number;
@@ -155,12 +153,6 @@ export default function SettingsClient({
   const limits = PLAN_LIMITS[plan];
   const usagePercent = diagnosesLimit > 0 ? Math.min(100, (diagnosesUsed / diagnosesLimit) * 100) : 0;
   const isPasswordAuth = authProvider === "email";
-
-  // Trial expired check
-  const trialExpired = plan === "trial" && trialEndsAt && new Date(trialEndsAt) < new Date();
-  const trialDaysLeft = plan === "trial" && trialEndsAt
-    ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : null;
 
   // Plans available for upgrade
   const currentPlanIndex = PLAN_ORDER.indexOf(plan);
@@ -335,12 +327,12 @@ export default function SettingsClient({
         </div>
       )}
 
-      {trialExpired && (
-        <div className="flex items-center gap-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-4">
-          <AlertTriangle size={20} strokeWidth={1.5} className="text-[#DC2626] flex-shrink-0" />
+      {plan === "free" && (
+        <div className="flex items-center gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl p-4">
+          <Zap size={20} strokeWidth={1.5} className="text-[#0D9488] flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-[#DC2626]">Trial expired</p>
-            <p className="text-xs text-[#6B7280] mt-0.5">Upgrade to continue using AI diagnoses.</p>
+            <p className="text-sm font-medium text-[#111827]">You&apos;re on the free plan</p>
+            <p className="text-xs text-[#6B7280] mt-0.5">Upgrade to unlock unlimited AI diagnoses and advanced features.</p>
           </div>
         </div>
       )}
@@ -592,12 +584,6 @@ export default function SettingsClient({
           </div>
         </div>
 
-        {plan === "trial" && trialDaysLeft !== null && !trialExpired && (
-          <p className="text-xs text-[#6B7280] mb-4">
-            {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining in trial
-          </p>
-        )}
-
         <div className="grid grid-cols-4 gap-4 mb-5">
           {[
             { icon: Globe, label: "Sites", value: limits.sites },
@@ -630,7 +616,7 @@ export default function SettingsClient({
           <p className="text-xs text-[#9CA3AF]">Resets monthly</p>
         </div>
 
-        {hasStripeCustomer && plan !== "trial" && (
+        {hasStripeCustomer && plan !== "free" && (
           <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
             <button
               onClick={handleManageBilling}
@@ -649,7 +635,7 @@ export default function SettingsClient({
       {upgradePlans.length > 0 && (
         <div id="upgrade-section" className="bg-white rounded-xl border border-[#E5E7EB] p-6">
           <h2 className="text-sm font-semibold text-[#111827] mb-4">
-            {plan === "trial" ? "Choose a plan" : "Upgrade"}
+            {plan === "free" ? "Choose a plan" : "Upgrade"}
           </h2>
           <div className={`grid grid-cols-1 ${upgradePlans.length >= 3 ? "sm:grid-cols-3" : upgradePlans.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-1 max-w-sm"} gap-4`}>
             {upgradePlans.map((p) => (

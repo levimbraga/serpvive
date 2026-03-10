@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       const statusMap: Record<string, string> = {
         active: "active",
         past_due: "past_due",
-        trialing: "trialing",
+        trialing: "active",
         canceled: "canceled",
         unpaid: "past_due",
       };
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       await admin
         .from("profiles")
         .update({
-          plan: "trial",
+          plan: "free",
           plan_status: "canceled",
           stripe_subscription_id: null,
           updated_at: new Date().toISOString(),

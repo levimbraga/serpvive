@@ -1,5 +1,5 @@
 export const PLAN_LIMITS = {
-  trial:   { sites: 1, pages: 100, diagnoses_per_month: 3,   team_members: 1 },
+  free:    { sites: 1, pages: 100, diagnoses_per_month: 0,   team_members: 1 },
   starter: { sites: 1, pages: 100, diagnoses_per_month: 10,  team_members: 1 },
   pro:     { sites: 3, pages: 1000, diagnoses_per_month: 40,  team_members: 3 },
   agency:  { sites: 10, pages: 5000, diagnoses_per_month: 120, team_members: 10 },

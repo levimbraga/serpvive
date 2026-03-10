@@ -16,13 +16,13 @@ export default function HeroSection() {
       </p>
 
       <a href="#waitlist" className="hero-cta">
-        Get early access <span className="arrow">→</span>
+        Get Started Free <span className="arrow">→</span>
       </a>
 
       <div className="hero-trust">
-        <span>7-day free trial</span>
-        <span>Cancel anytime</span>
-        <span>First diagnosis free</span>
+        <span>Free forever plan</span>
+        <span>No credit card required</span>
+        <span>First AI diagnosis included</span>
       </div>
     </section>
   );

@@ -3,5 +3,5 @@ export {
   sendWeeklyDigest,
   sendOnboardingDay0,
   sendOnboardingDay2,
-  sendOnboardingDay5,
+  sendOnboardingDay3,
 } from "./send";

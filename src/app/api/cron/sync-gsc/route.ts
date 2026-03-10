@@ -63,7 +63,7 @@ export async function GET(request: Request) {
         .eq("id", site.user_id)
         .single();
 
-      const plan = (profile?.plan ?? "trial") as PlanName;
+      const plan = (profile?.plan ?? "free") as PlanName;
       const pageLimit = PLAN_LIMITS[plan].pages;
 
       // Upsert new pages (only if under limit)
@@ -88,6 +88,13 @@ export async function GET(request: Request) {
         }
       }
 
+      // Log filter stats
+      const totalUniqueUrls = new Set(rows.map((r) => r.page)).size;
+      const filteredCount = totalUniqueUrls - existingUrls.size - newPages.length;
+      if (filteredCount > 0) {
+        console.log(`[cron/sync-gsc] Site ${site.id}: ${totalUniqueUrls} unique URLs from GSC, ${filteredCount} filtered out by URL filter, ${newPages.length} new content pages found`);
+      }
+
       if (newPages.length > 0 && slotsAvailable > 0) {
         // Sort new pages by clicks (highest traffic first) to prioritize valuable content
         const clicksMap = new Map<string, number>();
@@ -98,7 +105,7 @@ export async function GET(request: Request) {
 
         const pagesToAdd = newPages.slice(0, slotsAvailable);
         await admin.from("pages").upsert(pagesToAdd, { onConflict: "site_id,url", ignoreDuplicates: true });
-        console.log(`[cron/sync-gsc] Site ${site.id}: ${pagesToAdd.length} new pages (${newPages.length - pagesToAdd.length} skipped, at limit ${pageLimit})`);
+        console.log(`[cron/sync-gsc] Site ${site.id}: ${pagesToAdd.length} new pages added (${newPages.length - pagesToAdd.length} skipped, limit ${pageLimit})`);
       } else if (newPages.length > 0) {
         console.log(`[cron/sync-gsc] Site ${site.id}: skipped ${newPages.length} new pages (at limit ${pageLimit})`);
       }

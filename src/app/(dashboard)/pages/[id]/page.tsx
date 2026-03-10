@@ -65,9 +65,10 @@ export default async function PageDetailPage({
       siteDomain={site.domain}
       latestDiagnosis={diagnosisRes.data}
       latestRefresh={refreshRes.data}
+      plan={(profileRes.data?.plan ?? "free") as string}
       diagnosesUsed={profileRes.data?.diagnoses_used_this_month ?? 0}
       diagnosesLimit={
-        ({ trial: 3, starter: 10, pro: 50, agency: 150 } as Record<string, number>)[profileRes.data?.plan ?? "trial"] ?? 3
+        ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[profileRes.data?.plan ?? "free"] ?? 0
       }
     />
   );

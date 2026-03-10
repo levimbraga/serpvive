@@ -16,13 +16,13 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_status, diagnoses_used_this_month, trial_ends_at, stripe_customer_id, email, full_name, timezone, digest_day")
+    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day")
     .eq("id", user.id)
     .single();
 
   if (!profile) redirect("/login");
 
-  const plan = (profile.plan ?? "trial") as PlanName;
+  const plan = (profile.plan ?? "free") as PlanName;
   const limits = PLAN_LIMITS[plan];
 
   // Fetch user's sites
@@ -40,10 +40,9 @@ export default async function SettingsPage() {
       email={profile.email}
       fullName={profile.full_name}
       plan={plan}
-      planStatus={profile.plan_status ?? "trialing"}
+      planStatus={profile.plan_status ?? "active"}
       diagnosesUsed={profile.diagnoses_used_this_month ?? 0}
       diagnosesLimit={limits.diagnoses_per_month}
-      trialEndsAt={profile.trial_ends_at}
       hasStripeCustomer={!!profile.stripe_customer_id}
       sites={sites ?? []}
       sitesLimit={limits.sites}
