@@ -351,7 +351,7 @@ export default function PageDetailClient({
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-5 gap-4 mt-5 pt-5 border-t border-[#F3F4F6]">
+        <div className="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#F3F4F6]">
           <div>
             <p className="text-xs text-[#9CA3AF]">Clicks (28d)</p>
             <p className="text-lg font-bold text-[#111827] tabular-nums">{page.current_clicks_28d}</p>
@@ -374,18 +374,22 @@ export default function PageDetailClient({
               {page.decay_score > 0 ? `${page.decay_score.toFixed(1)}%` : "—"}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-[#9CA3AF]">Keyword</p>
-            <p className="text-sm font-medium text-[#111827] truncate">
-              {page.primary_keyword ?? "—"}
-              {page.primary_keyword && page.keyword_source && page.keyword_source !== "clicks" && (
+        </div>
+
+        {/* Keyword — full width so long keywords can wrap */}
+        {page.primary_keyword && (
+          <div className="mt-3">
+            <p className="text-xs text-[#9CA3AF] mb-0.5">Keyword</p>
+            <p className="text-sm font-medium text-[#111827]">
+              {page.primary_keyword}
+              {page.keyword_source && page.keyword_source !== "clicks" && (
                 <span className="text-xs font-normal text-[#9CA3AF] ml-1">
                   ({page.keyword_source === "impressions" ? "by impressions" : "estimated"})
                 </span>
               )}
             </p>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Refresh tracking card */}
