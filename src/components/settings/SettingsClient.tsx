@@ -48,19 +48,19 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features
     key: "starter",
     label: "Starter",
     price: 29,
-    features: ["1 site", "100 pages", "10 diagnoses/mo"],
+    features: ["1 site", "100 pages", "10 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
     key: "pro",
     label: "Pro",
     price: 69,
-    features: ["3 sites", "1,000 pages", "40 diagnoses/mo", "Velocity alerts", "CSV export"],
+    features: ["3 sites", "1,000 pages", "40 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
     key: "agency",
     label: "Agency",
     price: 129,
-    features: ["10 sites", "5,000 pages", "120 diagnoses/mo", "Client dashboards", "Priority support"],
+    features: ["10 sites", "5,000 pages", "120 diagnoses/mo", "Daily monitoring", "Priority support"],
   },
 ];
 
@@ -328,11 +328,17 @@ export default function SettingsClient({
       )}
 
       {plan === "free" && (
-        <div className="flex items-center gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl p-4">
-          <Zap size={20} strokeWidth={1.5} className="text-[#0D9488] flex-shrink-0" />
+        <div className="flex items-center gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-4">
+          <Zap size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-[#111827]">You&apos;re on the free plan</p>
-            <p className="text-xs text-[#6B7280] mt-0.5">Upgrade to unlock unlimited AI diagnoses and advanced features.</p>
+            <p className="text-sm font-medium text-[#92400E]">
+              {hasStripeCustomer ? "Your paid plan was canceled" : "You\u2019re on the free plan"}
+            </p>
+            <p className="text-xs text-[#B45309] mt-0.5">
+              {hasStripeCustomer
+                ? "Your data syncs weekly. Choose a plan to resume daily monitoring and AI diagnoses."
+                : "Upgrade to unlock daily monitoring, AI diagnoses, and weekly email digests."}
+            </p>
           </div>
         </div>
       )}
@@ -604,29 +610,53 @@ export default function SettingsClient({
           ))}
         </div>
 
+        {/* Monitoring frequency */}
+        <div className="flex items-center justify-between text-sm mb-4 pb-4 border-b border-[#F3F4F6]">
+          <span className="text-[#6B7280]">Monitoring</span>
+          <span className="text-[#111827] font-medium">
+            {plan === "free" ? "Weekly sync" : "Daily sync"}
+          </span>
+        </div>
+
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-[#6B7280] flex items-center gap-1.5">
               <BarChart3 size={14} strokeWidth={1.5} className="text-[#7C3AED]" />
-              AI Diagnoses used
+              AI Diagnoses
             </span>
-            <span className="text-[#111827] tabular-nums">{diagnosesUsed} / {diagnosesLimit}</span>
+            <span className="text-[#111827] tabular-nums">
+              {plan === "free" ? "Upgrade to unlock" : `${diagnosesUsed} / ${diagnosesLimit}`}
+            </span>
           </div>
-          <Progress value={usagePercent} className="h-2" />
-          <p className="text-xs text-[#9CA3AF]">Resets monthly</p>
+          {plan !== "free" && (
+            <>
+              <Progress value={usagePercent} className="h-2" />
+              <p className="text-xs text-[#9CA3AF]">Resets monthly</p>
+            </>
+          )}
         </div>
 
-        {hasStripeCustomer && plan !== "free" && (
+        {hasStripeCustomer && (
           <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
-            <button
-              onClick={handleManageBilling}
-              disabled={portalLoading}
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
-            >
-              {portalLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <CreditCard size={14} strokeWidth={1.5} />}
-              Manage Billing
-              <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
-            </button>
+            {plan !== "free" ? (
+              <button
+                onClick={handleManageBilling}
+                disabled={portalLoading}
+                className="w-full flex items-center justify-center gap-2 h-10 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+              >
+                {portalLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <CreditCard size={14} strokeWidth={1.5} />}
+                Manage Billing
+                <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
+              </button>
+            ) : (
+              <button
+                onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
+                className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+              >
+                <Zap size={14} strokeWidth={1.5} />
+                Reactivate — Choose a Plan
+              </button>
+            )}
           </div>
         )}
       </div>

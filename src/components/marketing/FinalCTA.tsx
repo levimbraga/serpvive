@@ -21,7 +21,7 @@ export default function FinalCTA() {
           Your content is decaying right now.<br />
           <span className="dim">Do you know which posts?</span>
         </h2>
-        <p className="fsub">Join the waitlist. Be first to revive your rankings.</p>
+        <p className="fsub">Start monitoring your blog — free. No credit card required.</p>
 
         {status === "success" ? (
           <div style={{ marginBottom: 16 }}>

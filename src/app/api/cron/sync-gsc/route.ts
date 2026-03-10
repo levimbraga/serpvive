@@ -11,10 +11,10 @@ export async function GET(request: Request) {
 
   const admin = getSupabaseAdmin();
 
-  // Get all active sites
+  // Get all active sites with user profile info
   const { data: sites, error: sitesErr } = await admin
     .from("sites")
-    .select("id, user_id, gsc_property, gsc_refresh_token")
+    .select("id, user_id, gsc_property, gsc_refresh_token, last_sync_at, status")
     .eq("status", "active");
 
   if (sitesErr || !sites) {
@@ -22,13 +22,50 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Failed to fetch sites" }, { status: 500 });
   }
 
-  console.log(`[cron/sync-gsc] Syncing ${sites.length} sites`);
+  console.log(`[cron/sync-gsc] Found ${sites.length} active sites`);
 
   let synced = 0;
+  let skipped = 0;
   let errors = 0;
 
   for (const site of sites) {
     try {
+      // Get user profile to check plan
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("plan, free_since")
+        .eq("id", site.user_id)
+        .single();
+
+      const plan = (profile?.plan ?? "free") as PlanName;
+
+      // ── Free plan: check freeze (90+ days) and weekly limit ──
+      if (plan === "free") {
+        // Check if frozen (90+ days on free)
+        if (profile?.free_since) {
+          const daysFree = (Date.now() - new Date(profile.free_since).getTime()) / (1000 * 60 * 60 * 24);
+          if (daysFree >= 90) {
+            console.log(`[cron/sync-gsc] Site ${site.id}: frozen (${Math.floor(daysFree)} days on free)`);
+            // Pause site if not already
+            if (site.status !== "paused") {
+              await admin.from("sites").update({ status: "paused" }).eq("id", site.id);
+            }
+            skipped++;
+            continue;
+          }
+        }
+
+        // Free: only sync weekly (7+ days since last sync)
+        if (site.last_sync_at) {
+          const daysSinceSync = (Date.now() - new Date(site.last_sync_at).getTime()) / (1000 * 60 * 60 * 24);
+          if (daysSinceSync < 7) {
+            console.log(`[cron/sync-gsc] Site ${site.id}: free plan, last sync ${daysSinceSync.toFixed(1)}d ago, skipping`);
+            skipped++;
+            continue;
+          }
+        }
+      }
+
       // Refresh access token
       const tokens = await refreshAccessToken(site.gsc_refresh_token);
       const accessToken = tokens.access_token;
@@ -52,18 +89,15 @@ export async function GET(request: Request) {
 
       if (rows.length === 0) {
         console.log(`[cron/sync-gsc] Site ${site.id}: no new data`);
+        await admin
+          .from("sites")
+          .update({ last_sync_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq("id", site.id);
         synced++;
         continue;
       }
 
       // Check plan page limit before adding new pages
-      const { data: profile } = await admin
-        .from("profiles")
-        .select("plan")
-        .eq("id", site.user_id)
-        .single();
-
-      const plan = (profile?.plan ?? "free") as PlanName;
       const pageLimit = PLAN_LIMITS[plan].pages;
 
       // Upsert new pages (only if under limit)
@@ -166,6 +200,6 @@ export async function GET(request: Request) {
     }
   }
 
-  console.log(`[cron/sync-gsc] Done. Synced: ${synced}, Errors: ${errors}`);
-  return NextResponse.json({ data: { synced, errors, total: sites.length } });
+  console.log(`[cron/sync-gsc] Done. Synced: ${synced}, Skipped: ${skipped}, Errors: ${errors}`);
+  return NextResponse.json({ data: { synced, skipped, errors, total: sites.length } });
 }

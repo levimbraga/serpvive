@@ -7,6 +7,7 @@ export type Profile = {
   plan: "free" | "starter" | "pro" | "agency";
   plan_status: "active" | "canceled" | "past_due";
   trial_ends_at: string | null; // deprecated, kept for DB compat
+  free_since: string | null;
   diagnoses_used_this_month: number;
   diagnoses_reset_at: string;
   digest_day: string;

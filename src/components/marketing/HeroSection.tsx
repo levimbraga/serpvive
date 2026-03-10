@@ -15,14 +15,14 @@ export default function HeroSection() {
         Your content is dying. We detect it, explain <strong>WHY</strong> with AI, and tell you exactly <strong>WHAT</strong> to do — so you can fix it in hours, not weeks.
       </p>
 
-      <a href="#waitlist" className="hero-cta">
+      <a href="/signup" className="hero-cta">
         Get Started Free <span className="arrow">→</span>
       </a>
 
       <div className="hero-trust">
-        <span>Free forever plan</span>
-        <span>No credit card required</span>
-        <span>First AI diagnosis included</span>
+        <span>✓ No credit card required</span>
+        <span>✓ 1 free AI diagnosis included</span>
+        <span>✓ Setup in under 5 minutes</span>
       </div>
     </section>
   );

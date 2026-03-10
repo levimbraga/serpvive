@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, STRIPE_PLANS } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type Stripe from "stripe";
+
+// Reverse lookup: price_id → plan name
+function getPlanFromPriceId(priceId: string): string {
+  for (const [key, config] of Object.entries(STRIPE_PLANS)) {
+    if (config.priceId === priceId) return key;
+  }
+  return "starter"; // fallback
+}
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -46,18 +54,31 @@ export async function POST(request: Request) {
         ? await stripe.subscriptions.retrieve(session.subscription as string)
         : null;
 
-      const plan = subscription?.metadata?.plan ?? "starter";
+      // Determine plan from subscription metadata or price_id
+      let plan = subscription?.metadata?.plan;
+      if (!plan && subscription?.items?.data?.[0]?.price?.id) {
+        plan = getPlanFromPriceId(subscription.items.data[0].price.id);
+      }
+      plan = plan ?? "starter";
 
       await admin
         .from("profiles")
         .update({
           plan,
           plan_status: "active",
+          free_since: null, // Clear free_since on upgrade
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: session.subscription as string,
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
+
+      // Reactivate any paused sites for this user
+      await admin
+        .from("sites")
+        .update({ status: "active" })
+        .eq("user_id", userId)
+        .eq("status", "paused");
 
       console.log(`[stripe/webhook] checkout.session.completed: user=${userId}, plan=${plan}`);
       break;
@@ -81,7 +102,13 @@ export async function POST(request: Request) {
       };
 
       const planStatus = statusMap[subscription.status] ?? "active";
-      const plan = subscription.metadata?.plan ?? "starter";
+
+      // Determine plan from metadata or price_id
+      let plan = subscription.metadata?.plan;
+      if (!plan && subscription.items?.data?.[0]?.price?.id) {
+        plan = getPlanFromPriceId(subscription.items.data[0].price.id);
+      }
+      plan = plan ?? "starter";
 
       await admin
         .from("profiles")
@@ -91,6 +118,31 @@ export async function POST(request: Request) {
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
+
+      // Handle downgrade: pause excess sites
+      const planLimits = await import("@/lib/constants").then((m) => m.PLAN_LIMITS);
+      const siteLimit = planLimits[plan as keyof typeof planLimits]?.sites ?? 1;
+
+      const { data: userSites } = await admin
+        .from("sites")
+        .select("id, status")
+        .eq("user_id", userId)
+        .order("last_sync_at", { ascending: false, nullsFirst: false });
+
+      if (userSites && userSites.length > siteLimit) {
+        // Keep the most recently synced sites active, pause the rest
+        const sitesToPause = userSites
+          .filter((s) => s.status === "active")
+          .slice(siteLimit);
+
+        for (const s of sitesToPause) {
+          await admin.from("sites").update({ status: "paused" }).eq("id", s.id);
+        }
+
+        if (sitesToPause.length > 0) {
+          console.log(`[stripe/webhook] Paused ${sitesToPause.length} excess sites for user=${userId} (limit=${siteLimit})`);
+        }
+      }
 
       console.log(`[stripe/webhook] subscription.updated: user=${userId}, status=${planStatus}, plan=${plan}`);
       break;
@@ -109,13 +161,15 @@ export async function POST(request: Request) {
         .from("profiles")
         .update({
           plan: "free",
-          plan_status: "canceled",
+          plan_status: "active", // Free is an active plan
+          free_since: new Date().toISOString(),
           stripe_subscription_id: null,
+          // Keep stripe_customer_id for reactivation
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
 
-      console.log(`[stripe/webhook] subscription.deleted: user=${userId}`);
+      console.log(`[stripe/webhook] subscription.deleted: user=${userId}, downgraded to free`);
       break;
     }
 

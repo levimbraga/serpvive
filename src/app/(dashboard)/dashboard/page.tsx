@@ -12,6 +12,8 @@ import RunEngineButton from "@/components/dashboard/RunEngineButton";
 import RecentResults from "@/components/dashboard/RecentResults";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
 import FreeDiagnosisBanner from "@/components/dashboard/FreeDiagnosisBanner";
+import FreePlanBanner from "@/components/dashboard/FreePlanBanner";
+import UpgradeSuccessBanner from "@/components/dashboard/UpgradeSuccessBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import { Sparkles } from "lucide-react";
 
@@ -37,13 +39,13 @@ export default async function DashboardPage() {
   const [profileRes, siteRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("plan, diagnoses_used_this_month")
+      .select("plan, diagnoses_used_this_month, free_since")
       .eq("id", user.id)
       .single(),
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, has_free_diagnosis, status")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -54,7 +56,7 @@ export default async function DashboardPage() {
 
   const plan = (profile?.plan ?? "free") as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
-  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 3;
+  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
 
   // No active site → show setup message
   if (!site) {
@@ -137,6 +139,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Upgrade success banner */}
+      <UpgradeSuccessBanner />
+
+      {/* Free plan banner */}
+      {plan === "free" && (
+        <FreePlanBanner
+          siteStatus={site.status}
+          lastSyncAt={site.last_sync_at}
+        />
+      )}
+
       {/* Upgrade banner when site has more pages than plan allows */}
       <UpgradeBanner
         totalContentPages={totalContentPages}
