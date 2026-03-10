@@ -11,6 +11,7 @@ import { isContentUrl } from "@/lib/engine/url-filter";
 import { runEngine } from "@/lib/engine/run-engine";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { sendOnboardingDay0 } from "@/lib/email/send";
 
 const ImportSchema = z.object({
   siteUrl: z.string().min(1),
@@ -374,7 +375,13 @@ async function runImport(
       }
     } catch (err) {
       console.error("[gsc/import] Auto-diagnosis failed (will retry on next login):", err);
-      // Don't mark has_free_diagnosis — will retry later
+    }
+
+    // ── Send onboarding day 0 email ──
+    try {
+      await sendOnboardingDay0(userId, siteId);
+    } catch (err) {
+      console.error("[gsc/import] Day 0 email failed:", err);
     }
   } catch (err) {
     console.error("[gsc/import] Fatal import error:", err);
