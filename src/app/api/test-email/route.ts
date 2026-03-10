@@ -1,37 +1,38 @@
 import { NextResponse } from "next/server";
-import { resend, FROM_EMAIL } from "@/lib/email/resend";
-import WeeklyDigest from "@/lib/email/templates/weekly-digest";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { sendWeeklyDigest } from "@/lib/email/send";
 
 export async function GET() {
   if (process.env.NODE_ENV === "production") {
     return NextResponse.json({ error: "Not available in production" }, { status: 403 });
   }
 
-  const { data, error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: "levimaiabraga@gmail.com",
-    subject: "SerpVive Test — Weekly Digest",
-    react: WeeklyDigest({
-      userName: "Levi",
-      siteDomain: "succulencare.com",
-      healthScore: 72,
-      healthScoreDelta: -3,
-      urgentPages: [
-        { url: "/blog/succulent-care-guide", title: "Succulent Care Guide", decayScore: 45.2, status: "critical" },
-        { url: "/blog/best-indoor-plants", title: "Best Indoor Plants 2024", decayScore: 32.1, status: "warning" },
-      ],
-      recentResults: [
-        { url: "/blog/propagation-tips", clicksDeltaPct: 23.5, resultStatus: "success" },
-        { url: "/blog/watering-schedule", clicksDeltaPct: -8.2, resultStatus: "declined" },
-      ],
-      dashboardUrl: "http://localhost:3000/dashboard",
-    }),
-  });
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("[test-email] Error:", error);
-    return NextResponse.json({ error }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated — login first" }, { status: 401 });
   }
 
-  return NextResponse.json({ data, message: "Test email sent to levimaiabraga@gmail.com" });
+  // Get first active site
+  const { data: site } = await supabase
+    .from("sites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (!site) {
+    return NextResponse.json({ error: "No active site found" }, { status: 404 });
+  }
+
+  try {
+    await sendWeeklyDigest(user.id, site.id);
+    return NextResponse.json({ message: "Weekly digest sent with real data" });
+  } catch (err) {
+    console.error("[test-email] Error:", err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
 }

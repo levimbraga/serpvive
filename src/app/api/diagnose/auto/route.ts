@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getActiveSiteId } from "@/lib/active-site";
@@ -121,25 +121,26 @@ export async function POST() {
     return NextResponse.json({ data: { status: "no_candidate" } });
   }
 
-  // Run diagnosis in background (non-blocking response)
-  runDiagnosisPipeline(admin, bestPage.id, user.id, "auto")
-    .then(async () => {
+  // Run diagnosis after response is sent — `after()` keeps the serverless
+  // function alive on Vercel so the pipeline actually completes.
+  after(async () => {
+    try {
+      console.log(`[diagnose/auto] Starting pipeline for site ${site.id}, page ${bestPage!.id}`);
+      await runDiagnosisPipeline(admin, bestPage!.id, user!.id, "auto");
       await admin
         .from("sites")
         .update({ has_free_diagnosis: true })
         .eq("id", site.id);
       console.log(`[diagnose/auto] Free diagnosis complete for site ${site.id}`);
-    })
-    .catch(async (err) => {
+    } catch (err) {
       console.error(`[diagnose/auto] Failed for site ${site.id}:`, err);
-      // Mark as done after failure to prevent infinite retries from UI polling
-      // The user can still manually trigger a diagnosis later
       await admin
         .from("sites")
         .update({ has_free_diagnosis: true })
         .eq("id", site.id);
       console.log(`[diagnose/auto] Marked has_free_diagnosis=true after failure for site ${site.id}`);
-    });
+    }
+  });
 
   return NextResponse.json({ data: { status: "started", pageId: bestPage.id } });
 }
