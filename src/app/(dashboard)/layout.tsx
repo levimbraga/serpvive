@@ -40,14 +40,21 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
-      <Sidebar diagnosesUsed={diagnosesUsed} diagnosesLimit={diagnosesLimit} />
-      <div className="ml-[60px]">
+      <Sidebar
+        diagnosesUsed={diagnosesUsed}
+        diagnosesLimit={diagnosesLimit}
+        sites={sites}
+        activeSiteId={activeSiteId}
+      />
+      <div className="sm:ml-[200px]">
         <DashboardHeader
           sites={sites}
           activeSiteId={activeSiteId}
           userEmail={user.email ?? ""}
+          diagnosesUsed={diagnosesUsed}
+          diagnosesLimit={diagnosesLimit}
         />
-        <main className="p-6 max-w-[1200px] mx-auto">
+        <main className="p-4 sm:p-6 max-w-[1200px] mx-auto">
           {children}
         </main>
       </div>

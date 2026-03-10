@@ -1,8 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Settings, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, FileText, Settings, Zap, Globe, ChevronDown, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+type SiteItem = {
+  id: string;
+  domain: string;
+  status: string;
+  health_score: number | null;
+};
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -10,61 +23,118 @@ const NAV_ITEMS = [
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 
+const STATUS_DOT: Record<string, string> = {
+  active: "bg-[#16A34A]",
+  importing: "bg-[#D97706]",
+  paused: "bg-[#6B7280]",
+  error: "bg-[#DC2626]",
+};
+
 type SidebarProps = {
   diagnosesUsed: number;
   diagnosesLimit: number;
+  sites: SiteItem[];
+  activeSiteId: string | null;
 };
 
-export default function Sidebar({ diagnosesUsed, diagnosesLimit }: SidebarProps) {
+export default function Sidebar({ diagnosesUsed, diagnosesLimit, sites, activeSiteId }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
 
+  const activeSite = sites.find((s) => s.id === activeSiteId) ?? sites[0] ?? null;
+  const hasMultipleSites = sites.length > 1;
+
+  function handleSiteChange(siteId: string) {
+    document.cookie = `active_site_id=${siteId};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
+    router.refresh();
+  }
+
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[60px] bg-[#0F172A] border-r border-[#1E293B] flex flex-col items-center py-4 z-50">
-      <Link href="/dashboard" className="mb-6">
-        <span className="text-[18px] font-extrabold text-white tracking-tight">S<span className="text-[#3B82F6]">V</span></span>
+    <aside className="fixed left-0 top-0 bottom-0 w-[200px] bg-[#0F172A] border-r border-[#1E293B] flex flex-col p-4 z-50 hidden sm:flex">
+      {/* Logo */}
+      <Link href="/dashboard" className="mb-2">
+        <span className="text-lg font-extrabold text-white tracking-tight">
+          Serp<span className="text-[#3B82F6]">Vive</span>
+        </span>
       </Link>
 
-      <nav className="flex flex-col items-center gap-1 flex-1">
+      {/* Site selector */}
+      <div className="mb-6">
+        {activeSite ? (
+          hasMultipleSites ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="w-full flex items-center gap-2 text-xs text-[#94A3B8] hover:text-white rounded-md px-2 py-1.5 -mx-2 hover:bg-[#1E293B] transition-colors outline-none truncate">
+                <Globe size={12} strokeWidth={1.5} className="flex-shrink-0" />
+                <span className="truncate flex-1 text-left">{activeSite.domain}</span>
+                <ChevronDown size={12} strokeWidth={1.5} className="flex-shrink-0 opacity-50" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" side="bottom" className="w-56">
+                {sites.map((site) => (
+                  <DropdownMenuItem
+                    key={site.id}
+                    onClick={() => handleSiteChange(site.id)}
+                    className="flex items-center gap-3 py-2 cursor-pointer"
+                  >
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[site.status] ?? "bg-[#6B7280]"}`} />
+                    <span className="text-sm truncate flex-1">{site.domain}</span>
+                    {site.health_score !== null && (
+                      <span className="text-xs text-[#6B7280] tabular-nums">{site.health_score}</span>
+                    )}
+                    {site.id === activeSite.id && (
+                      <Check size={14} strokeWidth={2} className="text-[#16A34A] flex-shrink-0" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-[#94A3B8] px-2 py-1.5 -mx-2 truncate">
+              <Globe size={12} strokeWidth={1.5} className="flex-shrink-0" />
+              <span className="truncate">{activeSite.domain}</span>
+            </div>
+          )
+        ) : (
+          <div className="text-xs text-[#64748B] px-2 py-1.5 -mx-2">No site connected</div>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-col gap-1 flex-1">
         {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
           const isActive = pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
-              title={label}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-[#1E293B] text-white"
-                  : "text-[#64748B] hover:text-[#E2E8F0] hover:bg-[#1E293B]"
+                  ? "bg-[#1E293B] text-white border-l-[3px] border-[#3B82F6] pl-[9px]"
+                  : "text-[#94A3B8] hover:text-white hover:bg-[#1E293B]"
               }`}
             >
-              <Icon size={20} strokeWidth={1.5} />
+              <Icon size={18} strokeWidth={1.5} />
+              {label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="mb-2" title={`${diagnosesUsed}/${diagnosesLimit} diagnoses used`}>
-        <div className="w-8 h-8 flex items-center justify-center relative">
-          <Zap size={16} strokeWidth={1.5} className="text-[#64748B]" />
-          <svg className="absolute inset-0" viewBox="0 0 32 32">
-            <circle
-              cx="16" cy="16" r="14"
-              fill="none"
-              stroke="#1E293B"
-              strokeWidth="2"
-            />
-            <circle
-              cx="16" cy="16" r="14"
-              fill="none"
-              stroke={usagePercent >= 90 ? "#EF4444" : usagePercent >= 70 ? "#F59E0B" : "#3B82F6"}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeDasharray={`${(usagePercent / 100) * 88} 88`}
-              transform="rotate(-90 16 16)"
-            />
-          </svg>
+      {/* Usage meter */}
+      <div className="pt-4 border-t border-[#1E293B]">
+        <div className="flex items-center gap-2 mb-2">
+          <Zap size={14} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
+          <span className={`text-xs font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
+            {diagnosesUsed}/{diagnosesLimit} diagnoses
+          </span>
+        </div>
+        <div className="h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              usagePercent >= 90 ? "bg-[#EF4444]" : usagePercent >= 80 ? "bg-[#F59E0B]" : "bg-[#3B82F6]"
+            }`}
+            style={{ width: `${usagePercent}%` }}
+          />
         </div>
       </div>
     </aside>

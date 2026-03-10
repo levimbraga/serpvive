@@ -1,8 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
-import { LogOut, Globe, ChevronDown, Check } from "lucide-react";
+import {
+  LogOut, Menu, LayoutDashboard, FileText, Settings,
+  Globe, ChevronDown, Check, Zap,
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +31,8 @@ type DashboardHeaderProps = {
   sites: SiteItem[];
   activeSiteId: string | null;
   userEmail: string;
+  diagnosesUsed: number;
+  diagnosesLimit: number;
 };
 
 const STATUS_DOT: Record<string, string> = {
@@ -30,11 +42,27 @@ const STATUS_DOT: Record<string, string> = {
   error: "bg-[#DC2626]",
 };
 
-export default function DashboardHeader({ sites, activeSiteId, userEmail }: DashboardHeaderProps) {
+const MOBILE_NAV = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/pages", icon: FileText, label: "Pages" },
+  { href: "/settings", icon: Settings, label: "Settings" },
+];
+
+export default function DashboardHeader({
+  sites,
+  activeSiteId,
+  userEmail,
+  diagnosesUsed,
+  diagnosesLimit,
+}: DashboardHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = getSupabaseBrowser();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const activeSite = sites.find((s) => s.id === activeSiteId) ?? sites[0] ?? null;
+  const hasMultipleSites = sites.length > 1;
+  const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -48,51 +76,110 @@ export default function DashboardHeader({ sites, activeSiteId, userEmail }: Dash
   }
 
   const initials = userEmail.charAt(0).toUpperCase();
-  const hasMultipleSites = sites.length > 1;
 
   return (
-    <header className="h-12 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-6">
-      <div>
-        {activeSite ? (
-          hasMultipleSites ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 text-sm font-medium text-[#111827] hover:text-[#3B82F6] transition-colors rounded-md px-2 py-1 -ml-2 hover:bg-[#F3F4F6] outline-none">
-                <Globe size={14} strokeWidth={1.5} className="text-[#6B7280]" />
-                {activeSite.domain}
-                <ChevronDown size={14} strokeWidth={1.5} className="text-[#9CA3AF]" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                {sites.map((site) => (
-                  <DropdownMenuItem
-                    key={site.id}
-                    onClick={() => handleSiteChange(site.id)}
-                    className="flex items-center gap-3 py-2.5 cursor-pointer"
+    <header className="h-12 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 sm:px-6">
+      {/* Mobile: hamburger + logo */}
+      <div className="flex items-center gap-3 sm:hidden">
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger className="text-[#6B7280] hover:text-[#111827] transition-colors">
+            <Menu size={20} strokeWidth={1.5} />
+          </SheetTrigger>
+          <SheetContent side="left" showCloseButton={false} className="w-[260px] bg-[#0F172A] border-r border-[#1E293B] p-4">
+            {/* Mobile logo */}
+            <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block mb-4">
+              <span className="text-lg font-extrabold text-white tracking-tight">
+                Serp<span className="text-[#3B82F6]">Vive</span>
+              </span>
+            </Link>
+
+            {/* Mobile site selector */}
+            {activeSite && (
+              <div className="mb-6">
+                {hasMultipleSites ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="w-full flex items-center gap-2 text-xs text-[#94A3B8] hover:text-white rounded-md px-2 py-1.5 hover:bg-[#1E293B] transition-colors outline-none truncate">
+                      <Globe size={12} strokeWidth={1.5} className="flex-shrink-0" />
+                      <span className="truncate flex-1 text-left">{activeSite.domain}</span>
+                      <ChevronDown size={12} strokeWidth={1.5} className="flex-shrink-0 opacity-50" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      {sites.map((site) => (
+                        <DropdownMenuItem
+                          key={site.id}
+                          onClick={() => { handleSiteChange(site.id); setMobileOpen(false); }}
+                          className="flex items-center gap-3 py-2 cursor-pointer"
+                        >
+                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[site.status] ?? "bg-[#6B7280]"}`} />
+                          <span className="text-sm truncate flex-1">{site.domain}</span>
+                          {site.id === activeSite.id && (
+                            <Check size={14} strokeWidth={2} className="text-[#16A34A] flex-shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs text-[#94A3B8] px-2 py-1.5 truncate">
+                    <Globe size={12} strokeWidth={1.5} className="flex-shrink-0" />
+                    <span className="truncate">{activeSite.domain}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mobile nav items */}
+            <nav className="flex flex-col gap-1 flex-1">
+              {MOBILE_NAV.map(({ href, icon: Icon, label }) => {
+                const isActive = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-[#1E293B] text-white border-l-[3px] border-[#3B82F6] pl-[9px]"
+                        : "text-[#94A3B8] hover:text-white hover:bg-[#1E293B]"
+                    }`}
                   >
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[site.status] ?? "bg-[#6B7280]"}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{site.domain}</p>
-                    </div>
-                    {site.health_score !== null && (
-                      <span className="text-xs text-[#6B7280] tabular-nums">{site.health_score}</span>
-                    )}
-                    {site.id === activeSite.id && (
-                      <Check size={14} strokeWidth={2} className="text-[#16A34A] flex-shrink-0" />
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2 text-sm font-medium text-[#111827]">
-              <Globe size={14} strokeWidth={1.5} className="text-[#6B7280]" />
-              {activeSite.domain}
+                    <Icon size={18} strokeWidth={1.5} />
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Mobile usage meter */}
+            <div className="mt-auto pt-4 border-t border-[#1E293B]">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap size={14} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
+                <span className={`text-xs font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
+                  {diagnosesUsed}/{diagnosesLimit} diagnoses
+                </span>
+              </div>
+              <div className="h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    usagePercent >= 90 ? "bg-[#EF4444]" : usagePercent >= 80 ? "bg-[#F59E0B]" : "bg-[#3B82F6]"
+                  }`}
+                  style={{ width: `${usagePercent}%` }}
+                />
+              </div>
             </div>
-          )
-        ) : (
-          <span className="text-sm text-[#6B7280]">No site connected</span>
-        )}
+          </SheetContent>
+        </Sheet>
+        <Link href="/dashboard">
+          <span className="text-sm font-extrabold text-[#111827] tracking-tight">
+            Serp<span className="text-[#3B82F6]">Vive</span>
+          </span>
+        </Link>
       </div>
 
+      {/* Desktop: empty left (sidebar handles everything) */}
+      <div className="hidden sm:block" />
+
+      {/* Right: user avatar + logout */}
       <div className="flex items-center gap-3">
         <div className="w-7 h-7 rounded-full bg-[#3B82F6] text-white text-xs font-semibold flex items-center justify-center">
           {initials}
