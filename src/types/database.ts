@@ -57,6 +57,7 @@ export type Page = {
   status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown";
   primary_keyword: string | null;
   primary_position: number | null;
+  keyword_source: "clicks" | "impressions" | "title" | "url" | null;
   last_diagnosis_at: string | null;
   last_refresh_at: string | null;
   created_at: string;

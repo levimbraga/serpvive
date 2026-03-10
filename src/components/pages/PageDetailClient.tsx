@@ -26,6 +26,7 @@ type PageData = {
   decay_velocity_7d: number;
   primary_keyword: string | null;
   primary_position: number | null;
+  keyword_source: "clicks" | "impressions" | "title" | "url" | null;
   last_diagnosis_at: string | null;
 };
 
@@ -377,6 +378,11 @@ export default function PageDetailClient({
             <p className="text-xs text-[#9CA3AF]">Keyword</p>
             <p className="text-sm font-medium text-[#111827] truncate">
               {page.primary_keyword ?? "—"}
+              {page.primary_keyword && page.keyword_source && page.keyword_source !== "clicks" && (
+                <span className="text-xs font-normal text-[#9CA3AF] ml-1">
+                  ({page.keyword_source === "impressions" ? "by impressions" : "estimated"})
+                </span>
+              )}
             </p>
           </div>
         </div>

@@ -63,30 +63,62 @@ export async function runEngine(
   const statusMap = new Map(classifierResults.map((r) => [r.pageId, r.status]));
   const healthScore = calculateHealthScore(statusMap);
 
-  // Step 6: Update primary keyword for each page
+  // Step 6: Update primary keyword for each page (recalculated every run)
+  // Fallback chain: clicks → impressions → title → URL path
   console.log("[engine] Updating primary keywords...");
   const { data: pages } = await admin
     .from("pages")
-    .select("id")
+    .select("id, title, path")
     .eq("site_id", siteId);
 
-  const primaryKeywords = new Map<string, { keyword: string; position: number }>();
+  type KeywordInfo = { keyword: string; position: number | null; source: "clicks" | "impressions" | "title" | "url" };
+  const primaryKeywords = new Map<string, KeywordInfo>();
 
   if (pages) {
     for (const page of pages) {
-      const { data: topQuery } = await admin
+      // 1. Top query by clicks
+      const { data: byClicks } = await admin
         .from("page_queries")
         .select("query, position")
         .eq("page_id", page.id)
+        .gt("clicks", 0)
         .order("clicks", { ascending: false })
         .limit(1)
         .maybeSingle();
 
-      if (topQuery) {
-        primaryKeywords.set(page.id, {
-          keyword: topQuery.query,
-          position: topQuery.position,
-        });
+      if (byClicks) {
+        primaryKeywords.set(page.id, { keyword: byClicks.query, position: byClicks.position, source: "clicks" });
+        continue;
+      }
+
+      // 2. Top query by impressions
+      const { data: byImpressions } = await admin
+        .from("page_queries")
+        .select("query, position")
+        .eq("page_id", page.id)
+        .gt("impressions", 0)
+        .order("impressions", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (byImpressions) {
+        primaryKeywords.set(page.id, { keyword: byImpressions.query, position: byImpressions.position, source: "impressions" });
+        continue;
+      }
+
+      // 3. Extract from page title
+      if (page.title) {
+        const cleaned = extractKeywordFromTitle(page.title);
+        if (cleaned) {
+          primaryKeywords.set(page.id, { keyword: cleaned, position: null, source: "title" });
+          continue;
+        }
+      }
+
+      // 4. Extract from URL path
+      const fromPath = extractKeywordFromPath(page.path);
+      if (fromPath) {
+        primaryKeywords.set(page.id, { keyword: fromPath, position: null, source: "url" });
       }
     }
   }
@@ -121,6 +153,7 @@ export async function runEngine(
         status,
         primary_keyword: pk?.keyword ?? null,
         primary_position: pk?.position ?? null,
+        keyword_source: pk?.source ?? null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", decay.pageId);
@@ -166,4 +199,33 @@ export async function runEngine(
     pagesDead,
     pagesProcessed,
   };
+}
+
+/** Clean a page title into a usable keyword. */
+function extractKeywordFromTitle(title: string): string | null {
+  let cleaned = title
+    .replace(/\s*[|–—-]\s*[^|–—-]*$/, "")  // Remove "| Site Name", "— Blog", etc.
+    .replace(/\s*\([^)]*\)\s*$/, "")          // Remove trailing "(anything)"
+    .trim()
+    .toLowerCase();
+
+  // Too short or just a domain/brand name
+  if (cleaned.length < 5 || cleaned.split(/\s+/).length < 2) return null;
+  return cleaned;
+}
+
+/** Extract a keyword phrase from a URL path. */
+function extractKeywordFromPath(path: string): string | null {
+  const segment = path.split("/").filter(Boolean).pop();
+  if (!segment) return null;
+
+  const cleaned = segment
+    .replace(/\.\w+$/, "")          // Remove file extension
+    .replace(/[-_]/g, " ")          // Dashes/underscores → spaces
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+  if (cleaned.length < 5 || cleaned.split(/\s+/).length < 2) return null;
+  return cleaned;
 }
