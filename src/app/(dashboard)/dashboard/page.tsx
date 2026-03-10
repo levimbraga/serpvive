@@ -39,7 +39,7 @@ export default async function DashboardPage() {
   const [profileRes, siteRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("plan, diagnoses_used_this_month, free_since")
+      .select("plan, diagnoses_used_this_month, free_since, timezone")
       .eq("id", user.id)
       .single(),
     activeSiteId
@@ -57,6 +57,7 @@ export default async function DashboardPage() {
   const plan = (profile?.plan ?? "free") as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+  const tz = profile?.timezone ?? "UTC";
 
   // No active site → show setup message
   if (!site) {
@@ -199,7 +200,7 @@ export default async function DashboardPage() {
               <p className="text-xs text-[#9CA3AF] mb-1">Last engine run</p>
               <p className="text-sm text-[#111827] font-medium">
                 {new Date(site.last_engine_run_at!).toLocaleDateString("en-US", {
-                  month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+                  month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: tz,
                 })}
               </p>
               <div className="mt-3">
@@ -253,6 +254,7 @@ export default async function DashboardPage() {
             refreshedAt: m.refreshed_at,
           };
         })}
+        timeZone={tz}
       />
 
       {/* Onboarding tour — shows once on first visit */}

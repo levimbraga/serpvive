@@ -31,7 +31,7 @@ function daysRemaining(refreshedAt: string): number {
   return Math.max(0, Math.ceil((measureDate.getTime() - now.getTime()) / 86400000));
 }
 
-export default function RecentResults({ results, measuring = [] }: { results: ResultItem[]; measuring?: MeasuringItem[] }) {
+export default function RecentResults({ results, measuring = [], timeZone = "UTC" }: { results: ResultItem[]; measuring?: MeasuringItem[]; timeZone?: string }) {
   const hasContent = results.length > 0 || measuring.length > 0;
 
   return (
@@ -77,7 +77,7 @@ export default function RecentResults({ results, measuring = [] }: { results: Re
                   </p>
                   <p className="text-xs text-[#9CA3AF]">
                     {r.resultCalculatedAt
-                      ? new Date(r.resultCalculatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                      ? new Date(r.resultCalculatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone })
                       : "—"}
                   </p>
                 </div>
@@ -117,7 +117,7 @@ export default function RecentResults({ results, measuring = [] }: { results: Re
                     {m.pagePath}
                   </p>
                   <p className="text-xs text-[#9CA3AF]">
-                    Refreshed {new Date(m.refreshedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    Refreshed {new Date(m.refreshedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone })}
                   </p>
                 </div>
                 <div className="text-right">
