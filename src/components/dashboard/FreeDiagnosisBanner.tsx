@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, ArrowRight, Loader2, AlertCircle, X } from "lucide-react";
 
 type FreeDiagnosisBannerProps = {
   pageId: string | null;
@@ -13,12 +13,17 @@ type FreeDiagnosisBannerProps = {
 
 const MAX_POLL_TIME_MS = 5 * 60 * 1000; // 5 minutes
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
+const DISMISS_KEY = "serpvive:free-diag-dismissed";
 
 export default function FreeDiagnosisBanner({ pageId, pagePath, isProcessing }: FreeDiagnosisBannerProps) {
   const router = useRouter();
   const triggered = useRef(false);
   const startTime = useRef(Date.now());
   const [timedOut, setTimedOut] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(DISMISS_KEY) === "true";
+  });
 
   // If processing, trigger the retry endpoint and poll for completion
   useEffect(() => {
@@ -84,14 +89,11 @@ export default function FreeDiagnosisBanner({ pageId, pagePath, isProcessing }: 
     );
   }
 
-  if (!pageId || !pagePath) return null;
+  if (!pageId || !pagePath || dismissed) return null;
 
   return (
-    <Link
-      href={`/pages/${pageId}`}
-      className="block bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl px-5 py-4 hover:bg-[#EDE9FE] transition-colors group"
-    >
-      <div className="flex items-center gap-4">
+    <div className="relative bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl px-5 py-4 hover:bg-[#EDE9FE] transition-colors group">
+      <Link href={`/pages/${pageId}`} className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-xl bg-[#EDE9FE] flex items-center justify-center flex-shrink-0 group-hover:bg-[#DDD6FE] transition-colors">
           <Sparkles size={20} strokeWidth={1.5} className="text-[#7C3AED]" />
         </div>
@@ -106,11 +108,22 @@ export default function FreeDiagnosisBanner({ pageId, pagePath, isProcessing }: 
             {pagePath}
           </p>
         </div>
-        <div className="flex items-center gap-1 text-sm font-medium text-[#7C3AED] whitespace-nowrap">
+        <div className="flex items-center gap-1 text-sm font-medium text-[#7C3AED] whitespace-nowrap mr-6">
           See diagnosis
           <ArrowRight size={16} strokeWidth={1.5} className="group-hover:translate-x-0.5 transition-transform" />
         </div>
-      </div>
-    </Link>
+      </Link>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          localStorage.setItem(DISMISS_KEY, "true");
+          setDismissed(true);
+        }}
+        className="absolute top-3 right-3 p-1 rounded-lg text-[#A78BFA] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"
+        aria-label="Dismiss"
+      >
+        <X size={16} strokeWidth={1.5} />
+      </button>
+    </div>
   );
 }
