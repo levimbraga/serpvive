@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
-  CheckCircle2, Crown, Zap, Globe, FileText, Users, BarChart3,
+  CheckCircle2, Crown, Zap, Globe, FileText, BarChart3,
   Unlink, Plus, ArrowUpRight, Key, Trash2, Clock, Calendar,
 } from "lucide-react";
 import {
@@ -590,22 +590,18 @@ export default function SettingsClient({
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-5">
+        <div className="grid grid-cols-3 gap-4 mb-5">
           {[
             { icon: Globe, label: "Sites", value: limits.sites },
             { icon: FileText, label: "Pages", value: limits.pages.toLocaleString() },
             { icon: Zap, label: "Diagnoses/mo", value: limits.diagnoses_per_month, accent: true },
-            { icon: Users, label: "Team", value: limits.team_members, comingSoon: true },
-          ].map(({ icon: Icon, label, value, accent, comingSoon }) => (
+          ].map(({ icon: Icon, label, value, accent }) => (
             <div key={label} className="bg-[#F9FAFB] rounded-lg p-3">
               <div className="flex items-center gap-1.5 mb-1">
                 <Icon size={12} strokeWidth={1.5} className={accent ? "text-[#7C3AED]" : "text-[#6B7280]"} />
                 <p className="text-xs text-[#6B7280]">{label}</p>
               </div>
               <p className="text-lg font-bold text-[#111827] tabular-nums">{value}</p>
-              {comingSoon && (
-                <span className="text-[10px] text-[#9CA3AF] mt-1 block">Coming soon</span>
-              )}
             </div>
           ))}
         </div>
