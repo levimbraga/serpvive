@@ -26,6 +26,7 @@ export async function runDiagnosisPipeline(
   admin: SupabaseClient,
   pageId: string,
   userId: string,
+  triggeredBy: "manual" | "auto" | "cron" = "manual",
 ): Promise<PipelineResult> {
   const startTime = Date.now();
 
@@ -136,7 +137,7 @@ export async function runDiagnosisPipeline(
       tokens_output: diagResult.tokensOutput + briefResult.tokensOutput,
       cost_usd: totalCostUsd,
       processing_time_ms: processingTimeMs,
-      triggered_by: "manual",
+      triggered_by: triggeredBy,
     })
     .select("id")
     .single();

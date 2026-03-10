@@ -11,6 +11,7 @@ import DecayList from "@/components/dashboard/DecayList";
 import RunEngineButton from "@/components/dashboard/RunEngineButton";
 import RecentResults from "@/components/dashboard/RecentResults";
 import UpgradeBanner from "@/components/dashboard/UpgradeBanner";
+import FreeDiagnosisBanner from "@/components/dashboard/FreeDiagnosisBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import { Sparkles } from "lucide-react";
 
@@ -42,7 +43,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, status")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, has_free_diagnosis, status")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -109,6 +110,28 @@ export default async function DashboardPage() {
   const totalContentPages = site.total_content_pages ?? site.pages_count ?? 0;
   const pageLimit = PLAN_LIMITS[plan]?.pages ?? 100;
 
+  // Free diagnosis: find the auto-diagnosed page
+  let freeDiagPageId: string | null = null;
+  let freeDiagPagePath: string | null = null;
+  const isAutoProcessing = site.status === "active" && !site.has_free_diagnosis && hasEngineRun;
+
+  if (site.has_free_diagnosis) {
+    const { data: autoDiag } = await supabase
+      .from("diagnoses")
+      .select("page_id")
+      .eq("user_id", user.id)
+      .eq("triggered_by", "auto")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (autoDiag) {
+      freeDiagPageId = autoDiag.page_id;
+      const pg = pages.find((p) => p.id === autoDiag.page_id);
+      freeDiagPagePath = pg?.path ?? null;
+    }
+  }
+
   // Detect "all new" site — all pages are "new" status
   const allPagesNew = hasEngineRun && pages.length > 0 && pages.every((p) => p.status === "new");
 
@@ -121,6 +144,15 @@ export default async function DashboardPage() {
         plan={plan}
         pageLimit={pageLimit}
       />
+
+      {/* Free diagnosis banner */}
+      {(freeDiagPageId || isAutoProcessing) && (
+        <FreeDiagnosisBanner
+          pageId={freeDiagPageId}
+          pagePath={freeDiagPagePath}
+          isProcessing={isAutoProcessing}
+        />
+      )}
 
       {/* Top section: Health Score + Usage */}
       <div className="grid grid-cols-[1fr_300px] gap-6">

@@ -8,6 +8,8 @@ import {
   getTopQueriesByPage,
 } from "@/lib/gsc/client";
 import { isContentUrl } from "@/lib/engine/url-filter";
+import { runEngine } from "@/lib/engine/run-engine";
+import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 
 const ImportSchema = z.object({
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
   const pageLimit = PLAN_LIMITS[plan].pages;
 
   // Start import in background (non-blocking)
-  runImport(admin, site.id, accessToken, siteUrl, pageLimit).catch((err) => {
+  runImport(admin, site.id, accessToken, siteUrl, pageLimit, user.id).catch((err) => {
     console.error("[gsc/import] Background import failed:", err);
   });
 
@@ -109,6 +111,7 @@ async function runImport(
   accessToken: string,
   siteUrl: string,
   pageLimit: number,
+  userId: string,
 ) {
   try {
     // Import 16 months of daily data in chunks (per month)
@@ -314,6 +317,65 @@ async function runImport(
       .eq("id", siteId);
 
     console.log(`[gsc/import] Done! ${knownPages.size} pages, ${totalMetrics} metrics`);
+
+    // ── Run engine to calculate decay scores ──
+    console.log("[gsc/import] Running decay engine...");
+    try {
+      await runEngine(admin, siteId);
+      console.log("[gsc/import] Engine complete");
+    } catch (err) {
+      console.error("[gsc/import] Engine failed:", err);
+    }
+
+    // ── Auto-generate free first diagnosis ──
+    try {
+      const { data: siteCheck } = await admin
+        .from("sites")
+        .select("has_free_diagnosis")
+        .eq("id", siteId)
+        .single();
+
+      if (!siteCheck?.has_free_diagnosis) {
+        // Pick the best page: highest decay_score, or highest clicks if all "new"
+        const { data: candidates } = await admin
+          .from("pages")
+          .select("id, status, decay_score, current_clicks_28d, current_impressions_28d, primary_keyword")
+          .eq("site_id", siteId)
+          .order("decay_score", { ascending: false })
+          .limit(50);
+
+        if (candidates && candidates.length > 0) {
+          const allNew = candidates.every((p) => p.status === "new" || p.status === "unknown");
+
+          let bestPage: typeof candidates[0] | null = null;
+
+          if (allNew) {
+            // New site: pick page with most clicks (most value to protect)
+            bestPage = [...candidates].sort((a, b) =>
+              (b.current_clicks_28d ?? 0) - (a.current_clicks_28d ?? 0),
+            )[0] ?? null;
+          } else {
+            // Existing site: pick most critical with keyword
+            bestPage = candidates.find((p) => p.primary_keyword) ?? candidates[0] ?? null;
+          }
+
+          if (bestPage) {
+            console.log(`[gsc/import] Auto-diagnosing page ${bestPage.id} (decay: ${bestPage.decay_score}, clicks: ${bestPage.current_clicks_28d})`);
+            await runDiagnosisPipeline(admin, bestPage.id, userId, "auto");
+
+            await admin
+              .from("sites")
+              .update({ has_free_diagnosis: true })
+              .eq("id", siteId);
+
+            console.log("[gsc/import] Free diagnosis complete!");
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[gsc/import] Auto-diagnosis failed (will retry on next login):", err);
+      // Don't mark has_free_diagnosis — will retry later
+    }
   } catch (err) {
     console.error("[gsc/import] Fatal import error:", err);
     await admin
