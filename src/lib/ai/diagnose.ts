@@ -8,7 +8,7 @@ const anthropic = new Anthropic();
 // ── Zod Schemas ──
 
 export const DiagnosisSchema = z.object({
-  summary: z.string().max(500),
+  summary: z.string().max(1000),
   causes: z.array(z.object({
     title: z.string().max(200),
     description: z.string().max(1000),
