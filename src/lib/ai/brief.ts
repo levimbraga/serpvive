@@ -11,8 +11,8 @@ export const RefreshBriefSchema = z.object({
   total_effort_hours: z.number(),
   actions: z.array(z.object({
     priority: z.enum(["urgent", "important", "nice_to_have"]),
-    title: z.string().max(200),
-    description: z.string().max(1000),
+    title: z.string().max(500),
+    description: z.string().max(2000),
     effort_minutes: z.number(),
     category: z.enum(["title", "content", "structure", "technical", "meta"]),
     micro_draft: z.object({
@@ -20,8 +20,8 @@ export const RefreshBriefSchema = z.object({
         "title_suggestions", "topics_to_cover", "corrected_data",
         "format_suggestion", "meta_text", "general_guidance",
       ]),
-      suggestions: z.array(z.string().max(500)).default([]),
-      competitor_references: z.array(z.string().max(300)).optional(),
+      suggestions: z.array(z.string().max(1000)).default([]),
+      competitor_references: z.array(z.string().max(500)).optional(),
     }),
   })).min(1).max(15),
 });

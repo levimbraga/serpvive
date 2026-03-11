@@ -8,12 +8,12 @@ const anthropic = new Anthropic();
 // ── Zod Schemas ──
 
 export const DiagnosisSchema = z.object({
-  summary: z.string().max(1000),
+  summary: z.string().max(2000),
   causes: z.array(z.object({
-    title: z.string().max(200),
-    description: z.string().max(1000),
+    title: z.string().max(500),
+    description: z.string().max(2000),
     severity: z.enum(["high", "medium", "low"]),
-    evidence: z.string().max(500),
+    evidence: z.string().max(1000),
     category: z.enum([
       "outdated_content", "new_competitors", "intent_shift",
       "missing_topic", "format_gap", "technical_issue",
@@ -25,11 +25,11 @@ export const DiagnosisSchema = z.object({
   serp_analysis: z.object({
     top_competitors: z.array(z.object({
       url: z.string().max(500),
-      title: z.string().max(200),
-      strengths: z.array(z.string().max(200)).default([]),
+      title: z.string().max(500),
+      strengths: z.array(z.string().max(500)).default([]),
     })).default([]),
     intent_type: z.enum(["informational", "commercial", "transactional", "navigational"]),
-    content_format_trend: z.string().max(300),
+    content_format_trend: z.string().max(1000),
   }),
 });
 
