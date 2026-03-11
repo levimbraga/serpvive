@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { refreshAccessToken, getSearchAnalyticsByPageAndDate, getTopQueriesByPage } from "@/lib/gsc/client";
+
+export const maxDuration = 300; // 5 minutes
 import { isContentUrl } from "@/lib/engine/url-filter";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 

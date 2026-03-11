@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
+
+export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
