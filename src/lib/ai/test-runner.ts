@@ -8,16 +8,11 @@ import type { PromptData, PromptVersion } from "./prompts/types";
 const anthropic = new Anthropic();
 
 export const PROMPT_NAMES: Record<string, string> = {
-  v1: "Baseline (current)",
-  v2: "Balanced Google + User",
-  v3: "Ultra Specific",
-  v4: "Impact x Effort Framework",
-  v5: "Conversational & Empathetic",
-  v6: "Data-Driven",
-  v7: "Competitor Deep-Dive",
-  v8: "Intent-First",
-  v9: "Quick Wins Only",
-  v10: "Editorial Complete",
+  v1: "Best of All",
+  v2: "Data-Driven",
+  v3: "Competitor Deep-Dive",
+  v4: "Intent-First",
+  v5: "Editorial Complete",
 };
 
 export type TestResult = {

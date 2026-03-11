@@ -15,7 +15,8 @@ import FreeDiagnosisBanner from "@/components/dashboard/FreeDiagnosisBanner";
 import FreePlanBanner from "@/components/dashboard/FreePlanBanner";
 import UpgradeSuccessBanner from "@/components/dashboard/UpgradeSuccessBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
-import { Sparkles } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Sparkles, Info } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard — SerpVive",
@@ -45,7 +46,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -148,6 +149,10 @@ export default async function DashboardPage() {
   // Detect "all new" site — all pages are "new" status
   const allPagesNew = hasEngineRun && pages.length > 0 && pages.every((p) => p.status === "new");
 
+  // Show GSC info banner for sites less than 3 months old
+  const siteAgeMs = site.created_at ? Date.now() - new Date(site.created_at).getTime() : Infinity;
+  const isRecentSite = siteAgeMs < 90 * 24 * 60 * 60 * 1000; // < 3 months
+
   return (
     <div className="space-y-6">
       {/* Upgrade success banner */}
@@ -241,6 +246,25 @@ export default async function DashboardPage() {
           critical={site.pages_critical}
           dead={site.pages_dead}
         />
+      )}
+
+      {/* GSC info banner for new sites */}
+      {hasEngineRun && isRecentSite && (
+        <Alert className="bg-[#EFF6FF] border-[#BFDBFE]">
+          <Info size={16} strokeWidth={1.5} className="text-[#2563EB]" />
+          <AlertDescription className="text-[#1E40AF]">
+            Pages only appear here after Google Search Console registers at least 1 impression.
+            New or recently published pages may take a few days to show up.{" "}
+            <a
+              href="https://search.google.com/search-console"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[#2563EB] hover:text-[#1D4ED8] underline underline-offset-2"
+            >
+              Open Google Search Console &rarr;
+            </a>
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Decay list */}
