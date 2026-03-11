@@ -39,7 +39,7 @@ export default async function DashboardPage() {
   const [profileRes, siteRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("plan, diagnoses_used_this_month, free_since, timezone")
+      .select("plan, diagnoses_used_this_month, free_since, timezone, full_name, created_at")
       .eq("id", user.id)
       .single(),
     activeSiteId
@@ -68,6 +68,16 @@ export default async function DashboardPage() {
       </div>
     );
   }
+
+  // Greeting logic
+  const firstName = profile?.full_name?.split(" ")[0] ?? null;
+  const isFirstAccess = !site.last_sync_at || (
+    profile?.created_at &&
+    new Date(profile.created_at).toDateString() === new Date().toDateString()
+  );
+  const greeting = isFirstAccess
+    ? firstName ? `Welcome, ${firstName}!` : "Welcome to SerpVive!"
+    : firstName ? `Welcome back, ${firstName}` : "Welcome back";
 
   const healthScore = site.health_score ?? 0;
   const healthDelta = site.health_score_prev !== null
@@ -162,11 +172,22 @@ export default async function DashboardPage() {
       {/* Free diagnosis banner */}
       {(freeDiagPageId || isAutoProcessing) && (
         <FreeDiagnosisBanner
+          siteId={site.id}
           pageId={freeDiagPageId}
           pagePath={freeDiagPagePath}
           isProcessing={isAutoProcessing}
         />
       )}
+
+      {/* Greeting */}
+      <div>
+        <h1 className="text-xl font-semibold text-[#111827]">
+          {greeting} {isFirstAccess ? "\uD83C\uDF89" : "\uD83D\uDC4B"}
+        </h1>
+        <p className="text-sm text-[#6B7280] mt-0.5">
+          Here&apos;s how your blog is doing today.
+        </p>
+      </div>
 
       {/* Top section: Health Score + Usage */}
       <div className="flex flex-col lg:grid lg:grid-cols-[1fr_300px] gap-6">

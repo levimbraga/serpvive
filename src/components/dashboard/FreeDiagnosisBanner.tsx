@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Sparkles, ArrowRight, Loader2, AlertCircle, X } from "lucide-react";
 
 type FreeDiagnosisBannerProps = {
+  siteId: string;
   pageId: string | null;
   pagePath: string | null;
   isProcessing: boolean;
@@ -13,16 +14,19 @@ type FreeDiagnosisBannerProps = {
 
 const MAX_POLL_TIME_MS = 5 * 60 * 1000; // 5 minutes
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
-const DISMISS_KEY = "serpvive:free-diag-dismissed";
 
-export default function FreeDiagnosisBanner({ pageId, pagePath, isProcessing }: FreeDiagnosisBannerProps) {
+function getDismissKey(siteId: string) {
+  return `serpvive:free-diag-dismissed:${siteId}`;
+}
+
+export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProcessing }: FreeDiagnosisBannerProps) {
   const router = useRouter();
   const triggered = useRef(false);
   const startTime = useRef(Date.now());
   const [timedOut, setTimedOut] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
-    return localStorage.getItem(DISMISS_KEY) === "true";
+    return localStorage.getItem(getDismissKey(siteId)) === "true";
   });
 
   // If processing, trigger the retry endpoint and poll for completion
@@ -116,7 +120,7 @@ export default function FreeDiagnosisBanner({ pageId, pagePath, isProcessing }: 
       <button
         onClick={(e) => {
           e.stopPropagation();
-          localStorage.setItem(DISMISS_KEY, "true");
+          localStorage.setItem(getDismissKey(siteId), "true");
           setDismissed(true);
         }}
         className="absolute top-3 right-3 p-1 rounded-lg text-[#A78BFA] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"

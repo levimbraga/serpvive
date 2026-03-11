@@ -3,8 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function DashboardLoading() {
   return (
     <div className="space-y-6">
+      {/* Greeting skeleton */}
+      <div className="space-y-1">
+        <Skeleton className="w-56 h-6" />
+        <Skeleton className="w-64 h-4" />
+      </div>
+
       {/* Top section: Health Score + Usage */}
-      <div className="grid grid-cols-[1fr_300px] gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_300px] gap-6">
         {/* Health Score ring skeleton */}
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -32,7 +38,7 @@ export default function DashboardLoading() {
       </div>
 
       {/* Stats row skeleton */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-3">
             <Skeleton className="w-10 h-10 rounded-lg" />

@@ -1,13 +1,8 @@
 import { redirect } from "next/navigation";
 
-// TODO: Remove this redirect when signup is enabled
+// Signup is disabled — redirect to login
+// Enhanced signup form (with full_name, country, auto-detect) is ready
+// in git history. To re-enable: restore from this commit's version of the file.
 export default function SignupPage() {
   redirect("/login?msg=signup-disabled");
 }
-
-/* ═══════════════════════════════════════════════════════════════
- * ORIGINAL SIGNUP CODE — preserved for when we enable signups.
- * To re-enable: replace this entire file with the version from
- * git commit 06806aa (or remove the redirect above and restore
- * the original "use client" component below).
- * ═══════════════════════════════════════════════════════════════ */

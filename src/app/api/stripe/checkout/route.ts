@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const admin = getSupabaseAdmin();
   const { data: profile } = await admin
     .from("profiles")
-    .select("stripe_customer_id, email")
+    .select("stripe_customer_id, stripe_subscription_id, email, plan")
     .eq("id", user.id)
     .single();
 
@@ -43,6 +43,30 @@ export async function POST(request: Request) {
   const stripe = getStripe();
   const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const appUrl = origin.replace(/\/$/, "");
+
+  // If user already has an active subscription, update it instead of creating a new one
+  if (profile.stripe_subscription_id) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id);
+
+      if (subscription.status === "active" || subscription.status === "trialing") {
+        // Update existing subscription's price
+        await stripe.subscriptions.update(profile.stripe_subscription_id, {
+          items: [{
+            id: subscription.items.data[0]!.id,
+            price: planConfig.priceId,
+          }],
+          metadata: { supabase_user_id: user.id, plan: planKey },
+          proration_behavior: "create_prorations",
+        });
+
+        return NextResponse.json({ data: { url: `${appUrl}/dashboard?upgraded=true` } });
+      }
+    } catch (err) {
+      // Subscription not found or already canceled — fall through to create new checkout
+      console.log("[stripe/checkout] Could not update existing subscription, creating new checkout:", err);
+    }
+  }
 
   // Create or reuse Stripe customer
   let customerId = profile.stripe_customer_id;

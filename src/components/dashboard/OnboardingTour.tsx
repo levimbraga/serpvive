@@ -6,7 +6,7 @@ import { HelpCircle } from "lucide-react";
 
 const STORAGE_KEY = "serpvive_tour_seen";
 const TOOLTIP_WIDTH = 280;
-const TOOLTIP_HEIGHT = 220;
+const TOOLTIP_EST_HEIGHT = 220; // estimate for placement; actual is measured
 const PAD = 8;
 const ARROW_GAP = 10;
 
@@ -53,27 +53,27 @@ function getHighlightRect(el: Element): HighlightRect {
   return { top: r.top, left: r.left, width: r.width, height: maxH };
 }
 
-function pickPlacement(hr: HighlightRect): Placement {
+function pickPlacement(hr: HighlightRect, tooltipH: number = TOOLTIP_EST_HEIGHT): Placement {
   const vh = window.innerHeight;
   const vw = window.innerWidth;
 
   // Prefer bottom
-  if (hr.top + hr.height + PAD + ARROW_GAP + TOOLTIP_HEIGHT < vh) return "bottom";
+  if (hr.top + hr.height + PAD + ARROW_GAP + tooltipH < vh) return "bottom";
   // Try top
-  if (hr.top - PAD - ARROW_GAP - TOOLTIP_HEIGHT > 0) return "top";
+  if (hr.top - PAD - ARROW_GAP - tooltipH > 0) return "top";
   // Try left
   if (hr.left - PAD - ARROW_GAP - TOOLTIP_WIDTH > 0) return "left";
   // Try right
   if (hr.left + hr.width + PAD + ARROW_GAP + TOOLTIP_WIDTH < vw) return "right";
-  // Fallback: top (scrollIntoView should have made space)
-  return "top";
+  // Fallback: bottom
+  return "bottom";
 }
 
-function getTooltipStyle(hr: HighlightRect, placement: Placement): React.CSSProperties {
+function getTooltipStyle(hr: HighlightRect, placement: Placement, tooltipH: number = TOOLTIP_EST_HEIGHT): React.CSSProperties {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const clampX = (x: number) => Math.max(12, Math.min(x, vw - TOOLTIP_WIDTH - 12));
-  const clampY = (y: number) => Math.max(12, Math.min(y, vh - TOOLTIP_HEIGHT - 12));
+  const clampY = (y: number) => Math.max(12, Math.min(y, vh - tooltipH - 12));
 
   switch (placement) {
     case "bottom":
@@ -83,17 +83,17 @@ function getTooltipStyle(hr: HighlightRect, placement: Placement): React.CSSProp
       };
     case "top":
       return {
-        top: clampY(hr.top - PAD - ARROW_GAP - TOOLTIP_HEIGHT),
+        top: clampY(hr.top - PAD - ARROW_GAP - tooltipH),
         left: clampX(hr.left + hr.width / 2 - TOOLTIP_WIDTH / 2),
       };
     case "left":
       return {
-        top: clampY(hr.top + hr.height / 2 - TOOLTIP_HEIGHT / 2),
+        top: clampY(hr.top + hr.height / 2 - tooltipH / 2),
         left: hr.left - PAD - ARROW_GAP - TOOLTIP_WIDTH,
       };
     case "right":
       return {
-        top: clampY(hr.top + hr.height / 2 - TOOLTIP_HEIGHT / 2),
+        top: clampY(hr.top + hr.height / 2 - tooltipH / 2),
         left: hr.left + hr.width + PAD + ARROW_GAP,
       };
   }
@@ -231,8 +231,19 @@ function TourOverlay({
 }) {
   const current = STEPS[step]!;
   const isLast = step === STEPS.length - 1;
-  const placement = pickPlacement(hr);
-  const tooltipStyle = getTooltipStyle(hr, placement);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [measuredH, setMeasuredH] = useState(TOOLTIP_EST_HEIGHT);
+
+  // Measure actual tooltip height after render
+  useEffect(() => {
+    if (tooltipRef.current) {
+      const h = tooltipRef.current.getBoundingClientRect().height;
+      if (h > 0) setMeasuredH(h);
+    }
+  });
+
+  const placement = pickPlacement(hr, measuredH);
+  const tooltipStyle = getTooltipStyle(hr, placement, measuredH);
 
   const arrow = (() => {
     const base = "absolute w-3 h-3 bg-white";
@@ -288,6 +299,7 @@ function TourOverlay({
 
       {/* Tooltip */}
       <div
+        ref={tooltipRef}
         className="fixed bg-white rounded-xl shadow-2xl border border-[#E5E7EB] p-5"
         style={{ ...tooltipStyle, width: TOOLTIP_WIDTH, pointerEvents: "auto" }}
       >
