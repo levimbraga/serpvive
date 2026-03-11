@@ -57,7 +57,7 @@ export async function POST(request: Request) {
             price: planConfig.priceId,
           }],
           metadata: { supabase_user_id: user.id, plan: planKey },
-          proration_behavior: "create_prorations",
+          proration_behavior: "always_invoice",
         });
 
         return NextResponse.json({ data: { url: `${appUrl}/dashboard?upgraded=true` } });

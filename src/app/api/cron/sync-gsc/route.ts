@@ -89,8 +89,10 @@ export async function GET(request: Request) {
 
       const rows = await getSearchAnalyticsByPageAndDate(accessToken, site.gsc_property, startDate, endDate);
 
+      console.log(`[cron/sync-gsc] Site ${site.id}: GSC returned ${rows.length} rows`);
+
       if (rows.length === 0) {
-        console.log(`[cron/sync-gsc] Site ${site.id}: no new data`);
+        console.log(`[cron/sync-gsc] Site ${site.id}: no new data from GSC for ${startDate} → ${endDate}`);
         await admin
           .from("sites")
           .update({ last_sync_at: new Date().toISOString(), updated_at: new Date().toISOString() })
@@ -112,23 +114,61 @@ export async function GET(request: Request) {
       const currentPageCount = existingUrls.size;
       const slotsAvailable = Math.max(0, pageLimit - currentPageCount);
 
+      // Detailed URL analysis for debugging
+      const allUniqueUrls = [...new Set(rows.map((r) => r.page))];
+      const urlAnalysis = {
+        total_from_gsc: allUniqueUrls.length,
+        already_tracked: 0,
+        filtered_by_url_filter: [] as string[],
+        new_content_pages: 0,
+        invalid_urls: [] as string[],
+      };
+
       const newPages: { site_id: string; url: string; path: string; title: string | null }[] = [];
 
       for (const row of rows) {
-        if (!existingUrls.has(row.page) && isContentUrl(row.page)) {
-          existingUrls.add(row.page);
-          try {
-            const url = new URL(row.page);
-            newPages.push({ site_id: site.id, url: row.page, path: url.pathname, title: null });
-          } catch { /* skip invalid */ }
+        if (existingUrls.has(row.page)) {
+          // Already tracked — skip but don't re-log
+          continue;
+        }
+
+        if (!isContentUrl(row.page)) {
+          // Track which URLs got filtered and why
+          if (!urlAnalysis.filtered_by_url_filter.includes(row.page)) {
+            urlAnalysis.filtered_by_url_filter.push(row.page);
+          }
+          continue;
+        }
+
+        // New content page
+        existingUrls.add(row.page);
+        try {
+          const url = new URL(row.page);
+          newPages.push({ site_id: site.id, url: row.page, path: url.pathname, title: null });
+        } catch {
+          urlAnalysis.invalid_urls.push(row.page);
         }
       }
 
-      // Log filter stats
-      const totalUniqueUrls = new Set(rows.map((r) => r.page)).size;
-      const filteredCount = totalUniqueUrls - existingUrls.size - newPages.length;
-      if (filteredCount > 0) {
-        console.log(`[cron/sync-gsc] Site ${site.id}: ${totalUniqueUrls} unique URLs from GSC, ${filteredCount} filtered out by URL filter, ${newPages.length} new content pages found`);
+      urlAnalysis.already_tracked = currentPageCount;
+      urlAnalysis.new_content_pages = newPages.length;
+
+      console.log(`[cron/sync-gsc] Site ${site.id} URL analysis:`, {
+        total_from_gsc: urlAnalysis.total_from_gsc,
+        already_tracked: urlAnalysis.already_tracked,
+        filtered_out: urlAnalysis.filtered_by_url_filter.length,
+        new_pages: urlAnalysis.new_content_pages,
+        invalid: urlAnalysis.invalid_urls.length,
+        slots_available: slotsAvailable,
+      });
+
+      if (urlAnalysis.filtered_by_url_filter.length > 0) {
+        console.log(`[cron/sync-gsc] Site ${site.id} filtered URLs (first 10):`,
+          urlAnalysis.filtered_by_url_filter.slice(0, 10));
+      }
+
+      if (urlAnalysis.invalid_urls.length > 0) {
+        console.log(`[cron/sync-gsc] Site ${site.id} invalid URLs:`, urlAnalysis.invalid_urls);
       }
 
       if (newPages.length > 0 && slotsAvailable > 0) {
