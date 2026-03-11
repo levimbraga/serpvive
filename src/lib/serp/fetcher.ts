@@ -34,8 +34,31 @@ export async function fetchPageContent(url: string): Promise<PageContent | null>
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Remove scripts, styles, nav, footer
-    $("script, style, nav, footer, header, aside, [role='navigation']").remove();
+    // Remove dangerous/hidden elements (prompt injection defense)
+    $("script, style, noscript, iframe, object, embed, svg, nav, footer, header, aside, [role='navigation']").remove();
+    $('[style*="display:none"], [style*="display: none"]').remove();
+    $('[style*="visibility:hidden"], [style*="visibility: hidden"]').remove();
+    $("[hidden]").remove();
+    $("head").remove();
+
+    // Remove HTML comments (can contain hidden instructions)
+    $("*")
+      .contents()
+      .filter(function () {
+        return this.type === "comment";
+      })
+      .remove();
+
+    // Remove event handler attributes
+    $("*").each(function () {
+      const el = $(this);
+      const attrs = el.attr();
+      if (attrs) {
+        Object.keys(attrs).forEach((attr) => {
+          if (attr.startsWith("on")) el.removeAttr(attr);
+        });
+      }
+    });
 
     const title = $("title").text().trim() ||
       $("h1").first().text().trim() ||

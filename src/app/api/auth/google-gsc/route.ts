@@ -21,7 +21,9 @@ export async function GET(request: Request) {
 
   // Pass redirect target through state (userId:redirect)
   const { searchParams } = new URL(request.url);
-  const redirectTarget = searchParams.get("redirect") ?? "";
+  const rawRedirect = searchParams.get("redirect") ?? "";
+  const validRedirects = ["settings", "dashboard"];
+  const redirectTarget = validRedirects.includes(rawRedirect) ? rawRedirect : "";
   const stateValue = redirectTarget ? `${user.id}:${redirectTarget}` : user.id;
 
   const params = new URLSearchParams({

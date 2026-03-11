@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const DiagnoseInputSchema = z.object({
   pageId: z.string().uuid(),
@@ -16,6 +17,14 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit: max 3 diagnoses per minute per user
+  if (!checkRateLimit(`diagnose:${user.id}`, 3, 60_000)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait before running another diagnosis." },
+      { status: 429 },
+    );
   }
 
   // Validate input
@@ -119,7 +128,7 @@ export async function POST(request: Request) {
 
     console.error("[api/diagnose] Pipeline error:", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Diagnosis failed" },
+      { error: "Diagnosis failed. Please try again." },
       { status: 500 },
     );
   }

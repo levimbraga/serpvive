@@ -33,6 +33,6 @@ export async function GET() {
     return NextResponse.json({ message: "Weekly digest sent with real data" });
   } catch (err) {
     console.error("[test-email] Error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }

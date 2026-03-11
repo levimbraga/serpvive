@@ -3,6 +3,7 @@ import { searchGoogle } from "@/lib/serp/client";
 import { fetchPageContent, formatContentForPrompt } from "@/lib/serp/fetcher";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
+import { sanitizeForPrompt, sanitizeQuery } from "./sanitize";
 
 export type PipelineResult = {
   diagnosisId: string;
@@ -54,7 +55,7 @@ export async function runDiagnosisPipeline(
   }
 
   const serpResultsStr = serpResults.length > 0
-    ? serpResults.map((r) => `#${r.position}: ${r.title}\n   ${r.url}\n   ${r.snippet}`).join("\n\n")
+    ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
   // Step 2: Fetch content (user + top 3 competitors)
@@ -68,10 +69,12 @@ export async function runDiagnosisPipeline(
     ...competitorUrls.map((r) => fetchPageContent(r.url)),
   ]);
 
-  const userContentStr = formatContentForPrompt(userContent, page.url);
-  const competitorsStr = competitorUrls
-    .map((r, i) => formatContentForPrompt(competitorContents[i] ?? null, r.url))
-    .join("\n\n---\n\n");
+  const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, page.url));
+  const competitorsStr = sanitizeForPrompt(
+    competitorUrls
+      .map((r, i) => formatContentForPrompt(competitorContents[i] ?? null, r.url))
+      .join("\n\n---\n\n")
+  );
 
   // Step 3: Get query data
   let queryDataStr = "No query data available";
@@ -84,7 +87,7 @@ export async function runDiagnosisPipeline(
 
   if (queries && queries.length > 0) {
     queryDataStr = queries
-      .map((q) => `"${q.query}" — ${q.clicks} clicks, ${q.impressions} impr, pos #${q.position.toFixed(1)}`)
+      .map((q) => `"${sanitizeQuery(q.query)}" — ${q.clicks} clicks, ${q.impressions} impr, pos #${q.position.toFixed(1)}`)
       .join("\n");
   }
 
