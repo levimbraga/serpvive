@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripe, getPlanFromPriceId } from "@/lib/stripe";
+import { getStripe, getPlanFromPriceIdAsync } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPostHogServer } from "@/lib/posthog/server";
 import type Stripe from "stripe";
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       // Determine plan from subscription metadata or price_id
       let plan = subscription?.metadata?.plan;
       if (!plan && subscription?.items?.data?.[0]?.price?.id) {
-        plan = getPlanFromPriceId(subscription.items.data[0].price.id);
+        plan = await getPlanFromPriceIdAsync(subscription.items.data[0].price.id);
       }
       plan = plan ?? "starter";
 
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
             const planStatus = statusMap[subscription.status] ?? "active";
             let plan = subscription.metadata?.plan;
             if (!plan && priceId) {
-              plan = getPlanFromPriceId(priceId);
+              plan = await getPlanFromPriceIdAsync(priceId);
             }
             plan = plan ?? "starter";
 
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
       // Determine plan from metadata or price_id
       let plan = subscription.metadata?.plan;
       if (!plan && subscription.items?.data?.[0]?.price?.id) {
-        plan = getPlanFromPriceId(subscription.items.data[0].price.id);
+        plan = await getPlanFromPriceIdAsync(subscription.items.data[0].price.id);
       }
       plan = plan ?? "starter";
 

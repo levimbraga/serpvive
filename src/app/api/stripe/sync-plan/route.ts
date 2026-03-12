@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getStripe, getPlanFromPriceId } from "@/lib/stripe";
+import { getStripe, getPlanFromPriceIdAsync } from "@/lib/stripe";
 
 export async function POST() {
   const supabase = await getSupabaseServer();
@@ -30,7 +30,7 @@ export async function POST() {
 
     let plan = subscription.metadata?.plan;
     if (!plan && priceId) {
-      plan = getPlanFromPriceId(priceId);
+      plan = await getPlanFromPriceIdAsync(priceId);
     }
     plan = plan ?? "starter";
 
