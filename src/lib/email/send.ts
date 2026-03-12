@@ -1,11 +1,17 @@
 import { resend, FROM_EMAIL } from "./resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { generateUnsubscribeToken } from "@/app/api/email/unsubscribe/route";
 import WeeklyDigest from "./templates/weekly-digest";
 import OnboardingDay0 from "./templates/onboarding-day0";
 import OnboardingDay2 from "./templates/onboarding-day2";
 import OnboardingDay3 from "./templates/onboarding-day3";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://serpvive.com";
+
+function getUnsubscribeUrl(userId: string): string {
+  const token = generateUnsubscribeToken(userId);
+  return `${APP_URL}/api/email/unsubscribe?uid=${userId}&token=${token}`;
+}
 
 export async function sendWeeklyDigest(userId: string, siteId: string) {
   const admin = getSupabaseAdmin();
@@ -56,6 +62,9 @@ export async function sendWeeklyDigest(userId: string, siteId: string) {
     from: FROM_EMAIL,
     to: profile.email,
     subject: `${site.domain}: Health ${healthScore}/100 ${healthScoreDelta >= 0 ? "↑" : "↓"}${Math.abs(healthScoreDelta)} — Weekly Digest`,
+    headers: {
+      "List-Unsubscribe": `<${getUnsubscribeUrl(userId)}>`,
+    },
     react: WeeklyDigest({
       userName: profile.full_name ?? "there",
       siteDomain: site.domain,
@@ -73,6 +82,7 @@ export async function sendWeeklyDigest(userId: string, siteId: string) {
         resultStatus: r.result_status,
       })),
       dashboardUrl: `${APP_URL}/dashboard`,
+      unsubscribeUrl: getUnsubscribeUrl(userId),
     }),
   });
 

@@ -225,6 +225,29 @@ export async function POST(request: Request) {
         })
         .eq("id", userId);
 
+      // Pause excess sites (free plan = 1 site)
+      const { PLAN_LIMITS } = await import("@/lib/constants");
+      const freeSiteLimit = PLAN_LIMITS.free.sites;
+
+      const { data: userSites } = await admin
+        .from("sites")
+        .select("id, status")
+        .eq("user_id", userId)
+        .order("last_sync_at", { ascending: false, nullsFirst: false });
+
+      if (userSites && userSites.filter((s) => s.status === "active").length > freeSiteLimit) {
+        const activeSites = userSites.filter((s) => s.status === "active");
+        const sitesToPause = activeSites.slice(freeSiteLimit);
+
+        for (const s of sitesToPause) {
+          await admin.from("sites").update({ status: "paused" }).eq("id", s.id);
+        }
+
+        if (sitesToPause.length > 0) {
+          console.log(`[stripe/webhook] Paused ${sitesToPause.length} excess sites on cancellation for user=${userId}`);
+        }
+      }
+
       getPostHogServer().capture({ distinctId: userId, event: "plan_downgraded", properties: { plan: "free" } });
       console.log(`[stripe/webhook] subscription.deleted: user=${userId}, downgraded to free`);
       break;

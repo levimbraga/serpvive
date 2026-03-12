@@ -23,6 +23,7 @@ type WeeklyDigestProps = {
   urgentPages: UrgentPage[];
   recentResults: RecentResult[];
   dashboardUrl: string;
+  unsubscribeUrl?: string;
 };
 
 function scoreColor(score: number): string {
@@ -50,6 +51,7 @@ export default function WeeklyDigest({
   urgentPages,
   recentResults,
   dashboardUrl,
+  unsubscribeUrl,
 }: WeeklyDigestProps) {
   const deltaStr = healthScoreDelta >= 0
     ? `↑${healthScoreDelta}`
@@ -135,6 +137,14 @@ export default function WeeklyDigest({
               <Link href={`${dashboardUrl.replace(/\/dashboard.*/, "")}/settings`} style={footerLink}>
                 Manage preferences
               </Link>
+              {unsubscribeUrl && (
+                <>
+                  {" · "}
+                  <Link href={unsubscribeUrl} style={footerLink}>
+                    Unsubscribe
+                  </Link>
+                </>
+              )}
             </Text>
           </Section>
         </Container>

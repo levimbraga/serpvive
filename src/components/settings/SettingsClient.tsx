@@ -7,7 +7,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
   CheckCircle2, Crown, Zap, Globe, FileText, BarChart3,
-  Unlink, Plus, ArrowUpRight, Key, Trash2, Clock, Calendar,
+  Unlink, Plus, ArrowUpRight, Key, Trash2, Clock, Calendar, Mail,
 } from "lucide-react";
 import {
   Dialog,
@@ -108,6 +108,7 @@ export default function SettingsClient({
   sitesLimit,
   timezone,
   digestDay,
+  emailUnsubscribed,
   billingInterval,
   authProvider,
 }: {
@@ -122,6 +123,7 @@ export default function SettingsClient({
   sitesLimit: number;
   timezone: string;
   digestDay: string;
+  emailUnsubscribed: boolean;
   billingInterval: "monthly" | "annual";
   authProvider: string;
 }) {
@@ -152,9 +154,10 @@ export default function SettingsClient({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
 
-  // Timezone/digest state
+  // Timezone/digest/email state
   const [currentTimezone, setCurrentTimezone] = useState(timezone);
   const [currentDigestDay, setCurrentDigestDay] = useState(digestDay);
+  const [emailOff, setEmailOff] = useState(emailUnsubscribed);
 
   // Delete account state
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -244,6 +247,23 @@ export default function SettingsClient({
 
     if (err) setError("Failed to update digest day");
     else flash("Digest day updated");
+  }
+
+  async function handleEmailToggle() {
+    const newValue = !emailOff;
+    setEmailOff(newValue);
+    try {
+      const res = await fetch("/api/email/unsubscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unsubscribed: newValue }),
+      });
+      if (!res.ok) throw new Error();
+      flash(newValue ? "Emails disabled" : "Emails re-enabled");
+    } catch {
+      setEmailOff(!newValue); // rollback
+      setError("Failed to update email preference");
+    }
   }
 
   // ── Billing actions ──
@@ -595,7 +615,7 @@ export default function SettingsClient({
           </div>
 
           {/* Digest day */}
-          <div className="flex items-center justify-between py-3 last:pb-0">
+          <div className="flex items-center justify-between py-3">
             <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
               <Calendar size={14} strokeWidth={1.5} />
               Weekly digest day
@@ -603,12 +623,31 @@ export default function SettingsClient({
             <select
               value={currentDigestDay}
               onChange={(e) => handleDigestDayChange(e.target.value)}
-              className="h-8 px-2 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer"
+              disabled={emailOff}
+              className="h-8 px-2 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer disabled:opacity-50"
             >
               {DIGEST_DAYS.map((d) => (
                 <option key={d.value} value={d.value}>{d.label}</option>
               ))}
             </select>
+          </div>
+
+          {/* Email toggle */}
+          <div className="flex items-center justify-between py-3 last:pb-0">
+            <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
+              <Mail size={14} strokeWidth={1.5} />
+              Email notifications
+            </span>
+            <button
+              onClick={handleEmailToggle}
+              className={`relative w-10 h-5 rounded-full transition-colors ${
+                emailOff ? "bg-[#D1D5DB]" : "bg-[#3B82F6]"
+              }`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                emailOff ? "" : "translate-x-5"
+              }`} />
+            </button>
           </div>
         </div>
       </div>
