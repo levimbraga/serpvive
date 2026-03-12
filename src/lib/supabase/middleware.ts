@@ -31,7 +31,8 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
+  const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup") || path.startsWith("/forgot-password");
+  // /reset-password is intentionally NOT in isAuthRoute (user needs active session from recovery link)
   const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes");
 
   // Not logged in → redirect to login
