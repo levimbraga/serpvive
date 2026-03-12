@@ -1,23 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import crypto from "crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { verifyUnsubscribeToken } from "@/lib/email/unsubscribe";
 
 const UnsubscribeSchema = z.object({
   uid: z.string().uuid(),
   token: z.string().min(1),
 });
-
-/** Generate an HMAC token for email unsubscribe links */
-export function generateUnsubscribeToken(userId: string): string {
-  const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY ?? "fallback";
-  return crypto.createHmac("sha256", secret).update(userId).digest("hex").slice(0, 32);
-}
-
-function verifyToken(userId: string, token: string): boolean {
-  const expected = generateUnsubscribeToken(userId);
-  return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
-}
 
 /** GET /api/email/unsubscribe?uid=xxx&token=yyy — one-click unsubscribe from emails */
 export async function GET(request: Request) {
@@ -36,7 +25,7 @@ export async function GET(request: Request) {
 
   const { uid, token } = parsed.data;
 
-  if (!verifyToken(uid, token)) {
+  if (!verifyUnsubscribeToken(uid, token)) {
     return new NextResponse(unsubscribePage("Invalid or expired link."), {
       status: 403,
       headers: { "Content-Type": "text/html" },

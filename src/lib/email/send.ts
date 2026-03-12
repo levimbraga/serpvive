@@ -1,6 +1,6 @@
 import { resend, FROM_EMAIL } from "./resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { generateUnsubscribeToken } from "@/app/api/email/unsubscribe/route";
+import { generateUnsubscribeToken } from "@/lib/email/unsubscribe";
 import WeeklyDigest from "./templates/weekly-digest";
 import OnboardingDay0 from "./templates/onboarding-day0";
 import OnboardingDay2 from "./templates/onboarding-day2";
