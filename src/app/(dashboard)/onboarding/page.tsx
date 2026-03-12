@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Shield, Unplug, Lock } from "lucide-react";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
 
 const ERROR_MESSAGES: Record<string, string> = {
   access_denied: "You denied access. We need read-only access to your Search Console data.",
@@ -17,6 +18,7 @@ export default function OnboardingConnectPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      <OnboardingProgress currentStep={1} />
       <div className="max-w-md w-full text-center">
         <h1 className="text-2xl font-semibold text-[#111827] mb-2">
           Connect Google Search Console

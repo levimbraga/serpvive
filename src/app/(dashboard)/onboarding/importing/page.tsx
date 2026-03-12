@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
 
 type ImportStatus = {
   status: "importing" | "active" | "error";
@@ -67,6 +68,7 @@ export default function ImportingPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      <OnboardingProgress currentStep={3} />
       <div className="max-w-md w-full text-center">
         {isError ? (
           <>

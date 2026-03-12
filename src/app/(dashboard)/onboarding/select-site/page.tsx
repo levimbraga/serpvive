@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Globe, Star } from "lucide-react";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
 
 type GscProperty = {
   siteUrl: string;
@@ -87,6 +88,7 @@ export default function SelectSitePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      <OnboardingProgress currentStep={2} />
       <div className="max-w-lg w-full">
         <h1 className="text-2xl font-semibold text-[#111827] mb-2 text-center">
           Select your site
