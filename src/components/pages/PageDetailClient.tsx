@@ -366,6 +366,28 @@ export default function PageDetailClient({
     URL.revokeObjectURL(url);
   }
 
+  function handleExportDiagnosisJson() {
+    if (!diagnosis) return;
+    const exportData = {
+      page: { id: page.id, url: page.url, path: page.path, keyword: page.primary_keyword },
+      diagnosis: diagnosis.diagnosis,
+      refresh_brief: diagnosis.refresh_brief ?? null,
+      meta: {
+        diagnosis_id: diagnosis.id,
+        cost_usd: diagnosis.cost_usd,
+        processing_time_ms: diagnosis.processing_time_ms,
+        created_at: diagnosis.created_at,
+      },
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `diagnosis-${page.path.replace(/\//g, "_")}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // Calculate days remaining for pending refresh
   const daysRemaining = refresh?.result_status === "pending"
     ? Math.max(0, 28 - Math.floor((Date.now() - new Date(refresh.refreshed_at).getTime()) / (1000 * 60 * 60 * 24)))
@@ -790,9 +812,19 @@ export default function PageDetailClient({
                   {isNew ? "Content Analysis" : "Decay Diagnosis"}
                 </h2>
               </div>
-              <span className="text-xs text-[#9CA3AF]">
-                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-[#9CA3AF]">
+                  {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </span>
+                <button
+                  onClick={handleExportDiagnosisJson}
+                  className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#7C3AED] transition-colors"
+                  title="Export diagnosis as JSON"
+                >
+                  <Download size={14} strokeWidth={1.5} />
+                  JSON
+                </button>
+              </div>
             </div>
 
             {/* Summary */}
