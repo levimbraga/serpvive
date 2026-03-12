@@ -15,6 +15,7 @@ import FreeDiagnosisBanner from "@/components/dashboard/FreeDiagnosisBanner";
 import FreePlanBanner from "@/components/dashboard/FreePlanBanner";
 import UpgradeSuccessBanner from "@/components/dashboard/UpgradeSuccessBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
+import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles, Info, AlertTriangle } from "lucide-react";
 
@@ -180,6 +181,19 @@ export default async function DashboardPage() {
             </a>
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Welcome card — first visit after onboarding, until engine + diagnosis complete and dismissed */}
+      {site.status === "active" && (
+        <WelcomeCard
+          siteId={site.id}
+          domain={site.domain}
+          pagesCount={site.pages_count ?? 0}
+          hasEngineRun={hasEngineRun}
+          hasDiagnosis={!!site.has_free_diagnosis}
+          freeDiagPageId={freeDiagPageId}
+          freeDiagPagePath={freeDiagPagePath}
+        />
       )}
 
       {/* Upgrade banner when site has more pages than plan allows */}
