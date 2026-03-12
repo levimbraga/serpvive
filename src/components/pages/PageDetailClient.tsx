@@ -357,11 +357,11 @@ export default function PageDetailClient({
     <div className="space-y-6">
       {/* Back link */}
       <Link
-        href="/dashboard"
+        href="/pages"
         className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] transition-colors"
       >
         <ArrowLeft size={16} strokeWidth={1.5} />
-        Back to dashboard
+        Back to pages
       </Link>
 
       {/* Page header */}
