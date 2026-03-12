@@ -7,16 +7,25 @@ export const metadata: Metadata = {
   title: "SerpVive — Revive Your Rankings | AI-Powered Content Decay Monitor",
   description:
     "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
+  metadataBase: new URL("https://serpvive.com"),
   icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
+    icon: "/icon.svg",
+    apple: "/og-icon.png",
   },
   openGraph: {
-    title: "SerpVive — Revive Your Rankings | AI-Powered Content Decay Monitor",
+    title: "SerpVive — Revive Your Rankings",
     description:
-      "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
+      "Detect content decay, get AI-powered diagnoses, and recover your rankings with actionable refresh briefs.",
     url: "https://serpvive.com",
-    images: [{ url: "/og-icon.png", width: 512, height: 512 }],
+    siteName: "SerpVive",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SerpVive — Revive Your Rankings",
+    description:
+      "AI-powered content decay monitor. Detect decay, diagnose causes, recover rankings.",
   },
 };
 

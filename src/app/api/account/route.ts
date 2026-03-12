@@ -28,27 +28,69 @@ export async function DELETE() {
       console.log(`[account/delete] Canceled subscription ${profile.stripe_subscription_id}`);
     } catch (err) {
       console.error("[account/delete] Stripe cancel error:", err);
-      // Continue with deletion even if Stripe fails
     }
   }
 
-  // Delete all sites (CASCADE handles pages, metrics, queries, diagnoses, refreshes)
-  const { error: sitesErr } = await admin
+  // Get all user's site IDs for cascading deletes
+  const { data: userSites } = await admin
     .from("sites")
-    .delete()
+    .select("id")
     .eq("user_id", user.id);
 
-  if (sitesErr) console.error("[account/delete] Sites delete error:", sitesErr);
+  const siteIds = (userSites ?? []).map((s) => s.id);
+
+  if (siteIds.length > 0) {
+    // Get all page IDs across all sites
+    const { data: userPages } = await admin
+      .from("pages")
+      .select("id")
+      .in("site_id", siteIds);
+
+    const pageIds = (userPages ?? []).map((p) => p.id);
+
+    if (pageIds.length > 0) {
+      // Delete leaf tables first (reverse dependency order)
+      // Batch in chunks of 100 to avoid query size limits
+      for (let i = 0; i < pageIds.length; i += 100) {
+        const batch = pageIds.slice(i, i + 100);
+
+        const results = await Promise.allSettled([
+          admin.from("page_metrics_daily").delete().in("page_id", batch),
+          admin.from("page_queries").delete().in("page_id", batch),
+        ]);
+        for (const r of results) {
+          if (r.status === "rejected") console.error("[account/delete] Leaf delete error:", r.reason);
+        }
+      }
+    }
+
+    // Delete refreshes and diagnoses by user_id (they have user_id FK)
+    const [refreshErr, diagErr] = await Promise.allSettled([
+      admin.from("refreshes").delete().eq("user_id", user.id),
+      admin.from("diagnoses").delete().eq("user_id", user.id),
+    ]);
+    if (refreshErr.status === "rejected") console.error("[account/delete] Refreshes error:", refreshErr.reason);
+    if (diagErr.status === "rejected") console.error("[account/delete] Diagnoses error:", diagErr.reason);
+
+    // Delete pages
+    if (pageIds.length > 0) {
+      for (let i = 0; i < pageIds.length; i += 100) {
+        const batch = pageIds.slice(i, i + 100);
+        const { error } = await admin.from("pages").delete().in("id", batch);
+        if (error) console.error("[account/delete] Pages delete error:", error);
+      }
+    }
+
+    // Delete sites
+    const { error: sitesErr } = await admin.from("sites").delete().eq("user_id", user.id);
+    if (sitesErr) console.error("[account/delete] Sites delete error:", sitesErr);
+  }
 
   // Delete profile
-  const { error: profileErr } = await admin
-    .from("profiles")
-    .delete()
-    .eq("id", user.id);
-
+  const { error: profileErr } = await admin.from("profiles").delete().eq("id", user.id);
   if (profileErr) console.error("[account/delete] Profile delete error:", profileErr);
 
-  // Delete auth user
+  // Delete auth user (this also cascades to profiles if ON DELETE CASCADE exists)
   const { error: authErr } = await admin.auth.admin.deleteUser(user.id);
 
   if (authErr) {

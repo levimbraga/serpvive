@@ -146,7 +146,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (err) {
-    // Rollback usage on failure
+    // Rollback usage on failure — user shouldn't lose a diagnosis credit
     await admin
       .from("profiles")
       .update({
@@ -154,18 +154,49 @@ export async function POST(request: Request) {
       })
       .eq("id", user.id);
 
-    console.error("[api/diagnose] Pipeline error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[api/diagnose] Pipeline error:", message);
+
     getPostHogServer().capture({
       distinctId: user.id,
       event: "diagnosis_failed",
-      properties: {
-        page_id: pageId,
-        error: err instanceof Error ? err.message : String(err),
-      },
+      properties: { page_id: pageId, error: message },
     });
+
+    // Map internal errors to user-friendly messages
+    const userMessage = getUserFriendlyError(message);
+
     return NextResponse.json(
-      { error: "Diagnosis failed. Please try again." },
+      { error: userMessage, code: "diagnosis_failed" },
       { status: 500 },
     );
   }
+}
+
+function getUserFriendlyError(message: string): string {
+  const lower = message.toLowerCase();
+
+  if (lower.includes("page not found")) {
+    return "This page could not be found. It may have been removed from your site.";
+  }
+  if (lower.includes("overloaded") || lower.includes("529") || lower.includes("capacity")) {
+    return "Our AI service is temporarily overloaded. Please try again in a few minutes.";
+  }
+  if (lower.includes("rate") || lower.includes("429") || lower.includes("too many")) {
+    return "Too many requests. Please wait a minute and try again.";
+  }
+  if (lower.includes("timeout") || lower.includes("timed out") || lower.includes("econnrefused")) {
+    return "The analysis timed out. This can happen with very large pages. Please try again.";
+  }
+  if (lower.includes("invalid json") || lower.includes("json parse") || lower.includes("unexpected token")) {
+    return "The AI returned an unexpected response. Please try again — this is usually a one-time issue.";
+  }
+  if (lower.includes("failed to save")) {
+    return "The analysis completed but could not be saved. Please try again.";
+  }
+  if (lower.includes("fetch") || lower.includes("network") || lower.includes("enotfound")) {
+    return "Could not reach your page or competitor pages. Check that the URL is accessible and try again.";
+  }
+
+  return "Something went wrong during the analysis. Your diagnosis credit was not consumed — please try again.";
 }

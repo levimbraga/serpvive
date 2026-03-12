@@ -10,7 +10,7 @@ import {
   ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
-  Search, FileText, Brain, Sparkles, Info,
+  Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -812,9 +812,12 @@ export default function PageDetailClient({
 
                           {/* Micro-draft */}
                           <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
-                            <p className="text-xs font-medium text-[#16A34A] uppercase tracking-wider mb-2">
-                              Micro-draft: {action.micro_draft.type.replace(/_/g, " ")}
-                            </p>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-medium text-[#16A34A] uppercase tracking-wider">
+                                Micro-draft: {action.micro_draft.type.replace(/_/g, " ")}
+                              </p>
+                              <CopyMicroDraftButton suggestions={action.micro_draft.suggestions} />
+                            </div>
                             <ul className="space-y-2">
                               {action.micro_draft.suggestions.map((s, j) => (
                                 <li key={j} className="text-sm text-[#111827] flex gap-2">
@@ -1034,9 +1037,12 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
                   <p className="text-sm text-[#4B5563] mt-3 mb-3">{action.description}</p>
 
                   <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
-                    <p className="text-xs font-medium text-[#16A34A] uppercase tracking-wider mb-2">
-                      Micro-draft: {action.micro_draft.type.replace(/_/g, " ")}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-medium text-[#16A34A] uppercase tracking-wider">
+                        Micro-draft: {action.micro_draft.type.replace(/_/g, " ")}
+                      </p>
+                      <CopyMicroDraftButton suggestions={action.micro_draft.suggestions} />
+                    </div>
                     <ul className="space-y-2">
                       {action.micro_draft.suggestions.map((s, j) => (
                         <li key={j} className="text-sm text-[#111827] flex gap-2">
@@ -1060,5 +1066,36 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
         })}
       </div>
     </div>
+  );
+}
+
+function CopyMicroDraftButton({ suggestions }: { suggestions: string[] }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const text = suggestions.map((s) => `• ${s}`).join("\n");
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1 text-xs text-[#16A34A] hover:text-[#15803D] transition-colors"
+      title="Copy to clipboard"
+    >
+      {copied ? (
+        <>
+          <ClipboardCheck size={13} strokeWidth={1.5} />
+          Copied
+        </>
+      ) : (
+        <>
+          <Copy size={13} strokeWidth={1.5} />
+          Copy
+        </>
+      )}
+    </button>
   );
 }

@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, ArrowUpDown, X } from "lucide-react";
+import { Search, ArrowUpDown, X, ChevronLeft, ChevronRight } from "lucide-react";
+
+const PAGE_SIZE = 25;
 
 type PageData = {
   id: string;
@@ -45,9 +47,11 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("decay_score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [activePreset, setActivePreset] = useState<SortPreset>("most_critical");
+  const [currentPage, setCurrentPage] = useState(1);
 
   function applyPreset(preset: SortPreset) {
     setActivePreset(preset);
+    setCurrentPage(1);
     switch (preset) {
       case "most_critical":
         setSortKey("decay_score");
@@ -69,7 +73,8 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
   }
 
   function toggleSort(key: SortKey) {
-    setActivePreset("most_critical"); // Clear preset highlight when manual sort
+    setActivePreset("most_critical");
+    setCurrentPage(1);
     if (sortKey === key) {
       setSortDir(sortDir === "desc" ? "asc" : "desc");
     } else {
@@ -120,6 +125,13 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
     return result;
   }, [pages, search, sortKey, sortDir, activePreset]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedRows = filtered.slice(
+    (safeCurrentPage - 1) * PAGE_SIZE,
+    safeCurrentPage * PAGE_SIZE,
+  );
+
   const columns: { key: SortKey; label: string; className: string }[] = [
     { key: "status", label: "Status", className: "w-[100px]" },
     { key: "current_clicks_28d", label: "Clicks (28d)", className: "w-[110px] text-right" },
@@ -138,7 +150,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
             type="text"
             placeholder="Search by URL..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
           />
           {search && (
@@ -197,7 +209,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((page) => {
+              {paginatedRows.map((page) => {
                 const cfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
                 return (
                   <tr
@@ -267,11 +279,37 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
           </table>
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+        {/* Footer with pagination */}
+        <div className="px-5 py-3 border-t border-[#E5E7EB] bg-[#F9FAFB] flex items-center justify-between">
           <p className="text-xs text-[#9CA3AF]">
-            {filtered.length} of {pages.length} pages
+            {filtered.length === 0
+              ? "0 pages"
+              : `${(safeCurrentPage - 1) * PAGE_SIZE + 1}–${Math.min(safeCurrentPage * PAGE_SIZE, filtered.length)} of ${filtered.length} pages`
+            }
           </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safeCurrentPage <= 1}
+                className="p-1.5 rounded-lg text-[#6B7280] hover:bg-[#F3F4F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                aria-label="Previous page"
+              >
+                <ChevronLeft size={16} strokeWidth={1.5} />
+              </button>
+              <span className="text-xs text-[#6B7280] px-2 tabular-nums">
+                {safeCurrentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safeCurrentPage >= totalPages}
+                className="p-1.5 rounded-lg text-[#6B7280] hover:bg-[#F3F4F6] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                aria-label="Next page"
+              >
+                <ChevronRight size={16} strokeWidth={1.5} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
