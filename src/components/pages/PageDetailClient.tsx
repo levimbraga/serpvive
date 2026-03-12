@@ -9,11 +9,9 @@ import {
   ArrowLeft, Loader2, Zap, ExternalLink,
   ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
-  FlaskConical, Download, X as XIcon,
   BarChart3, Lightbulb, History,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 type PageData = {
@@ -98,32 +96,6 @@ type RefreshRecord = {
   result_calculated_at: string | null;
 };
 
-const ADMIN_EMAIL = "levimaiabraga@gmail.com";
-
-type TestResultItem = {
-  version: string;
-  name: string;
-  diagnosis?: DiagnosisData;
-  brief?: BriefData;
-  error?: string;
-  duration_ms: number;
-  tokens: { input: number; output: number };
-  cost_usd: number;
-};
-
-type TestResponse = {
-  data: {
-    results: TestResultItem[];
-    summary: {
-      total_cost_usd: number;
-      total_duration_ms: number;
-      versions_run: number;
-      versions_succeeded: number;
-      versions_failed: number;
-    };
-  };
-};
-
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
   healthy:  { color: "#16A34A", bg: "#F0FDF4", label: "Healthy" },
   warning:  { color: "#D97706", bg: "#FFFBEB", label: "Warning" },
@@ -161,7 +133,6 @@ export default function PageDetailClient({
   plan,
   diagnosesUsed,
   diagnosesLimit,
-  userEmail,
 }: {
   page: PageData;
   siteDomain: string;
@@ -171,7 +142,6 @@ export default function PageDetailClient({
   plan: string;
   diagnosesUsed: number;
   diagnosesLimit: number;
-  userEmail?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -182,13 +152,6 @@ export default function PageDetailClient({
   const [expandedActions, setExpandedActions] = useState<Set<number>>(new Set());
   const [checkedActions, setCheckedActions] = useState<Set<number>>(new Set());
   const [showConfettiMsg, setShowConfettiMsg] = useState(false);
-
-  // Prompt test state (admin only)
-  const [testResults, setTestResults] = useState<TestResultItem[] | null>(null);
-  const [testSummary, setTestSummary] = useState<TestResponse["data"]["summary"] | null>(null);
-  const [testLoading, setTestLoading] = useState(false);
-  const [testError, setTestError] = useState("");
-  const isAdmin = userEmail === ADMIN_EMAIL;
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
@@ -326,68 +289,6 @@ export default function PageDetailClient({
     });
   }
 
-  async function handleRunPromptTest() {
-    setTestLoading(true);
-    setTestError("");
-    setTestResults(null);
-    setTestSummary(null);
-
-    try {
-      const res = await fetch("/api/test-prompts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page_id: page.id, versions: ["v1", "v2", "v3", "v4", "v5"] }),
-      });
-
-      const json = (await res.json()) as TestResponse & { error?: string };
-
-      if (!res.ok) {
-        setTestError(json.error ?? "Test failed");
-        return;
-      }
-
-      setTestResults(json.data.results);
-      setTestSummary(json.data.summary);
-    } catch {
-      setTestError("Network error");
-    } finally {
-      setTestLoading(false);
-    }
-  }
-
-  function handleExportTestJson() {
-    if (!testResults) return;
-    const blob = new Blob([JSON.stringify({ results: testResults, summary: testSummary }, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `prompt-test-${page.path.replace(/\//g, "_")}-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function handleExportDiagnosisJson() {
-    if (!diagnosis) return;
-    const exportData = {
-      page: { id: page.id, url: page.url, path: page.path, keyword: page.primary_keyword },
-      diagnosis: diagnosis.diagnosis,
-      refresh_brief: diagnosis.refresh_brief ?? null,
-      meta: {
-        diagnosis_id: diagnosis.id,
-        cost_usd: diagnosis.cost_usd,
-        processing_time_ms: diagnosis.processing_time_ms,
-        created_at: diagnosis.created_at,
-      },
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `diagnosis-${page.path.replace(/\//g, "_")}-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
   // Calculate days remaining for pending refresh
   const daysRemaining = refresh?.result_status === "pending"
     ? Math.max(0, 28 - Math.floor((Date.now() - new Date(refresh.refreshed_at).getTime()) / (1000 * 60 * 60 * 24)))
@@ -458,21 +359,6 @@ export default function PageDetailClient({
                 </>
               )}
             </button>
-
-            {isAdmin && (
-              <button
-                onClick={handleRunPromptTest}
-                disabled={testLoading || loading}
-                className="flex items-center gap-2 h-10 px-4 rounded-xl border-2 border-[#7C3AED]/30 text-[#7C3AED] text-sm font-medium hover:bg-[#F5F3FF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {testLoading ? (
-                  <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
-                ) : (
-                  <FlaskConical size={16} strokeWidth={1.5} />
-                )}
-                {testLoading ? "Running..." : "Test 5 Prompts"}
-              </button>
-            )}
           </div>
         </div>
 
@@ -647,7 +533,7 @@ export default function PageDetailClient({
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
           <Loader2 size={32} strokeWidth={1.5} className="text-[#7C3AED] animate-spin mx-auto mb-4" />
           <p className="text-[#111827] font-medium">Analyzing your page...</p>
-          <p className="text-sm text-[#6B7280] mt-1">This usually takes about 2 minutes. Searching Google, fetching competitors, running AI analysis.</p>
+          <p className="text-sm text-[#6B7280] mt-1">This usually takes 2–3 minutes. Searching Google, fetching competitors, running AI analysis.</p>
         </div>
       )}
 
@@ -658,150 +544,8 @@ export default function PageDetailClient({
         </div>
       )}
 
-      {/* Test error */}
-      {testError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-          Test error: {testError}
-        </div>
-      )}
-
-      {/* Test loading state */}
-      {testLoading && (
-        <div className="bg-[#F5F3FF] border-2 border-[#7C3AED]/30 rounded-xl p-8 text-center">
-          <Loader2 size={32} strokeWidth={1.5} className="text-[#7C3AED] animate-spin mx-auto mb-4" />
-          <p className="text-[#5B21B6] font-medium">Running 5 AI analyses in parallel...</p>
-          <p className="text-sm text-[#7C3AED] mt-1">This takes about 5 minutes. Fetching SERP data, running all prompt versions, validating outputs.</p>
-        </div>
-      )}
-
-      {/* Prompt test results (tabs) */}
-      {testResults && !testLoading && (
-        <div className="space-y-4">
-          {/* Test header */}
-          <div className="bg-[#F5F3FF] border-2 border-[#7C3AED]/30 rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <FlaskConical size={20} strokeWidth={1.5} className="text-[#7C3AED]" />
-                <div>
-                  <p className="text-sm font-semibold text-[#5B21B6]">
-                    Comparing {testSummary?.versions_run ?? 5} prompt versions
-                  </p>
-                  <p className="text-xs text-[#7C3AED] mt-0.5">
-                    Total: ${testSummary?.total_cost_usd.toFixed(4) ?? "—"} · {Math.round((testSummary?.total_duration_ms ?? 0) / 1000)}s
-                    {testSummary?.versions_failed ? ` · ${testSummary.versions_failed} failed` : ""}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleExportTestJson}
-                  className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#7C3AED]/30 text-xs font-medium text-[#7C3AED] hover:bg-[#EDE9FE] transition-colors"
-                >
-                  <Download size={12} strokeWidth={1.5} />
-                  Export JSON
-                </button>
-                <button
-                  onClick={() => { setTestResults(null); setTestSummary(null); }}
-                  className="flex items-center gap-1 h-8 px-3 rounded-lg border border-[#E5E7EB] text-xs text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
-                >
-                  <XIcon size={12} strokeWidth={1.5} />
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <Tabs defaultValue={testResults[0]?.version ?? "v1"}>
-            <TabsList className="w-full flex overflow-x-auto">
-              {testResults.map((r) => (
-                <TabsTrigger
-                  key={r.version}
-                  value={r.version}
-                  className="flex-1 min-w-0 text-xs sm:text-sm"
-                >
-                  <span className="truncate">
-                    {r.version}: {r.name.split(" ")[0]}
-                  </span>
-                  {r.error && <span className="ml-1 text-red-500">!</span>}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {testResults.map((r) => (
-              <TabsContent key={r.version} value={r.version} className="space-y-4 mt-4">
-                {/* Version info bar */}
-                <div className="flex items-center gap-4 text-xs text-[#6B7280] bg-[#F9FAFB] rounded-lg px-4 py-2">
-                  <span className="font-medium text-[#111827]">{r.name}</span>
-                  <span>${r.cost_usd.toFixed(4)}</span>
-                  <span>{Math.round(r.duration_ms / 1000)}s</span>
-                  <span>{(r.tokens.input + r.tokens.output).toLocaleString()} tokens</span>
-                </div>
-
-                {r.error ? (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-                    Error: {r.error}
-                  </div>
-                ) : (
-                  <>
-                    {/* Reuse exact same diagnosis card rendering */}
-                    {r.diagnosis && (
-                      <div className="bg-white rounded-xl border-2 border-[#7C3AED]/30 p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <Zap size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
-                          <h2 className="text-lg font-semibold text-[#111827]">
-                            {isNew ? "Content Analysis" : "Decay Diagnosis"}
-                          </h2>
-                          <span className="text-xs text-[#9CA3AF] ml-auto">{r.version}</span>
-                        </div>
-
-                        <p className="text-[#4B5563] mb-5">{r.diagnosis.summary}</p>
-
-                        <div className="space-y-3">
-                          {r.diagnosis.causes.map((cause, i) => {
-                            const sev = SEVERITY_CONFIG[cause.severity] ?? SEVERITY_CONFIG["medium"]!;
-                            return (
-                              <div key={i} className={`border-l-4 ${sev.border} bg-[#F9FAFB] rounded-r-xl p-4`}>
-                                <div className="flex items-start gap-2">
-                                  <span>{sev.emoji}</span>
-                                  <div>
-                                    <p className="font-medium text-[#111827]">{cause.title}</p>
-                                    <p className="text-sm text-[#4B5563] mt-1">{cause.description}</p>
-                                    <p className="text-xs text-[#6B7280] mt-2 italic">Evidence: {cause.evidence}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {r.diagnosis.serp_analysis && (
-                          <div className="mt-5 pt-5 border-t border-[#E5E7EB]">
-                            <p className="text-xs text-[#9CA3AF] uppercase tracking-wider mb-2">SERP Insight</p>
-                            <p className="text-sm text-[#4B5563]">
-                              Intent: <span className="font-medium text-[#111827]">{r.diagnosis.serp_analysis.intent_type}</span>
-                              {" · "}
-                              Format trend: <span className="font-medium text-[#111827]">{r.diagnosis.serp_analysis.content_format_trend}</span>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Reuse exact same brief card rendering */}
-                    {r.brief && (
-                      <TestBriefCard brief={r.brief} />
-                    )}
-                  </>
-                )}
-              </TabsContent>
-            ))}
-          </Tabs>
-        </div>
-      )}
-
       {/* Diagnosis results */}
-      {diagnosis && !loading && !testResults && (
+      {diagnosis && !loading && (
         <>
           {/* Diagnosis card */}
           <div className="bg-white rounded-xl border-2 border-[#7C3AED]/30 p-6">
@@ -812,19 +556,9 @@ export default function PageDetailClient({
                   {isNew ? "Content Analysis" : "Decay Diagnosis"}
                 </h2>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-[#9CA3AF]">
-                  {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                </span>
-                <button
-                  onClick={handleExportDiagnosisJson}
-                  className="flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#7C3AED] transition-colors"
-                  title="Export diagnosis as JSON"
-                >
-                  <Download size={14} strokeWidth={1.5} />
-                  JSON
-                </button>
-              </div>
+              <span className="text-xs text-[#9CA3AF]">
+                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </span>
             </div>
 
             {/* Summary */}
@@ -1008,7 +742,7 @@ export default function PageDetailClient({
       )}
 
       {/* Previous Analyses — only show if there's history */}
-      {previousDiagnoses.length > 0 && !loading && !testResults && (
+      {previousDiagnoses.length > 0 && !loading && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <History size={18} strokeWidth={1.5} className="text-[#9CA3AF]" />
@@ -1086,7 +820,7 @@ export default function PageDetailClient({
 
                       {/* Brief */}
                       {prev.refresh_brief && (
-                        <TestBriefCard brief={prev.refresh_brief} />
+                        <ReadOnlyBriefCard brief={prev.refresh_brief} />
                       )}
                     </div>
                   </AccordionContent>
@@ -1098,7 +832,7 @@ export default function PageDetailClient({
       )}
 
       {/* Empty state — no diagnosis yet */}
-      {!diagnosis && !loading && !testResults && !testLoading && (
+      {!diagnosis && !loading && (
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
           <Zap size={32} strokeWidth={1.5} className="text-[#9CA3AF] mx-auto mb-3" />
           <p className="text-[#6B7280]">
@@ -1120,9 +854,9 @@ export default function PageDetailClient({
 }
 
 /**
- * Read-only brief card for test results (no checkboxes, no mark-as-updated).
+ * Read-only brief card for previous diagnoses (no checkboxes, no mark-as-updated).
  */
-function TestBriefCard({ brief }: { brief: BriefData }) {
+function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   return (
