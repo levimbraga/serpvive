@@ -40,6 +40,7 @@ export default function LoginPage() {
   }
 
   async function handleGoogle() {
+    posthog.capture("user_logged_in", { method: "google" });
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

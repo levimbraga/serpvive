@@ -127,6 +127,7 @@ export default function SignupForm() {
   }
 
   async function handleGoogle() {
+    posthog.capture("user_signed_up", { method: "google" });
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

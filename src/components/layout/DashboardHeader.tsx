@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
   LogOut, Menu, LayoutDashboard, FileText, RefreshCw, Settings,
@@ -66,6 +67,8 @@ export default function DashboardHeader({
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
 
   async function handleLogout() {
+    posthog.capture("user_logged_out");
+    posthog.reset();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
