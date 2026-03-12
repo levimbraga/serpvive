@@ -6,6 +6,7 @@ import { getStripe, STRIPE_PLANS, type StripePlanKey } from "@/lib/stripe";
 
 const CheckoutInputSchema = z.object({
   plan: z.enum(["starter", "pro", "agency"]),
+  interval: z.enum(["monthly", "annual"]).default("monthly"),
 });
 
 export async function POST(request: Request) {
@@ -23,9 +24,12 @@ export async function POST(request: Request) {
   }
 
   const planKey = parsed.data.plan as StripePlanKey;
+  const interval = parsed.data.interval;
   const planConfig = STRIPE_PLANS[planKey];
 
-  if (!planConfig.priceId) {
+  const priceId = interval === "annual" ? planConfig.annualPriceId : planConfig.priceId;
+
+  if (!priceId) {
     return NextResponse.json({ error: "Stripe price not configured for this plan" }, { status: 500 });
   }
 
@@ -44,27 +48,30 @@ export async function POST(request: Request) {
   const origin = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const appUrl = origin.replace(/\/$/, "");
 
-  // If user already has an active subscription, update it instead of creating a new one
-  if (profile.stripe_subscription_id) {
+  // If user already has an active subscription, redirect to Customer Portal for plan change
+  // This shows proration and requires user confirmation — never change plans silently
+  if (profile.stripe_subscription_id && profile.stripe_customer_id) {
     try {
       const subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id);
 
       if (subscription.status === "active" || subscription.status === "trialing") {
-        // Update existing subscription's price
-        await stripe.subscriptions.update(profile.stripe_subscription_id, {
-          items: [{
-            id: subscription.items.data[0]!.id,
-            price: planConfig.priceId,
-          }],
-          metadata: { supabase_user_id: user.id, plan: planKey },
-          proration_behavior: "always_invoice",
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: profile.stripe_customer_id,
+          return_url: `${appUrl}/settings?upgrade=success`,
+          flow_data: {
+            type: "subscription_update",
+            subscription_update: {
+              subscription: profile.stripe_subscription_id,
+            },
+          },
         });
 
-        return NextResponse.json({ data: { url: `${appUrl}/dashboard?upgraded=true` } });
+        console.log(`[stripe/checkout] Redirecting to portal for plan change: user=${user.id}, from=${profile.plan}, to=${planKey} (${interval})`);
+        return NextResponse.json({ data: { url: portalSession.url } });
       }
     } catch (err) {
-      // Subscription not found or already canceled — fall through to create new checkout
-      console.log("[stripe/checkout] Could not update existing subscription, creating new checkout:", err);
+      // Portal flow_data not configured or subscription issue — fall through to new checkout
+      console.log("[stripe/checkout] Could not create portal session, falling through to checkout:", err);
     }
   }
 
@@ -86,11 +93,11 @@ export async function POST(request: Request) {
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
-    line_items: [{ price: planConfig.priceId, quantity: 1 }],
-    success_url: `${appUrl}/dashboard?upgraded=true`,
-    cancel_url: `${appUrl}/settings`,
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${appUrl}/settings?upgrade=success`,
+    cancel_url: `${appUrl}/settings?upgrade=canceled`,
     subscription_data: {
-      metadata: { supabase_user_id: user.id, plan: planKey },
+      metadata: { supabase_user_id: user.id, plan: planKey, interval },
     },
   });
 

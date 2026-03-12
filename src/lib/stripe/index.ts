@@ -22,17 +22,26 @@ export const STRIPE_PLANS = {
   starter: {
     name: "Starter",
     price: 29,
+    annualPrice: 24,
+    annualTotal: 290,
     priceId: process.env.STRIPE_PRICE_STARTER ?? "",
+    annualPriceId: process.env.STRIPE_PRICE_STARTER_ANNUAL ?? "",
   },
   pro: {
     name: "Pro",
     price: 69,
+    annualPrice: 58,
+    annualTotal: 690,
     priceId: process.env.STRIPE_PRICE_PRO ?? "",
+    annualPriceId: process.env.STRIPE_PRICE_PRO_ANNUAL ?? "",
   },
   agency: {
     name: "Agency",
     price: 129,
+    annualPrice: 108,
+    annualTotal: 1290,
     priceId: process.env.STRIPE_PRICE_AGENCY ?? "",
+    annualPriceId: process.env.STRIPE_PRICE_AGENCY_ANNUAL ?? "",
   },
 } as const;
 

@@ -16,7 +16,7 @@ import FreePlanBanner from "@/components/dashboard/FreePlanBanner";
 import UpgradeSuccessBanner from "@/components/dashboard/UpgradeSuccessBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sparkles, Info } from "lucide-react";
+import { Sparkles, Info, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard — SerpVive",
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at, token_error")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -166,6 +166,22 @@ export default async function DashboardPage() {
         />
       )}
 
+      {/* GSC disconnection banner */}
+      {site.token_error && (
+        <Alert className="bg-[#FEF2F2] border-[#FECACA]">
+          <AlertTriangle size={16} strokeWidth={1.5} className="text-[#DC2626]" />
+          <AlertDescription className="text-[#991B1B]">
+            Google Search Console disconnected. Your data may be outdated.{" "}
+            <a
+              href="/api/auth/google-gsc?redirect=dashboard"
+              className="font-medium text-[#DC2626] hover:text-[#991B1B] underline underline-offset-2"
+            >
+              Reconnect &rarr;
+            </a>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Upgrade banner when site has more pages than plan allows */}
       <UpgradeBanner
         totalContentPages={totalContentPages}
@@ -239,13 +255,19 @@ export default async function DashboardPage() {
 
       {/* Stats row */}
       {hasEngineRun && (
-        <StatsRow
-          totalPages={site.pages_count}
-          healthy={site.pages_healthy}
-          warning={site.pages_warning}
-          critical={site.pages_critical}
-          dead={site.pages_dead}
-        />
+        <div>
+          <StatsRow
+            totalPages={site.pages_count}
+            healthy={site.pages_healthy}
+            warning={site.pages_warning}
+            critical={site.pages_critical}
+            dead={site.pages_dead}
+          />
+          <p className="text-[10px] text-[#D1D5DB] mt-1.5 flex items-center gap-1">
+            <Info size={10} strokeWidth={1.5} />
+            Data from Google Search Console (2–3 day delay)
+          </p>
+        </div>
       )}
 
       {/* GSC info banner for new sites */}

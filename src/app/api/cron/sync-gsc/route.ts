@@ -69,16 +69,28 @@ export async function GET(request: Request) {
       }
 
       // Refresh access token
-      const tokens = await refreshAccessToken(site.gsc_refresh_token);
-      const accessToken = tokens.access_token;
+      let accessToken: string;
+      try {
+        const tokens = await refreshAccessToken(site.gsc_refresh_token);
+        accessToken = tokens.access_token;
 
-      await admin
-        .from("sites")
-        .update({
-          gsc_access_token: accessToken,
-          gsc_token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-        })
-        .eq("id", site.id);
+        await admin
+          .from("sites")
+          .update({
+            gsc_access_token: accessToken,
+            gsc_token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+            token_error: false,
+          })
+          .eq("id", site.id);
+      } catch (tokenErr) {
+        console.error(`[cron/sync-gsc] Site ${site.id}: token refresh failed — marking token_error`, tokenErr);
+        await admin
+          .from("sites")
+          .update({ token_error: true })
+          .eq("id", site.id);
+        errors++;
+        continue;
+      }
 
       // Pull last 3 days of data (covers any gaps from weekends/delays)
       const now = new Date();

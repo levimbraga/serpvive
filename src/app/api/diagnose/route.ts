@@ -8,6 +8,7 @@ import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getPostHogServer } from "@/lib/posthog/server";
 
 const DiagnoseInputSchema = z.object({
   pageId: z.string().uuid(),
@@ -24,7 +25,11 @@ export async function POST(request: Request) {
   // Rate limit: max 3 diagnoses per minute per user
   if (!checkRateLimit(`diagnose:${user.id}`, 3, 60_000)) {
     return NextResponse.json(
-      { error: "Too many requests. Please wait before running another diagnosis." },
+      {
+        error: "Please wait a moment before running another analysis. Each diagnosis takes significant processing power.",
+        code: "slow_down",
+        retry_after: 60,
+      },
       { status: 429 },
     );
   }
@@ -98,6 +103,27 @@ export async function POST(request: Request) {
     );
   }
 
+  // Check for concurrent diagnosis — prevent user from running 2 at once
+  const { data: recentDiag } = await admin
+    .from("diagnoses")
+    .select("id, created_at")
+    .eq("user_id", user.id)
+    .gte("created_at", new Date(Date.now() - 5 * 60 * 1000).toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (recentDiag) {
+    const ageMs = Date.now() - new Date(recentDiag.created_at).getTime();
+    // If a diagnosis finished in the last 30 seconds, it's probably still being written
+    if (ageMs < 30_000) {
+      return NextResponse.json(
+        { error: "A diagnosis just completed. Please wait a moment before running another." },
+        { status: 429 },
+      );
+    }
+  }
+
   // Increment usage BEFORE running (prevents race condition)
   await admin
     .from("profiles")
@@ -129,6 +155,14 @@ export async function POST(request: Request) {
       .eq("id", user.id);
 
     console.error("[api/diagnose] Pipeline error:", err);
+    getPostHogServer().capture({
+      distinctId: user.id,
+      event: "diagnosis_failed",
+      properties: {
+        page_id: pageId,
+        error: err instanceof Error ? err.message : String(err),
+      },
+    });
     return NextResponse.json(
       { error: "Diagnosis failed. Please try again." },
       { status: 500 },

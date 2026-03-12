@@ -259,7 +259,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-5 py-8 text-center text-sm text-[#6B7280]">
-                    {search ? "No pages match your search." : "No pages found."}
+                    {search ? "No pages match your search. Try a different URL or keyword." : "No pages found. Run the engine to process your data."}
                   </td>
                 </tr>
               )}

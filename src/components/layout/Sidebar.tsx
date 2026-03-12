@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, Settings, Zap, Globe, ChevronDown, Check } from "lucide-react";
+import { LayoutDashboard, FileText, RefreshCw, Settings, Zap, Globe, ChevronDown, Check } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,7 @@ type SiteItem = {
 const NAV_ITEMS = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/pages", icon: FileText, label: "Pages" },
+  { href: "/refreshes", icon: RefreshCw, label: "Refreshes" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 

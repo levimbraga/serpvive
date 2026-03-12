@@ -35,32 +35,38 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> 
   error:     { label: "Error",     bg: "bg-[#FEF2F2]", text: "text-[#DC2626]" },
 };
 
-const PLAN_DISPLAY: Record<PlanName, { label: string; price: string; color: string }> = {
-  free:    { label: "Free", price: "Free", color: "#6B7280" },
-  starter: { label: "Starter", price: "$29/mo", color: "#0D9488" },
-  pro:     { label: "Pro", price: "$69/mo", color: "#2563EB" },
-  agency:  { label: "Agency", price: "$129/mo", color: "#7C3AED" },
+const PLAN_DISPLAY: Record<PlanName, { label: string; monthlyPrice: string; annualPrice: string; color: string }> = {
+  free:    { label: "Free", monthlyPrice: "Free", annualPrice: "Free", color: "#6B7280" },
+  starter: { label: "Starter", monthlyPrice: "$29/mo", annualPrice: "$24/mo", color: "#0D9488" },
+  pro:     { label: "Pro", monthlyPrice: "$69/mo", annualPrice: "$58/mo", color: "#2563EB" },
+  agency:  { label: "Agency", monthlyPrice: "$129/mo", annualPrice: "$108/mo", color: "#7C3AED" },
 };
 
 const PLAN_ORDER: PlanName[] = ["free", "starter", "pro", "agency"];
 
-const PLANS_FOR_UPGRADE: { key: PlanName; label: string; price: number; features: string[] }[] = [
+const PLANS_FOR_UPGRADE: { key: PlanName; label: string; monthly: number; annual: number; annualTotal: number; features: string[] }[] = [
   {
     key: "starter",
     label: "Starter",
-    price: 29,
+    monthly: 29,
+    annual: 24,
+    annualTotal: 290,
     features: ["1 site", "100 pages", "10 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
     key: "pro",
     label: "Pro",
-    price: 69,
+    monthly: 69,
+    annual: 58,
+    annualTotal: 690,
     features: ["3 sites", "1,000 pages", "40 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
     key: "agency",
     label: "Agency",
-    price: 129,
+    monthly: 129,
+    annual: 108,
+    annualTotal: 1290,
     features: ["10 sites", "5,000 pages", "120 diagnoses/mo", "Daily monitoring", "Priority support"],
   },
 ];
@@ -102,6 +108,7 @@ export default function SettingsClient({
   sitesLimit,
   timezone,
   digestDay,
+  billingInterval,
   authProvider,
 }: {
   email: string;
@@ -115,15 +122,19 @@ export default function SettingsClient({
   sitesLimit: number;
   timezone: string;
   digestDay: string;
+  billingInterval: "monthly" | "annual";
   authProvider: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabaseBrowser();
   const checkoutStatus = searchParams.get("checkout");
+  const upgradeStatus = searchParams.get("upgrade");
 
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [syncingPlan, setSyncingPlan] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -238,20 +249,34 @@ export default function SettingsClient({
   // ── Billing actions ──
 
   async function handleUpgrade(planKey: PlanName) {
-    posthog.capture("upgrade_clicked", { from: "settings", current_plan: plan, target_plan: planKey });
+    const interval = isAnnual ? "annual" : "monthly";
+    posthog.capture("upgrade_clicked", { from: "settings", current_plan: plan, target_plan: planKey, interval });
     setLoadingPlan(planKey);
     setError("");
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planKey }),
+        body: JSON.stringify({ plan: planKey, interval }),
       });
       const json = (await res.json()) as { data?: { url: string }; error?: string };
       if (!res.ok) { setError(json.error ?? "Failed to create checkout"); return; }
       if (json.data?.url) window.location.href = json.data.url;
     } catch { setError("Network error"); }
     finally { setLoadingPlan(null); }
+  }
+
+  async function handleSyncPlan() {
+    setSyncingPlan(true);
+    setError("");
+    try {
+      const res = await fetch("/api/stripe/sync-plan", { method: "POST" });
+      const json = (await res.json()) as { data?: { plan: string; planStatus: string; synced: boolean }; error?: string };
+      if (!res.ok) { setError(json.error ?? "Failed to sync plan"); return; }
+      flash("Plan status refreshed");
+      router.refresh();
+    } catch { setError("Network error"); }
+    finally { setSyncingPlan(false); }
   }
 
   async function handleManageBilling() {
@@ -322,10 +347,17 @@ export default function SettingsClient({
       <h1 className="text-xl font-semibold text-[#111827]">Settings</h1>
 
       {/* Banners */}
-      {checkoutStatus === "success" && (
+      {(checkoutStatus === "success" || upgradeStatus === "success") && (
         <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4">
           <CheckCircle2 size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
-          <p className="text-sm text-[#16A34A] font-medium">Payment successful! Your plan has been upgraded.</p>
+          <p className="text-sm text-[#16A34A] font-medium">Plan updated successfully! Changes are now active.</p>
+        </div>
+      )}
+
+      {upgradeStatus === "canceled" && (
+        <div className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
+          <AlertTriangle size={20} strokeWidth={1.5} className="text-[#6B7280] flex-shrink-0" />
+          <p className="text-sm text-[#6B7280] font-medium">Plan change was canceled. No changes were made.</p>
         </div>
       )}
 
@@ -588,7 +620,10 @@ export default function SettingsClient({
           <div className="flex items-center gap-2">
             <Crown size={14} strokeWidth={1.5} style={{ color: planInfo.color }} />
             <span className="text-sm font-medium" style={{ color: planInfo.color }}>{planInfo.label}</span>
-            <span className="text-xs text-[#9CA3AF]">{planInfo.price}</span>
+            <span className="text-xs text-[#9CA3AF]">
+              {plan === "free" ? "Free" : billingInterval === "annual" ? planInfo.annualPrice : planInfo.monthlyPrice}
+              {plan !== "free" && <span className="ml-1 text-[10px]">({billingInterval})</span>}
+            </span>
           </div>
         </div>
 
@@ -647,13 +682,23 @@ export default function SettingsClient({
                   Manage Billing
                   <ExternalLink size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
                 </button>
-                <button
-                  onClick={handleManageBilling}
-                  disabled={portalLoading}
-                  className="w-full text-center text-xs text-[#9CA3AF] hover:text-[#DC2626] transition-colors disabled:opacity-50"
-                >
-                  Cancel subscription
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleManageBilling}
+                    disabled={portalLoading}
+                    className="flex-1 text-center text-xs text-[#9CA3AF] hover:text-[#DC2626] transition-colors disabled:opacity-50"
+                  >
+                    Cancel subscription
+                  </button>
+                  <button
+                    onClick={handleSyncPlan}
+                    disabled={syncingPlan}
+                    className="text-xs text-[#9CA3AF] hover:text-[#3B82F6] transition-colors disabled:opacity-50 flex items-center gap-1"
+                  >
+                    {syncingPlan ? <Loader2 size={10} className="animate-spin" /> : null}
+                    Refresh plan status
+                  </button>
+                </div>
                 <p className="text-[10px] text-[#D1D5DB] text-center">
                   If you cancel, you&apos;ll keep access on the free plan with weekly syncs.
                 </p>
@@ -686,33 +731,69 @@ export default function SettingsClient({
       {/* ── Upgrade ── */}
       {upgradePlans.length > 0 && (
         <div id="upgrade-section" className="bg-white rounded-xl border border-[#E5E7EB] p-6">
-          <h2 className="text-sm font-semibold text-[#111827] mb-4">
-            {plan === "free" ? "Choose a plan" : "Upgrade"}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-[#111827]">
+              {plan === "free" ? "Choose a plan" : "Upgrade"}
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium ${!isAnnual ? "text-[#111827]" : "text-[#9CA3AF]"}`}>Monthly</span>
+              <button
+                onClick={() => setIsAnnual(!isAnnual)}
+                className="relative w-10 h-5 rounded-full transition-colors flex-shrink-0"
+                style={{ background: isAnnual ? "#0D9488" : "#D1D5DB" }}
+                aria-label="Toggle annual billing"
+              >
+                <span
+                  className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all"
+                  style={{ left: isAnnual ? 22 : 2 }}
+                />
+              </button>
+              <span className={`text-xs font-medium ${isAnnual ? "text-[#111827]" : "text-[#9CA3AF]"}`}>Annual</span>
+              {isAnnual && (
+                <span className="text-[10px] font-bold text-white bg-[#0D9488] px-2 py-0.5 rounded-full">
+                  Save 17%
+                </span>
+              )}
+            </div>
+          </div>
           <div className={`grid grid-cols-1 ${upgradePlans.length >= 3 ? "sm:grid-cols-3" : upgradePlans.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-1 max-w-sm"} gap-4`}>
-            {upgradePlans.map((p) => (
-              <div key={p.key} className="border border-[#E5E7EB] rounded-xl p-4 flex flex-col">
-                <p className="font-semibold text-[#111827]">{p.label}</p>
-                <p className="text-2xl font-bold text-[#111827] mt-1">
-                  ${p.price}<span className="text-sm font-normal text-[#6B7280]">/mo</span>
-                </p>
-                <ul className="mt-3 space-y-1.5 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="text-xs text-[#4B5563] flex items-center gap-1.5">
-                      <CheckCircle2 size={12} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleUpgrade(p.key)}
-                  disabled={loadingPlan !== null}
-                  className="mt-4 w-full h-9 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loadingPlan === p.key ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : "Upgrade"}
-                </button>
-              </div>
-            ))}
+            {upgradePlans.map((p) => {
+              const price = isAnnual ? p.annual : p.monthly;
+              const savings = (p.monthly * 12) - p.annualTotal;
+
+              return (
+                <div key={p.key} className="border border-[#E5E7EB] rounded-xl p-4 flex flex-col">
+                  <p className="font-semibold text-[#111827]">{p.label}</p>
+                  <div className="mt-1">
+                    {isAnnual && (
+                      <span className="text-lg text-[#9CA3AF] line-through mr-2">${p.monthly}</span>
+                    )}
+                    <span className="text-2xl font-bold text-[#111827]">${price}</span>
+                    <span className="text-sm font-normal text-[#6B7280]">/mo</span>
+                  </div>
+                  {isAnnual && (
+                    <p className="text-[11px] text-[#0D9488] font-medium mt-0.5">
+                      Billed as ${p.annualTotal}/yr — save ${savings}/yr
+                    </p>
+                  )}
+                  <ul className="mt-3 space-y-1.5 flex-1">
+                    {p.features.map((f) => (
+                      <li key={f} className="text-xs text-[#4B5563] flex items-center gap-1.5">
+                        <CheckCircle2 size={12} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => handleUpgrade(p.key)}
+                    disabled={loadingPlan !== null}
+                    className="mt-4 w-full h-9 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {loadingPlan === p.key ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : "Upgrade"}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

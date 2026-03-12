@@ -42,7 +42,8 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
   if (sorted.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
-        <p className="text-[#6B7280]">No pages found. Run the engine first.</p>
+        <p className="text-lg mb-1">All clear!</p>
+        <p className="text-[#6B7280]">No pages are losing traffic right now. We&apos;ll alert you if anything changes.</p>
       </div>
     );
   }

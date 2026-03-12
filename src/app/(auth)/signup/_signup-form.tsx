@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import posthog from "posthog-js";
 
 const COUNTRIES = [
   { value: "", label: "Select country (optional)" },
@@ -108,6 +109,11 @@ export default function SignupForm() {
           ...(country ? { country } : {}),
         })
         .eq("id", data.user.id);
+    }
+
+    if (data.user) {
+      posthog.identify(data.user.id, { email, name: fullName.trim(), ...(country ? { country } : {}) });
+      posthog.capture("user_signed_up", { method: "email", country: country || null });
     }
 
     if (!data.session) {

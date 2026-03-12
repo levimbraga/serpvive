@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
-  LogOut, Menu, LayoutDashboard, FileText, Settings,
+  LogOut, Menu, LayoutDashboard, FileText, RefreshCw, Settings,
   Globe, ChevronDown, Check, Zap,
 } from "lucide-react";
 import {
@@ -45,6 +45,7 @@ const STATUS_DOT: Record<string, string> = {
 const MOBILE_NAV = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/pages", icon: FileText, label: "Pages" },
+  { href: "/refreshes", icon: RefreshCw, label: "Refreshes" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 

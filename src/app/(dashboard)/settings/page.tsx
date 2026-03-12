@@ -48,6 +48,7 @@ export default async function SettingsPage() {
       sitesLimit={limits.sites}
       timezone={profile.timezone ?? "UTC"}
       digestDay={profile.digest_day ?? "monday"}
+      billingInterval="monthly"
       authProvider={authProvider}
     />
   );

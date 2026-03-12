@@ -53,7 +53,7 @@ src/
 │   ├── supabase/             # client, server, admin, middleware
 │   ├── gsc/                  # OAuth, API calls, transforms
 │   ├── engine/               # decay-scorer, velocity, seasonal, classifier
-│   ├── ai/                   # Anthropic client, prompts, schemas
+│   ├── ai/                   # diagnose.ts, brief.ts, pipeline.ts, sanitize.ts
 │   ├── serp/                 # Serper client, content fetcher
 │   ├── email/                # Resend client, templates
 │   ├── stripe/               # Client, plans, webhooks
@@ -107,6 +107,9 @@ src/
 
 ### AI / Anthropic
 - Model: `claude-opus-4-6` pra diagnósticos
+- Prompts de produção finalizados em `src/lib/ai/diagnose.ts` e `src/lib/ai/brief.ts`
+- NÃO existe mais sistema de teste de prompts (v1-v5 removidos)
+- Pipeline: SERP → fetch content → diagnosis → brief (~2-3 min, ~$0.12)
 - Structured output: prompt pede JSON, validar com Zod
 - Retry 1x se JSON inválido
 - Salvar tokens_input, tokens_output, cost_usd em toda chamada
@@ -137,7 +140,9 @@ src/
 - Tipografia: DM Sans (headings/body) + JetBrains Mono (URLs/dados)
 - Health Score: ring gauge SVG animado (1.2s easeOutCubic)
 - Diagnóstico: borda roxa (AI accent), causas com border-left colorida
+- Histórico de análises: accordion com comparação (causes count badge)
 - Confetti: canvas-confetti no "Já atualizei" (apenas success)
+- Onboarding tour: driver.js (3 steps, brand-matched styles em globals.css)
 - Skeleton shimmer pra TODOS os loading states
 - Toast: sonner (slide in, 4s auto-dismiss)
 
@@ -164,7 +169,7 @@ export const DECAY_THRESHOLDS = {
 
 ## O que NÃO fazer
 - NÃO usar Pages Router (só App Router)
-- NÃO criar CSS files separados (só Tailwind)
+- NÃO criar CSS files separados (só Tailwind, exceto globals.css)
 - NÃO usar `any` type
 - NÃO expor secrets no client
 - NÃO skip RLS em tabelas com user data
@@ -173,3 +178,4 @@ export const DECAY_THRESHOLDS = {
 - NÃO commitar sem testar no browser
 - NÃO usar Inter, Roboto, Arial (usar DM Sans)
 - NÃO usar gradientes purple genéricos (usar nosso design system)
+- NÃO recriar sistema de teste de prompts (já finalizado e removido)

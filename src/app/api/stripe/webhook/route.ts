@@ -38,9 +38,17 @@ export async function POST(request: Request) {
 
   const admin = getSupabaseAdmin();
 
+  console.log("[stripe/webhook] Received event:", event.type);
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      console.log("[stripe/webhook] checkout.session.completed:", {
+        customerId: session.customer,
+        subscriptionId: session.subscription,
+        mode: session.mode,
+      });
+
       const userId = session.subscription
         ? (await getSubscriptionUserId(stripe, session.subscription as string))
         : session.metadata?.supabase_user_id;
@@ -88,10 +96,56 @@ export async function POST(request: Request) {
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
+      const priceId = subscription.items?.data?.[0]?.price?.id;
+      console.log("[stripe/webhook] subscription.updated:", {
+        customerId: subscription.customer,
+        subscriptionId: subscription.id,
+        status: subscription.status,
+        priceId,
+        metadataUserId: subscription.metadata?.supabase_user_id,
+        metadataPlan: subscription.metadata?.plan,
+      });
+
       const userId = subscription.metadata?.supabase_user_id;
 
       if (!userId) {
-        console.error("[stripe/webhook] No user ID in subscription metadata");
+        // Fallback: try to find user by stripe_customer_id
+        const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.toString();
+        if (customerId) {
+          const { data: profile } = await admin
+            .from("profiles")
+            .select("id")
+            .eq("stripe_customer_id", customerId)
+            .single();
+
+          if (profile) {
+            console.log(`[stripe/webhook] Found user by customer ID fallback: ${profile.id}`);
+            // Process with fallback userId
+            const statusMap: Record<string, string> = {
+              active: "active",
+              past_due: "past_due",
+              trialing: "active",
+              canceled: "canceled",
+              unpaid: "past_due",
+            };
+            const planStatus = statusMap[subscription.status] ?? "active";
+            let plan = subscription.metadata?.plan;
+            if (!plan && priceId) {
+              plan = getPlanFromPriceId(priceId);
+            }
+            plan = plan ?? "starter";
+
+            await admin
+              .from("profiles")
+              .update({ plan, plan_status: planStatus, updated_at: new Date().toISOString() })
+              .eq("id", profile.id);
+
+            console.log(`[stripe/webhook] subscription.updated (fallback): user=${profile.id}, status=${planStatus}, plan=${plan}`);
+            break;
+          }
+        }
+
+        console.error("[stripe/webhook] No user ID in subscription metadata and fallback failed");
         break;
       }
 

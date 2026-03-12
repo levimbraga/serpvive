@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import posthog from "posthog-js";
@@ -9,7 +9,8 @@ import {
   ArrowLeft, Loader2, Zap, ExternalLink,
   ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
-  BarChart3, Lightbulb, History,
+  BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
+  Search, FileText, Brain, Sparkles, Info,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -145,8 +146,12 @@ export default function PageDetailClient({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [error, setError] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const [diagnosis, setDiagnosis] = useState<DiagnosisRecord | null>(latestDiagnosis);
   const [refresh, setRefresh] = useState<RefreshRecord | null>(latestRefresh);
   const [expandedActions, setExpandedActions] = useState<Set<number>>(new Set());
@@ -157,6 +162,36 @@ export default function PageDetailClient({
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const isFree = plan === "free";
   const atLimit = isFree || diagnosesUsed >= diagnosesLimit;
+
+  // Loading step animation: simulate progress through pipeline stages
+  useEffect(() => {
+    if (!loading) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setElapsedSeconds(0);
+      setLoadingStep(0);
+      return;
+    }
+
+    setElapsedSeconds(0);
+    setLoadingStep(0);
+
+    timerRef.current = setInterval(() => {
+      setElapsedSeconds((s) => s + 1);
+    }, 1000);
+
+    // Simulate pipeline steps
+    const t1 = setTimeout(() => setLoadingStep(1), 3000);   // SERP fetched
+    const t2 = setTimeout(() => setLoadingStep(2), 8000);   // Competitors analyzed
+    const t3 = setTimeout(() => setLoadingStep(3), 15000);  // AI diagnosing
+    // Step 4 (generating brief) comes after diagnosis returns
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [loading]);
 
   const fireConfetti = useCallback(() => {
     confetti({
@@ -204,10 +239,32 @@ export default function PageDetailClient({
       }
 
       router.refresh();
-    } catch {
+    } catch (err) {
+      posthog.captureException(err);
       setError("Network error");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleFeedback(helpful: boolean) {
+    if (!diagnosis || feedbackSent) return;
+    setFeedbackSent(true);
+    try {
+      await fetch("/api/diagnose/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          diagnosisId: diagnosis.id,
+          feedback: helpful ? "helpful" : "not_helpful",
+        }),
+      });
+      posthog.capture("diagnosis_feedback", {
+        diagnosis_id: diagnosis.id,
+        feedback: helpful ? "helpful" : "not_helpful",
+      });
+    } catch {
+      // Silent fail for feedback — not critical
     }
   }
 
@@ -388,6 +445,12 @@ export default function PageDetailClient({
           </div>
         </div>
 
+        {/* GSC data lag disclaimer */}
+        <p className="text-[10px] text-[#D1D5DB] mt-3 flex items-center gap-1">
+          <Info size={10} strokeWidth={1.5} />
+          Data from Google Search Console (2–3 day delay)
+        </p>
+
         {/* Keyword — full width so long keywords can wrap */}
         {page.primary_keyword && (
           <div className="mt-3">
@@ -528,12 +591,51 @@ export default function PageDetailClient({
         </div>
       )}
 
-      {/* Loading state */}
+      {/* Loading state — step-by-step progress */}
       {loading && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
-          <Loader2 size={32} strokeWidth={1.5} className="text-[#7C3AED] animate-spin mx-auto mb-4" />
-          <p className="text-[#111827] font-medium">Analyzing your page...</p>
-          <p className="text-sm text-[#6B7280] mt-1">This usually takes 2–3 minutes. Searching Google, fetching competitors, running AI analysis.</p>
+        <div className="bg-white rounded-xl border-2 border-[#7C3AED]/20 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-[#111827] font-semibold">Analyzing your page...</p>
+            <span className="text-xs text-[#9CA3AF] tabular-nums">
+              {Math.floor(elapsedSeconds / 60)}:{String(elapsedSeconds % 60).padStart(2, "0")} elapsed
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { icon: Search, label: "Fetching SERP data...", step: 0 },
+              { icon: FileText, label: "Analyzing competitor content...", step: 1 },
+              { icon: Brain, label: "AI is diagnosing your page...", step: 2 },
+              { icon: Sparkles, label: "Generating refresh brief...", step: 3 },
+            ].map(({ icon: Icon, label, step: s }) => {
+              const isDone = loadingStep > s;
+              const isActive = loadingStep === s;
+              return (
+                <div key={s} className="flex items-center gap-3">
+                  {isDone ? (
+                    <div className="w-6 h-6 rounded-full bg-[#F0FDF4] flex items-center justify-center flex-shrink-0">
+                      <Check size={14} strokeWidth={2} className="text-[#16A34A]" />
+                    </div>
+                  ) : isActive ? (
+                    <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                      <Loader2 size={16} strokeWidth={2} className="text-[#7C3AED] animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                      <Icon size={12} strokeWidth={1.5} className="text-[#9CA3AF]" />
+                    </div>
+                  )}
+                  <span className={`text-sm ${isDone ? "text-[#16A34A]" : isActive ? "text-[#111827] font-medium" : "text-[#9CA3AF]"}`}>
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="text-xs text-[#9CA3AF] mt-4">
+            Usually takes 2–3 minutes. You can navigate away — the result will be saved automatically.
+          </p>
         </div>
       )}
 
@@ -621,6 +723,33 @@ export default function PageDetailClient({
                 </p>
               </div>
             )}
+
+            {/* Feedback */}
+            <div className="mt-5 pt-4 border-t border-[#E5E7EB] flex items-center justify-between">
+              {feedbackSent ? (
+                <p className="text-xs text-[#16A34A]">Thanks for your feedback!</p>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-[#9CA3AF]">Was this diagnosis helpful?</p>
+                  <button
+                    onClick={() => handleFeedback(true)}
+                    className="flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#16A34A] transition-colors px-2 py-1 rounded-md hover:bg-[#F0FDF4]"
+                  >
+                    <ThumbsUp size={12} strokeWidth={1.5} /> Yes
+                  </button>
+                  <button
+                    onClick={() => handleFeedback(false)}
+                    className="flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#DC2626] transition-colors px-2 py-1 rounded-md hover:bg-[#FEF2F2]"
+                  >
+                    <ThumbsDown size={12} strokeWidth={1.5} /> No
+                  </button>
+                </div>
+              )}
+              <span className="text-[10px] text-[#D1D5DB]">
+                {diagnosis.cost_usd ? `$${diagnosis.cost_usd.toFixed(3)}` : ""}
+                {diagnosis.processing_time_ms ? ` · ${Math.round(diagnosis.processing_time_ms / 1000)}s` : ""}
+              </span>
+            </div>
           </div>
 
           {/* Refresh Brief */}
