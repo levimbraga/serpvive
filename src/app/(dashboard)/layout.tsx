@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getActiveSiteId } from "@/lib/active-site";
 import Sidebar from "@/components/layout/Sidebar";
@@ -38,23 +37,8 @@ export default async function DashboardLayout({
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 3;
   const sites = sitesRes.data ?? [];
 
-  // Onboarding re-entry: redirect users who abandoned onboarding
-  const headersList = await headers();
-  const pathname = headersList.get("x-next-pathname") ?? headersList.get("x-invoke-path") ?? "";
-  const isOnboardingPage = pathname.includes("/onboarding");
-
-  if (!isOnboardingPage && sites.length === 0) {
-    // No sites — needs to connect GSC
-    redirect("/onboarding");
-  }
-
-  if (!isOnboardingPage && sites.length > 0) {
-    const firstSite = sites[0]!;
-    if (firstSite.status === "importing") {
-      redirect("/onboarding/importing");
-    }
-  }
-
+  // Onboarding redirects are handled by middleware (middleware.ts)
+  // Layout only needs to provide activeSiteId for the sidebar/header
   const activeSiteId = await getActiveSiteId(supabase, user.id);
 
   return (
