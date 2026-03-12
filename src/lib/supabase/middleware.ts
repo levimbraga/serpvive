@@ -34,13 +34,6 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
   const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes");
 
-  // TODO: Remove this block when signup is enabled
-  // ── PRE-LAUNCH: block signup ──
-  if (path.startsWith("/signup")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-  // ── END PRE-LAUNCH ──
-
   // Not logged in → redirect to login
   if (!user && isDashboardRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
