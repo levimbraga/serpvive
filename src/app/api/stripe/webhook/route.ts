@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getStripe, getPlanFromPriceIdAsync } from "@/lib/stripe";
+import { getStripe, resolvePlanFromPriceId } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPostHogServer } from "@/lib/posthog/server";
 import type Stripe from "stripe";
 
@@ -30,67 +31,55 @@ export async function POST(request: Request) {
 
   const admin = getSupabaseAdmin();
 
-  console.log("[stripe/webhook] Received event:", event.type);
+  console.log(`[stripe/webhook] ── Event: ${event.type} ──`);
 
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      const customerId = session.customer as string;
+      const subscriptionId = session.subscription as string;
+
       console.log("[stripe/webhook] checkout.session.completed:", {
-        customerId: session.customer,
-        subscriptionId: session.subscription,
+        customerId,
+        subscriptionId,
         mode: session.mode,
       });
 
-      const userId = session.subscription
-        ? (await getSubscriptionUserId(stripe, session.subscription as string))
+      const userId = subscriptionId
+        ? (await getSubscriptionUserId(stripe, subscriptionId))
         : session.metadata?.supabase_user_id;
 
       if (!userId) {
-        console.error("[stripe/webhook] No user ID in checkout session");
+        // Fallback: find user by customer ID
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("id")
+          .eq("stripe_customer_id", customerId)
+          .single();
+
+        if (!profile) {
+          console.error("[stripe/webhook] CRITICAL: No user found for checkout session. customerId:", customerId);
+          break;
+        }
+
+        console.log(`[stripe/webhook] Found user by customer_id fallback: ${profile.id}`);
+        await processCheckout(admin, stripe, profile.id, customerId, subscriptionId);
         break;
       }
 
-      // Get subscription to find plan
-      const subscription = session.subscription
-        ? await stripe.subscriptions.retrieve(session.subscription as string)
-        : null;
-
-      // Determine plan from subscription metadata or price_id
-      let plan = subscription?.metadata?.plan;
-      if (!plan && subscription?.items?.data?.[0]?.price?.id) {
-        plan = await getPlanFromPriceIdAsync(subscription.items.data[0].price.id);
-      }
-      plan = plan ?? "starter";
-
-      await admin
-        .from("profiles")
-        .update({
-          plan,
-          plan_status: "active",
-          free_since: null, // Clear free_since on upgrade
-          stripe_customer_id: session.customer as string,
-          stripe_subscription_id: session.subscription as string,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
-
-      // Reactivate any paused sites for this user
-      await admin
-        .from("sites")
-        .update({ status: "active" })
-        .eq("user_id", userId)
-        .eq("status", "paused");
-
-      getPostHogServer().capture({ distinctId: userId, event: "plan_upgraded", properties: { plan } });
-      console.log(`[stripe/webhook] checkout.session.completed: user=${userId}, plan=${plan}`);
+      await processCheckout(admin, stripe, userId, customerId, subscriptionId);
       break;
     }
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       const priceId = subscription.items?.data?.[0]?.price?.id;
+      const customerId = typeof subscription.customer === "string"
+        ? subscription.customer
+        : subscription.customer?.toString() ?? "";
+
       console.log("[stripe/webhook] subscription.updated:", {
-        customerId: subscription.customer,
+        customerId,
         subscriptionId: subscription.id,
         status: subscription.status,
         priceId,
@@ -98,48 +87,33 @@ export async function POST(request: Request) {
         metadataPlan: subscription.metadata?.plan,
       });
 
-      const userId = subscription.metadata?.supabase_user_id;
+      // Find user: try metadata first, then customer_id lookup
+      let userId = subscription.metadata?.supabase_user_id;
+
+      if (!userId && customerId) {
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("id")
+          .eq("stripe_customer_id", customerId)
+          .single();
+
+        if (profile) {
+          userId = profile.id;
+          console.log(`[stripe/webhook] Found user by customer_id fallback: ${userId}`);
+        }
+      }
 
       if (!userId) {
-        // Fallback: try to find user by stripe_customer_id
-        const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.toString();
-        if (customerId) {
-          const { data: profile } = await admin
-            .from("profiles")
-            .select("id")
-            .eq("stripe_customer_id", customerId)
-            .single();
-
-          if (profile) {
-            console.log(`[stripe/webhook] Found user by customer ID fallback: ${profile.id}`);
-            // Process with fallback userId
-            const statusMap: Record<string, string> = {
-              active: "active",
-              past_due: "past_due",
-              trialing: "active",
-              canceled: "canceled",
-              unpaid: "past_due",
-            };
-            const planStatus = statusMap[subscription.status] ?? "active";
-            let plan = subscription.metadata?.plan;
-            if (!plan && priceId) {
-              plan = await getPlanFromPriceIdAsync(priceId);
-            }
-            plan = plan ?? "starter";
-
-            await admin
-              .from("profiles")
-              .update({ plan, plan_status: planStatus, updated_at: new Date().toISOString() })
-              .eq("id", profile.id);
-
-            console.log(`[stripe/webhook] subscription.updated (fallback): user=${profile.id}, status=${planStatus}, plan=${plan}`);
-            break;
-          }
-        }
-
-        console.error("[stripe/webhook] No user ID in subscription metadata and fallback failed");
+        console.error("[stripe/webhook] CRITICAL: No user found for subscription.updated. customerId:", customerId);
         break;
       }
+
+      // Resolve plan
+      let plan = subscription.metadata?.plan;
+      if (!plan && priceId) {
+        plan = await resolvePlanFromPriceId(priceId);
+      }
+      plan = plan || "starter";
 
       const statusMap: Record<string, string> = {
         active: "active",
@@ -148,24 +122,25 @@ export async function POST(request: Request) {
         canceled: "canceled",
         unpaid: "past_due",
       };
-
       const planStatus = statusMap[subscription.status] ?? "active";
 
-      // Determine plan from metadata or price_id
-      let plan = subscription.metadata?.plan;
-      if (!plan && subscription.items?.data?.[0]?.price?.id) {
-        plan = await getPlanFromPriceIdAsync(subscription.items.data[0].price.id);
-      }
-      plan = plan ?? "starter";
+      console.log(`[stripe/webhook] Updating profile: user=${userId}, plan=${plan}, status=${planStatus}`);
 
-      await admin
+      const { error: updateError } = await admin
         .from("profiles")
         .update({
           plan,
           plan_status: planStatus,
+          stripe_subscription_id: subscription.id,
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
+
+      if (updateError) {
+        console.error(`[stripe/webhook] CRITICAL: Failed to update profile:`, updateError);
+      } else {
+        console.log(`[stripe/webhook] SUCCESS: user=${userId} updated to plan=${plan}, status=${planStatus}`);
+      }
 
       // Handle downgrade: pause excess sites
       const planLimits = await import("@/lib/constants").then((m) => m.PLAN_LIMITS);
@@ -178,7 +153,6 @@ export async function POST(request: Request) {
         .order("last_sync_at", { ascending: false, nullsFirst: false });
 
       if (userSites && userSites.length > siteLimit) {
-        // Keep the most recently synced sites active, pause the rest
         const sitesToPause = userSites
           .filter((s) => s.status === "active")
           .slice(siteLimit);
@@ -192,30 +166,50 @@ export async function POST(request: Request) {
         }
       }
 
-      console.log(`[stripe/webhook] subscription.updated: user=${userId}, status=${planStatus}, plan=${plan}`);
+      getPostHogServer().capture({ distinctId: userId, event: "plan_changed", properties: { plan, planStatus } });
       break;
     }
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
-      const userId = subscription.metadata?.supabase_user_id;
+      const customerId = typeof subscription.customer === "string"
+        ? subscription.customer
+        : subscription.customer?.toString() ?? "";
+
+      let userId = subscription.metadata?.supabase_user_id;
+
+      if (!userId && customerId) {
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("id")
+          .eq("stripe_customer_id", customerId)
+          .single();
+
+        if (profile) {
+          userId = profile.id;
+          console.log(`[stripe/webhook] subscription.deleted: found user by customer_id: ${userId}`);
+        }
+      }
 
       if (!userId) {
-        console.error("[stripe/webhook] No user ID in deleted subscription");
+        console.error("[stripe/webhook] CRITICAL: No user found for subscription.deleted. customerId:", customerId);
         break;
       }
 
-      await admin
+      const { error: deleteError } = await admin
         .from("profiles")
         .update({
           plan: "free",
-          plan_status: "active", // Free is an active plan
+          plan_status: "active",
           free_since: new Date().toISOString(),
           stripe_subscription_id: null,
-          // Keep stripe_customer_id for reactivation
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
+
+      if (deleteError) {
+        console.error(`[stripe/webhook] CRITICAL: Failed to downgrade profile:`, deleteError);
+      }
 
       // Pause excess sites (free plan = 1 site)
       const { PLAN_LIMITS } = await import("@/lib/constants");
@@ -241,7 +235,7 @@ export async function POST(request: Request) {
       }
 
       getPostHogServer().capture({ distinctId: userId, event: "plan_downgraded", properties: { plan: "free" } });
-      console.log(`[stripe/webhook] subscription.deleted: user=${userId}, downgraded to free`);
+      console.log(`[stripe/webhook] SUCCESS: user=${userId} downgraded to free`);
       break;
     }
 
@@ -249,7 +243,6 @@ export async function POST(request: Request) {
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
 
-      // Find user by stripe_customer_id
       const { data: profile } = await admin
         .from("profiles")
         .select("id")
@@ -281,4 +274,51 @@ export async function POST(request: Request) {
 async function getSubscriptionUserId(stripe: Stripe, subscriptionId: string): Promise<string | undefined> {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   return subscription.metadata?.supabase_user_id;
+}
+
+async function processCheckout(
+  admin: SupabaseClient,
+  stripe: Stripe,
+  userId: string,
+  customerId: string,
+  subscriptionId: string,
+) {
+  const subscription = subscriptionId
+    ? await stripe.subscriptions.retrieve(subscriptionId)
+    : null;
+
+  let plan = subscription?.metadata?.plan;
+  if (!plan && subscription?.items?.data?.[0]?.price?.id) {
+    plan = await resolvePlanFromPriceId(subscription.items.data[0].price.id);
+  }
+  plan = plan || "starter";
+
+  console.log(`[stripe/webhook] processCheckout: user=${userId}, plan=${plan}`);
+
+  const { error: updateError } = await admin
+    .from("profiles")
+    .update({
+      plan,
+      plan_status: "active",
+      free_since: null,
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+
+  if (updateError) {
+    console.error(`[stripe/webhook] CRITICAL: Failed to update profile on checkout:`, updateError);
+  } else {
+    console.log(`[stripe/webhook] SUCCESS: checkout complete for user=${userId}, plan=${plan}`);
+  }
+
+  // Reactivate paused sites
+  await admin
+    .from("sites")
+    .update({ status: "active" })
+    .eq("user_id", userId)
+    .eq("status", "paused");
+
+  getPostHogServer().capture({ distinctId: userId, event: "plan_upgraded", properties: { plan } });
 }

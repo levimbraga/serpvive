@@ -135,7 +135,7 @@ export default function SettingsClient({
 
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [syncingPlan, setSyncingPlan] = useState(false);
+
   const [isAnnual, setIsAnnual] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -286,18 +286,6 @@ export default function SettingsClient({
     finally { setLoadingPlan(null); }
   }
 
-  async function handleSyncPlan() {
-    setSyncingPlan(true);
-    setError("");
-    try {
-      const res = await fetch("/api/stripe/sync-plan", { method: "POST" });
-      const json = (await res.json()) as { data?: { plan: string; planStatus: string; synced: boolean }; error?: string };
-      if (!res.ok) { setError(json.error ?? "Failed to sync plan"); return; }
-      flash("Plan status refreshed");
-      router.refresh();
-    } catch { setError("Network error"); }
-    finally { setSyncingPlan(false); }
-  }
 
   async function handleManageBilling() {
     setPortalLoading(true);
@@ -728,14 +716,6 @@ export default function SettingsClient({
                     className="flex-1 text-center text-xs text-[#9CA3AF] hover:text-[#DC2626] transition-colors disabled:opacity-50"
                   >
                     Cancel subscription
-                  </button>
-                  <button
-                    onClick={handleSyncPlan}
-                    disabled={syncingPlan}
-                    className="text-xs text-[#9CA3AF] hover:text-[#3B82F6] transition-colors disabled:opacity-50 flex items-center gap-1"
-                  >
-                    {syncingPlan ? <Loader2 size={10} className="animate-spin" /> : null}
-                    Refresh plan status
                   </button>
                 </div>
                 <p className="text-[10px] text-[#D1D5DB] text-center">
