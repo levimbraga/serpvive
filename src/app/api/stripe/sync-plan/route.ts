@@ -28,9 +28,13 @@ export async function POST() {
     const subscription = await stripe.subscriptions.retrieve(profile.stripe_subscription_id);
     const priceId = subscription.items?.data?.[0]?.price?.id;
 
-    let plan = subscription.metadata?.plan;
-    if (!plan && priceId) {
+    // ALWAYS resolve from price_id first (metadata may be stale from original checkout)
+    let plan: string | undefined;
+    if (priceId) {
       plan = await resolvePlanFromPriceId(priceId);
+    }
+    if (!plan) {
+      plan = subscription.metadata?.plan;
     }
     plan = plan ?? "starter";
 

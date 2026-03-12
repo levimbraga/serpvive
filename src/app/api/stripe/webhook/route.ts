@@ -108,10 +108,13 @@ export async function POST(request: Request) {
         break;
       }
 
-      // Resolve plan
-      let plan = subscription.metadata?.plan;
-      if (!plan && priceId) {
+      // Resolve plan: ALWAYS use price_id (metadata may be stale from original checkout)
+      let plan: string | undefined;
+      if (priceId) {
         plan = await resolvePlanFromPriceId(priceId);
+      }
+      if (!plan) {
+        plan = subscription.metadata?.plan;
       }
       plan = plan || "starter";
 
@@ -287,9 +290,13 @@ async function processCheckout(
     ? await stripe.subscriptions.retrieve(subscriptionId)
     : null;
 
-  let plan = subscription?.metadata?.plan;
-  if (!plan && subscription?.items?.data?.[0]?.price?.id) {
+  // ALWAYS resolve from price_id first (metadata may be stale)
+  let plan: string | undefined;
+  if (subscription?.items?.data?.[0]?.price?.id) {
     plan = await resolvePlanFromPriceId(subscription.items.data[0].price.id);
+  }
+  if (!plan) {
+    plan = subscription?.metadata?.plan;
   }
   plan = plan || "starter";
 
