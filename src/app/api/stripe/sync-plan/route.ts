@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getStripe, STRIPE_PLANS } from "@/lib/stripe";
-
-function getPlanFromPriceId(priceId: string): string {
-  for (const [key, config] of Object.entries(STRIPE_PLANS)) {
-    if (config.priceId === priceId) return key;
-  }
-  return "starter";
-}
+import { getStripe, getPlanFromPriceId } from "@/lib/stripe";
 
 export async function POST() {
   const supabase = await getSupabaseServer();

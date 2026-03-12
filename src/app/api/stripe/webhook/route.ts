@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
-import { getStripe, STRIPE_PLANS } from "@/lib/stripe";
+import { getStripe, getPlanFromPriceId } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPostHogServer } from "@/lib/posthog/server";
 import type Stripe from "stripe";
-
-// Reverse lookup: price_id → plan name
-function getPlanFromPriceId(priceId: string): string {
-  for (const [key, config] of Object.entries(STRIPE_PLANS)) {
-    if (config.priceId === priceId) return key;
-  }
-  return "starter"; // fallback
-}
 
 export async function POST(request: Request) {
   const body = await request.text();

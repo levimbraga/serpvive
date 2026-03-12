@@ -46,3 +46,14 @@ export const STRIPE_PLANS = {
 } as const;
 
 export type StripePlanKey = keyof typeof STRIPE_PLANS;
+
+/** Reverse lookup: Stripe price_id → plan name (checks both monthly and annual) */
+export function getPlanFromPriceId(priceId: string): string {
+  for (const [key, config] of Object.entries(STRIPE_PLANS)) {
+    if (config.priceId === priceId || config.annualPriceId === priceId) return key;
+  }
+  console.error(`[stripe] Unknown price_id: ${priceId}. Known:`, JSON.stringify(
+    Object.fromEntries(Object.entries(STRIPE_PLANS).map(([k, v]) => [k, { monthly: v.priceId, annual: v.annualPriceId }]))
+  ));
+  return "starter";
+}
