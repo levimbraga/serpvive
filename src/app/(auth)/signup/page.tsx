@@ -1,8 +1,10 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import SignupForm from "./_signup-form";
 
-// Signup is disabled — redirect to login
-// Enhanced signup form (with full_name, country, auto-detect) is ready
-// in git history. To re-enable: restore from this commit's version of the file.
+export const metadata: Metadata = {
+  title: "Sign Up — SerpVive",
+};
+
 export default function SignupPage() {
-  redirect("/login?msg=signup-disabled");
+  return <SignupForm />;
 }

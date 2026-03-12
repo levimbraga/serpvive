@@ -55,23 +55,9 @@ export default function LoginPage() {
         <h1 className="text-[32px] font-extrabold tracking-tight text-white">
           Serp<span className="text-[#3B82F6]">Vive</span>
         </h1>
-        <p className="text-[#94A3B8] text-base mt-3">App coming soon</p>
+        <p className="text-[#94A3B8] text-base mt-3">Sign in to your account</p>
       </div>
 
-      {/* Coming soon banner */}
-      <div className="bg-[#0F1219] border border-[#1E293B] rounded-2xl p-6 mb-4 text-center">
-        <p className="text-[#94A3B8] text-[15px] leading-relaxed">
-          We&apos;re building something great. Sign up is not available yet.
-        </p>
-        <Link
-          href="https://serpvive.com/#waitlist"
-          className="inline-block mt-3 text-[#3B82F6] text-sm font-medium hover:underline"
-        >
-          Join the Waitlist →
-        </Link>
-      </div>
-
-      {/* Functional login form */}
       <div className="bg-[#0F1219] border border-[#1E293B] rounded-2xl p-8">
         <button
           type="button"
@@ -132,6 +118,11 @@ export default function LoginPage() {
           </button>
         </form>
       </div>
+
+      <p className="text-center text-[15px] text-[#64748B] mt-6">
+        Don&apos;t have an account?{" "}
+        <Link href="/signup" className="text-[#3B82F6] hover:underline">Sign up</Link>
+      </p>
     </div>
   );
 }
