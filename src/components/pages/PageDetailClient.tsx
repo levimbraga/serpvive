@@ -10,10 +10,11 @@ import {
   ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   FlaskConical, Download, X as XIcon,
-  BarChart3, Lightbulb,
+  BarChart3, Lightbulb, History,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 type PageData = {
   id: string;
@@ -155,6 +156,7 @@ export default function PageDetailClient({
   page,
   siteDomain,
   latestDiagnosis,
+  previousDiagnoses,
   latestRefresh,
   plan,
   diagnosesUsed,
@@ -164,6 +166,7 @@ export default function PageDetailClient({
   page: PageData;
   siteDomain: string;
   latestDiagnosis: DiagnosisRecord | null;
+  previousDiagnoses: DiagnosisRecord[];
   latestRefresh: RefreshRecord | null;
   plan: string;
   diagnosesUsed: number;
@@ -793,7 +796,31 @@ export default function PageDetailClient({
             </div>
 
             {/* Summary */}
-            <p className="text-[#4B5563] mb-5">{diagnosis.diagnosis.summary}</p>
+            <p className="text-[#4B5563] mb-4">{diagnosis.diagnosis.summary}</p>
+
+            {/* Comparison badge */}
+            {previousDiagnoses.length > 0 && (() => {
+              const prevCauses = previousDiagnoses[0]!.diagnosis.causes.length;
+              const currCauses = diagnosis.diagnosis.causes.length;
+              const prevDate = new Date(previousDiagnoses[0]!.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+              const improved = currCauses < prevCauses;
+              const worsened = currCauses > prevCauses;
+              return (
+                <div className={`flex items-start gap-2 rounded-lg px-4 py-3 mb-5 text-sm ${
+                  improved ? "bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534]"
+                  : worsened ? "bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E]"
+                  : "bg-[#F9FAFB] border border-[#E5E7EB] text-[#4B5563]"
+                }`}>
+                  <span className="flex-shrink-0">{improved ? "📈" : worsened ? "⚠️" : "📊"}</span>
+                  <span>
+                    Compared to your last analysis ({prevDate}): Previously {prevCauses} cause{prevCauses !== 1 ? "s" : ""} identified, now {currCauses}
+                    {improved && " — your updates are working!"}
+                    {worsened && " — new competitors may have appeared."}
+                    {!improved && !worsened && " — same number of issues."}
+                  </span>
+                </div>
+              );
+            })()}
 
             {/* Causes */}
             <div className="space-y-3">
@@ -946,6 +973,96 @@ export default function PageDetailClient({
             </div>
           )}
         </>
+      )}
+
+      {/* Previous Analyses — only show if there's history */}
+      {previousDiagnoses.length > 0 && !loading && !testResults && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <History size={18} strokeWidth={1.5} className="text-[#9CA3AF]" />
+            <h2 className="text-lg font-semibold text-[#111827]">Previous Analyses</h2>
+            <span className="text-xs text-[#9CA3AF]">
+              {previousDiagnoses.length} previous{previousDiagnoses.length > 10 ? " (showing last 10)" : ""}
+            </span>
+          </div>
+
+          <Accordion>
+            {previousDiagnoses.map((prev) => {
+              const summaryPreview = prev.diagnosis.summary.length > 150
+                ? prev.diagnosis.summary.slice(0, 150) + "..."
+                : prev.diagnosis.summary;
+              const causesCount = prev.diagnosis.causes.length;
+              const actionsCount = prev.refresh_brief?.actions.length ?? 0;
+              const effort = prev.refresh_brief?.total_effort_hours ?? 0;
+
+              return (
+                <AccordionItem key={prev.id} className="bg-white rounded-xl border border-[#E5E7EB] mb-2 overflow-hidden">
+                  <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-[#F9FAFB]">
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-sm font-medium text-[#111827]">
+                        Analysis from {new Date(prev.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                      <p className="text-sm text-[#6B7280] mt-1 line-clamp-1">
+                        &ldquo;{summaryPreview}&rdquo;
+                      </p>
+                      <p className="text-xs text-[#9CA3AF] mt-1.5">
+                        {causesCount} cause{causesCount !== 1 ? "s" : ""}
+                        {actionsCount > 0 && ` · ${actionsCount} action${actionsCount !== 1 ? "s" : ""}`}
+                        {effort > 0 && ` · Est. ${effort}h total`}
+                      </p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-5 pb-5">
+                    <div className="space-y-4 pt-2">
+                      {/* Diagnosis */}
+                      <div className="bg-[#F9FAFB] rounded-xl border border-[#E5E7EB] p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Zap size={16} strokeWidth={1.5} className="text-[#7C3AED]" />
+                          <p className="text-sm font-semibold text-[#111827]">
+                            {page.status === "new" ? "Content Analysis" : "Decay Diagnosis"}
+                          </p>
+                        </div>
+                        <p className="text-sm text-[#4B5563] mb-4">{prev.diagnosis.summary}</p>
+                        <div className="space-y-2">
+                          {prev.diagnosis.causes.map((cause, i) => {
+                            const sev = SEVERITY_CONFIG[cause.severity] ?? SEVERITY_CONFIG["medium"]!;
+                            return (
+                              <div key={i} className={`border-l-4 ${sev.border} bg-white rounded-r-lg p-3`}>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-sm">{sev.emoji}</span>
+                                  <div>
+                                    <p className="text-sm font-medium text-[#111827]">{cause.title}</p>
+                                    <p className="text-xs text-[#4B5563] mt-1">{cause.description}</p>
+                                    <p className="text-xs text-[#6B7280] mt-1.5 italic">Evidence: {cause.evidence}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {prev.diagnosis.serp_analysis && (
+                          <div className="mt-4 pt-3 border-t border-[#E5E7EB]">
+                            <p className="text-xs text-[#9CA3AF] uppercase tracking-wider mb-1">SERP Insight</p>
+                            <p className="text-xs text-[#4B5563]">
+                              Intent: <span className="font-medium text-[#111827]">{prev.diagnosis.serp_analysis.intent_type}</span>
+                              {" · "}
+                              Format: <span className="font-medium text-[#111827]">{prev.diagnosis.serp_analysis.content_format_trend}</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Brief */}
+                      {prev.refresh_brief && (
+                        <TestBriefCard brief={prev.refresh_brief} />
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        </div>
       )}
 
       {/* Empty state — no diagnosis yet */}
