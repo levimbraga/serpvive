@@ -10,6 +10,7 @@ import {
   ChevronDown, ChevronUp, Check,
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   FlaskConical, Download, X as XIcon,
+  BarChart3, Lightbulb,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -497,29 +498,61 @@ export default function PageDetailClient({
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
           {/* Confetti success message */}
           {showConfettiMsg && refresh.result_status === "pending" && (
-            <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-4">
-              <PartyPopper size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-[#16A34A]">Great! We&apos;ll measure your results in 28 days.</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">Keep making great content!</p>
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4">
+                <PartyPopper size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-[#16A34A]">Great! We&apos;ll measure your results in 28 days.</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">Keep making great content!</p>
+                </div>
+              </div>
+
+              {/* Post-refresh info tip */}
+              <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <BarChart3 size={18} strokeWidth={1.5} className="text-[#2563EB] flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-[#1E40AF] leading-relaxed">
+                    <p>Results will be automatically measured in 28 days. We&apos;ll compare your before and after metrics to prove what worked.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 mt-3">
+                  <Lightbulb size={18} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-[#92400E] leading-relaxed">
+                    <p><span className="font-medium">Tip:</span> You can run a new analysis right now to see how your updated content compares against competitors. The diagnosis reads your live content — so if your changes are published, the new analysis will reflect them.</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Pending state */}
           {refresh.result_status === "pending" && !showConfettiMsg && (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
-                <Timer size={20} strokeWidth={1.5} className="text-[#2563EB]" />
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+                  <Timer size={20} strokeWidth={1.5} className="text-[#2563EB]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#111827]">Refresh tracked</p>
+                  <p className="text-xs text-[#6B7280]">
+                    Marked as updated on {new Date(refresh.refreshed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    {" — "}
+                    Measuring... {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-[#111827]">Refresh tracked</p>
-                <p className="text-xs text-[#6B7280]">
-                  Marked as updated on {new Date(refresh.refreshed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  {" — "}
-                  Measuring... {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
-                </p>
-              </div>
+
+              {/* Refresh flow tip */}
+              <p className="text-[13px] text-[#6B7280] leading-relaxed">
+                Want to see how your changes stack up?{" "}
+                <button
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  className="text-[#0D9488] hover:text-[#0F766E] font-medium transition-colors"
+                >
+                  Run a new analysis &rarr;
+                </button>
+                {" "}It will read your updated content and compare it fresh against today&apos;s top competitors.
+              </p>
             </div>
           )}
 

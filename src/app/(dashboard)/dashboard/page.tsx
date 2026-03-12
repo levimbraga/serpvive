@@ -253,15 +253,15 @@ export default async function DashboardPage() {
         <Alert className="bg-[#EFF6FF] border-[#BFDBFE]">
           <Info size={16} strokeWidth={1.5} className="text-[#2563EB]" />
           <AlertDescription className="text-[#1E40AF]">
-            Pages only appear here after Google Search Console registers at least 1 impression.
-            New or recently published pages may take a few days to show up.{" "}
+            Pages appear here after Google Search Console registers at least 1 impression.
+            Recently published pages may take a few days to show up.{" "}
             <a
               href="https://search.google.com/search-console"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-[#2563EB] hover:text-[#1D4ED8] underline underline-offset-2"
             >
-              Open Google Search Console &rarr;
+              Check indexation status in Google Search Console &rarr;
             </a>
           </AlertDescription>
         </Alert>
