@@ -43,9 +43,21 @@ export async function POST() {
     const cooldownMs = 5 * 60 * 1000;
     const elapsed = Date.now() - lastRun;
     if (elapsed < cooldownMs) {
+      // If the engine ran very recently (e.g. auto-run after import), return success
+      // instead of blocking — the user doesn't need to know it already ran
+      if (elapsed < 60_000) {
+        const { data: siteData } = await admin
+          .from("sites")
+          .select("pages_count")
+          .eq("id", site.id)
+          .single();
+        return NextResponse.json({
+          data: { pagesProcessed: siteData?.pages_count ?? 0, alreadyRan: true },
+        });
+      }
       const waitSec = Math.ceil((cooldownMs - elapsed) / 1000);
       return NextResponse.json(
-        { error: `Please wait ${waitSec}s before running the engine again.` },
+        { error: `The engine ran recently. Please wait ${waitSec}s before running again.` },
         { status: 429 },
       );
     }
