@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
   metadataBase: new URL("https://serpvive.com"),
   icons: {
-    icon: "/icon.svg",
+    icon: "/favicon.ico",
     apple: "/og-icon.png",
   },
   openGraph: {
