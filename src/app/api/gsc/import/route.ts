@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { after } from "next/server";
 import { z } from "zod";
 
 export const maxDuration = 300; // 5 minutes
@@ -94,9 +95,13 @@ export async function POST(request: Request) {
 
   const pageLimit = PLAN_LIMITS[plan].pages;
 
-  // Start import in background (non-blocking)
-  runImport(admin, site.id, accessToken, siteUrl, pageLimit, user.id).catch((err) => {
-    console.error("[gsc/import] Background import failed:", err);
+  // Start import in background — after() keeps the function alive on Vercel
+  after(async () => {
+    try {
+      await runImport(admin, site.id, accessToken, siteUrl, pageLimit, user.id);
+    } catch (err) {
+      console.error("[gsc/import] Background import failed:", err);
+    }
   });
 
   // Clear temporary cookies
@@ -242,24 +247,25 @@ async function runImport(
     if (allPages && allPages.length > pageLimit) {
       console.log(`[gsc/import] Site has ${allPages.length} pages, pruning to top ${pageLimit}`);
 
-      // Get total clicks per page from metrics
-      const pageClicks: { id: string; clicks: number }[] = [];
-      for (const page of allPages) {
-        const { data: agg } = await admin
-          .from("page_metrics_daily")
-          .select("clicks")
-          .eq("page_id", page.id);
-        const total = (agg ?? []).reduce((sum, r) => sum + (r.clicks ?? 0), 0);
-        pageClicks.push({ id: page.id, clicks: total });
+      // Single query: aggregate total clicks per page using Supabase RPC or inline
+      const allPageIds = allPages.map((p) => p.id);
+      const { data: metricsAgg } = await admin
+        .from("page_metrics_daily")
+        .select("page_id, clicks")
+        .in("page_id", allPageIds);
+
+      // Sum clicks per page in-memory (single DB call instead of N)
+      const clicksMap = new Map<string, number>();
+      for (const row of metricsAgg ?? []) {
+        clicksMap.set(row.page_id, (clicksMap.get(row.page_id) ?? 0) + (row.clicks ?? 0));
       }
 
-      // Sort by clicks DESC, keep top pageLimit
+      const pageClicks = allPages.map((p) => ({ id: p.id, clicks: clicksMap.get(p.id) ?? 0 }));
       pageClicks.sort((a, b) => b.clicks - a.clicks);
       const keepIds = new Set(pageClicks.slice(0, pageLimit).map((p) => p.id));
       const deleteIds = pageClicks.filter((p) => !keepIds.has(p.id)).map((p) => p.id);
 
       if (deleteIds.length > 0) {
-        // Delete metrics first, then pages (CASCADE should handle this, but be explicit)
         for (let i = 0; i < deleteIds.length; i += 100) {
           const batch = deleteIds.slice(i, i + 100);
           await admin.from("page_metrics_daily").delete().in("page_id", batch);
@@ -267,7 +273,6 @@ async function runImport(
         }
         console.log(`[gsc/import] Pruned ${deleteIds.length} low-traffic pages`);
 
-        // Update knownPages count
         knownPages.clear();
         const { data: remaining } = await admin
           .from("pages")
