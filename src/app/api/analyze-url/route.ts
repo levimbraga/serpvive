@@ -7,11 +7,12 @@ import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getPostHogServer } from "@/lib/posthog/server";
+import { validateUrl } from "@/lib/url-validator";
 
 export const maxDuration = 300; // 5 minutes
 
 const AnalyzeUrlSchema = z.object({
-  url: z.string().url().startsWith("http"),
+  url: z.string().url().startsWith("https://"),
   keyword: z.string().min(2).max(200),
 });
 
@@ -23,10 +24,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Rate limit: max 3 per minute
-  if (!checkRateLimit(`analyze-url:${user.id}`, 3, 60_000)) {
+  // Rate limit: max 3 per hour
+  if (!checkRateLimit(`analyze-url:${user.id}`, 3, 3_600_000)) {
     return NextResponse.json(
-      { error: "Please wait a moment before running another analysis.", code: "slow_down", retry_after: 60 },
+      { error: "You can run up to 3 analyses per hour. Please wait before trying again.", code: "slow_down", retry_after: 3600 },
       { status: 429 },
     );
   }
@@ -35,12 +36,19 @@ export async function POST(request: Request) {
   const parsed = AnalyzeUrlSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Please provide a valid URL (https://...) and a keyword (2+ chars)." },
+      { error: "Please provide a valid HTTPS URL and a keyword (2+ chars)." },
       { status: 400 },
     );
   }
 
-  const { url, keyword } = parsed.data;
+  // SSRF / URL validation
+  const urlCheck = await validateUrl(parsed.data.url);
+  if (!urlCheck.ok) {
+    return NextResponse.json({ error: urlCheck.error }, { status: 400 });
+  }
+
+  const { keyword } = parsed.data;
+  const url = urlCheck.url;
   const admin = getSupabaseAdmin();
 
   // Check plan limits

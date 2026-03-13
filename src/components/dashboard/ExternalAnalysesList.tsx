@@ -27,7 +27,7 @@ export default async function ExternalAnalysesList({ userId, timeZone }: Externa
           href="/pages/analyze"
           className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
         >
-          Analyze another URL &rarr;
+          Analyze another page &rarr;
         </Link>
       </div>
       <div className="space-y-2">

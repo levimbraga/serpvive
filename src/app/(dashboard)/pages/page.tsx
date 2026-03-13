@@ -43,7 +43,7 @@ export default async function PagesListPage() {
             href="/pages/analyze"
             className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
           >
-            <Zap size={14} strokeWidth={1.5} /> Analyze a URL
+            <Zap size={14} strokeWidth={1.5} /> Analyze any page
           </Link>
         </div>
         <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
@@ -74,7 +74,7 @@ export default async function PagesListPage() {
           href="/pages/analyze"
           className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
         >
-          <Zap size={14} strokeWidth={1.5} /> Analyze a URL
+          <Zap size={14} strokeWidth={1.5} /> Analyze any page
         </Link>
       </div>
       <PagesTable pages={pages ?? []} timeZone={timeZone} />

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
+import { validateUrl } from "@/lib/url-validator";
 import { nanoid } from "nanoid";
 
 export const maxDuration = 300; // 5 minutes
@@ -10,7 +11,7 @@ export const maxDuration = 300; // 5 minutes
 const ADMIN_EMAIL = "levimaiabraga@gmail.com";
 
 const CreateDemoSchema = z.object({
-  url: z.string().url().startsWith("http"),
+  url: z.string().url().startsWith("https://"),
   keyword: z.string().min(2).max(200),
 });
 
@@ -37,7 +38,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Valid URL and keyword required." }, { status: 400 });
   }
 
-  const { url, keyword } = parsed.data;
+  // SSRF / URL validation
+  const urlCheck = await validateUrl(parsed.data.url);
+  if (!urlCheck.ok) {
+    return NextResponse.json({ error: urlCheck.error }, { status: 400 });
+  }
+
+  const url = urlCheck.url;
+  const { keyword } = parsed.data;
   const admin = getSupabaseAdmin();
 
   try {

@@ -5,7 +5,7 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 import AnalyzeUrlClient from "@/components/pages/AnalyzeUrlClient";
 
 export const metadata: Metadata = {
-  title: "Analyze a URL — SerpVive",
+  title: "Analyze any page — SerpVive",
 };
 
 export default async function AnalyzeUrlPage() {

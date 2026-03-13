@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { safeFetchHtml } from "@/lib/url-validator";
 
 export type LinkInfo = {
   text: string;
@@ -26,26 +27,37 @@ export type PageContent = {
 
 /**
  * Fetches a URL and extracts structured content using Cheerio.
- * Timeout: 5 seconds. Returns null if fetch fails (403, timeout, etc).
+ * When ssrfProtection is true, uses safeFetchHtml (SSRF-safe redirect
+ * following, DNS checks, 10s timeout, 5MB limit, HTML-only) and
+ * propagates errors to the caller instead of returning null.
  */
-export async function fetchPageContent(url: string): Promise<PageContent | null> {
+export async function fetchPageContent(
+  url: string,
+  options?: { ssrfProtection?: boolean },
+): Promise<PageContent | null> {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    let html: string;
 
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; SerpVive/1.0; +https://serpvive.com)",
-        "Accept": "text/html",
-      },
-    });
+    if (options?.ssrfProtection) {
+      html = await safeFetchHtml(url);
+    } else {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10_000);
 
-    clearTimeout(timeout);
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; SerpVive/1.0; +https://serpvive.com)",
+          "Accept": "text/html",
+        },
+      });
 
-    if (!res.ok) return null;
+      clearTimeout(timeout);
 
-    const html = await res.text();
+      if (!res.ok) return null;
+
+      html = await res.text();
+    }
     const $ = cheerio.load(html);
 
     // Extract structured data (JSON-LD) before removing <script> tags
@@ -197,7 +209,9 @@ export async function fetchPageContent(url: string): Promise<PageContent | null>
       externalLinks: externalLinks.slice(0, 50),
       tables: tables.slice(0, 10),
     };
-  } catch {
+  } catch (err) {
+    // Propagate descriptive errors from SSRF-safe fetch to the caller
+    if (options?.ssrfProtection) throw err;
     return null;
   }
 }

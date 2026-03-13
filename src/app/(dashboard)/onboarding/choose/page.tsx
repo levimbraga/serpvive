@@ -28,11 +28,11 @@ export default function OnboardingChoosePage() {
             <Zap size={24} strokeWidth={1.5} className="text-[#3B82F6]" />
           </div>
           <h2 className="text-lg font-semibold text-[#111827] mb-2">
-            Analyze a page
+            Analyze any page
           </h2>
           <p className="text-sm text-[#4B5563] mb-6">
-            Paste any URL and get an AI diagnosis in 3 minutes.
-            No setup required.
+            Paste any public HTTPS URL and get an AI diagnosis with
+            actionable recommendations. No setup required.
           </p>
           <span className="inline-flex items-center gap-2 text-sm font-medium text-[#3B82F6] group-hover:gap-3 transition-all">
             Analyze now <ArrowRight size={16} strokeWidth={1.5} />

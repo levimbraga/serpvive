@@ -34,7 +34,7 @@ export default async function ExternalAnalysisPage({
       diagnosis={analysis.diagnosis as Record<string, unknown>}
       brief={analysis.refresh_brief as Record<string, unknown> | null}
       createdAt={analysis.created_at}
-      badge="External URL"
+      badge="Page Analysis"
     />
   );
 }

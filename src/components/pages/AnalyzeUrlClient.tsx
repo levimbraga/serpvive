@@ -196,7 +196,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com/blog/my-post"
+                  placeholder="https://yoursite.com/blog/your-post"
                   className="w-full h-10 px-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
                   style={{ fontFamily: "var(--font-mono, monospace)" }}
                 />
@@ -251,6 +251,10 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
                   Uses 1 AI diagnosis ({remaining}/{diagnosesLimit} remaining). Takes 2-3 min.
                 </span>
               </div>
+              <p className="text-[10px] text-[#D1D5DB] leading-relaxed">
+                Only public HTTPS pages are supported. We fetch the page content server-side to run the analysis.
+                Max 3 analyses per hour.
+              </p>
             </div>
           )}
         </div>
@@ -272,7 +276,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
           onClick={() => { setStatus("idle"); setDiagnosis(null); setBrief(null); }}
           className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
         >
-          Analyze another URL
+          Analyze another page
         </button>
       </div>
 
@@ -280,7 +284,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
       <div className="bg-white rounded-xl border border-[#E5E7EB] p-5">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
-            External URL
+            Page Analysis
           </span>
         </div>
         <p className="text-sm font-medium text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>

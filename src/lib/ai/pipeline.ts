@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { searchGoogle } from "@/lib/serp/client";
 import { fetchPageContent, formatContentForPrompt } from "@/lib/serp/fetcher";
+import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
 import { sanitizeForPrompt, sanitizeQuery } from "./sanitize";
@@ -180,7 +181,7 @@ export async function runDiagnosisPipeline(
 }
 
 /**
- * External URL analysis pipeline (no GSC data required):
+ * External page analysis pipeline (no GSC data required):
  * 1. User provides URL + keyword
  * 2. Search Google via Serper
  * 3. Fetch competitors + user content (Cheerio)
@@ -207,8 +208,16 @@ export async function runExternalPipeline(
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch content (user + top 3 competitors)
-  console.log("[external-pipeline] Fetching content...");
+  // Step 2: Fetch user content (SSRF-protected) + competitor content
+  console.log("[external-pipeline] Fetching user content...");
+  const userContent = await fetchPageContent(url, { ssrfProtection: true });
+
+  // Content quality check — reject pages with too little text
+  const contentError = validateContent(userContent?.wordCount ?? 0);
+  if (contentError) {
+    throw new Error(contentError);
+  }
+
   let userHostname: string;
   try {
     userHostname = new URL(url).hostname;
@@ -220,10 +229,10 @@ export async function runExternalPipeline(
     .filter((r) => !r.url.includes(userHostname))
     .slice(0, 3);
 
-  const [userContent, ...competitorContents] = await Promise.all([
-    fetchPageContent(url),
-    ...competitorUrls.map((r) => fetchPageContent(r.url)),
-  ]);
+  console.log("[external-pipeline] Fetching competitor content...");
+  const competitorContents = await Promise.all(
+    competitorUrls.map((r) => fetchPageContent(r.url)),
+  );
 
   const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, url));
   const competitorsStr = sanitizeForPrompt(

@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           >
             <div className="flex items-center gap-3 mb-3">
               <Zap size={20} strokeWidth={1.5} className="text-[#3B82F6]" />
-              <h2 className="text-base font-semibold text-[#111827]">Analyze a page</h2>
+              <h2 className="text-base font-semibold text-[#111827]">Analyze any page</h2>
             </div>
             <p className="text-sm text-[#4B5563]">
               Paste any URL + keyword and get an AI diagnosis with actionable recommendations.
