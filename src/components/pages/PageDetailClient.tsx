@@ -816,11 +816,15 @@ export default function PageDetailClient({
                               </p>
                               <CopyMicroDraftButton suggestions={action.micro_draft.suggestions} />
                             </div>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {action.micro_draft.suggestions.map((s, j) => (
                                 <li key={j} className="text-sm text-[#111827] flex gap-2">
-                                  <span className="text-[#16A34A] flex-shrink-0">→</span>
-                                  <span>{s}</span>
+                                  <span className="text-[#16A34A] flex-shrink-0 mt-0.5">→</span>
+                                  <div className="flex-1 space-y-1.5">
+                                    {s.split(/\n+/).map((paragraph, k) => (
+                                      <p key={k} className="leading-relaxed">{paragraph}</p>
+                                    ))}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
