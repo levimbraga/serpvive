@@ -15,7 +15,7 @@ export default function StepsSection() {
           <div className="step reveal"><div className="sn">5</div><h3>PROVE</h3><p>28 days later: automatic before vs after. Did it work?</p><span className="st auto">AUTOMATIC</span></div>
         </div>
 
-        <div className="ctr"><a href="#waitlist" className="btn">Join the Waitlist →</a></div>
+        <div className="ctr"><a href="/signup" className="btn">Get Started Free →</a></div>
       </div>
     </section>
   );

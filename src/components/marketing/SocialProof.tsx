@@ -23,7 +23,7 @@ export default function SocialProof() {
             <div className="avatar purple">AL</div>
             <div className="avatar red">TC</div>
           </div>
-          <span className="sp-text">Join <strong>early adopters</strong> on the waitlist</span>
+          <span className="sp-text">Join <strong>early adopters</strong> already monitoring their content</span>
         </div>
 
         <div className="logo-wall">
