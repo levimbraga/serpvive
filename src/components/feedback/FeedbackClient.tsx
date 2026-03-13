@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2, MessageSquare, Copy } from "lucide-react";
+import { Loader2, CheckCircle2, MessageSquare } from "lucide-react";
 
 export default function FeedbackClient({ email, plan }: { email: string; plan: string }) {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [copied, setCopied] = useState(false);
-
   async function handleSubmit() {
     if (!message.trim()) return;
     setStatus("sending");
@@ -25,13 +23,6 @@ export default function FeedbackClient({ email, plan }: { email: string; plan: s
     } catch {
       setStatus("error");
     }
-  }
-
-  function handleCopyEmail() {
-    navigator.clipboard.writeText("hello@serpvive.com").then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
   }
 
   return (
@@ -72,7 +63,7 @@ export default function FeedbackClient({ email, plan }: { email: string; plan: s
             />
 
             {status === "error" && (
-              <p className="text-sm text-[#DC2626] mt-2">Failed to send. Please try again or email us directly.</p>
+              <p className="text-sm text-[#DC2626] mt-2">Failed to send. Please try again.</p>
             )}
 
             <button
@@ -85,17 +76,6 @@ export default function FeedbackClient({ email, plan }: { email: string; plan: s
             </button>
           </>
         )}
-      </div>
-
-      <div className="text-center">
-        <p className="text-xs text-[#9CA3AF] mb-2">Or email us directly:</p>
-        <button
-          onClick={handleCopyEmail}
-          className="inline-flex items-center gap-1.5 text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium transition-colors"
-        >
-          <Copy size={12} strokeWidth={1.5} />
-          {copied ? "Copied!" : "hello@serpvive.com"}
-        </button>
       </div>
     </div>
   );
