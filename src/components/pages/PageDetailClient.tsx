@@ -181,10 +181,10 @@ export default function PageDetailClient({
       setElapsedSeconds((s) => s + 1);
     }, 1000);
 
-    // Simulate pipeline steps
-    const t1 = setTimeout(() => setLoadingStep(1), 3000);   // SERP fetched
-    const t2 = setTimeout(() => setLoadingStep(2), 8000);   // Competitors analyzed
-    const t3 = setTimeout(() => setLoadingStep(3), 15000);  // AI diagnosing
+    // Simulate pipeline steps — spread visually across ~2-3 min total
+    const t1 = setTimeout(() => setLoadingStep(1), 15000);  // SERP fetched (~15s)
+    const t2 = setTimeout(() => setLoadingStep(2), 40000);  // Competitors analyzed (~40s)
+    const t3 = setTimeout(() => setLoadingStep(3), 80000);  // AI diagnosing (~80s)
     // Step 4 (generating brief) comes after diagnosis returns
 
     return () => {
