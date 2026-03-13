@@ -49,6 +49,7 @@ export default async function DashboardLayout({
         diagnosesLimit={diagnosesLimit}
         sites={sites}
         activeSiteId={activeSiteId}
+        userEmail={user.email ?? ""}
       />
       <div className="sm:ml-[200px]">
         <DashboardHeader

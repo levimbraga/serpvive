@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, RefreshCw, Settings, Zap, Globe, ChevronDown, Check, MessageSquare } from "lucide-react";
+import { LayoutDashboard, FileText, RefreshCw, Settings, Zap, Globe, ChevronDown, Check, MessageSquare, Share2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,17 +32,21 @@ const STATUS_DOT: Record<string, string> = {
   error: "bg-[#DC2626]",
 };
 
+const ADMIN_EMAIL = "levimaiabraga@gmail.com";
+
 type SidebarProps = {
   diagnosesUsed: number;
   diagnosesLimit: number;
   sites: SiteItem[];
   activeSiteId: string | null;
+  userEmail?: string;
 };
 
-export default function Sidebar({ diagnosesUsed, diagnosesLimit, sites, activeSiteId }: SidebarProps) {
+export default function Sidebar({ diagnosesUsed, diagnosesLimit, sites, activeSiteId, userEmail }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
+  const isAdmin = userEmail === ADMIN_EMAIL;
 
   const activeSite = sites.find((s) => s.id === activeSiteId) ?? sites[0] ?? null;
   const hasMultipleSites = sites.length > 1;
@@ -120,6 +124,19 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, sites, activeSi
             </Link>
           );
         })}
+        {isAdmin && (
+          <Link
+            href="/admin/demo"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              pathname.startsWith("/admin/demo")
+                ? "bg-[#1E293B] text-white border-l-[3px] border-[#3B82F6] pl-[9px]"
+                : "text-[#94A3B8] hover:text-white hover:bg-[#1E293B]"
+            }`}
+          >
+            <Share2 size={18} strokeWidth={1.5} />
+            Demo
+          </Link>
+        )}
       </nav>
 
       {/* Usage meter */}
