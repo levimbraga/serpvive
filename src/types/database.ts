@@ -8,6 +8,8 @@ export type Profile = {
   plan_status: "active" | "canceled" | "past_due";
   trial_ends_at: string | null; // deprecated, kept for DB compat
   free_since: string | null;
+  pending_plan: string | null;
+  plan_changes_at: string | null;
   country: string | null;
   diagnoses_used_this_month: number;
   diagnoses_reset_at: string;

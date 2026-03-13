@@ -109,6 +109,8 @@ export default function SettingsClient({
   timezone,
   digestDay,
   emailUnsubscribed,
+  pendingPlan,
+  planChangesAt,
   billingInterval,
   authProvider,
 }: {
@@ -124,6 +126,8 @@ export default function SettingsClient({
   timezone: string;
   digestDay: string;
   emailUnsubscribed: boolean;
+  pendingPlan: string | null;
+  planChangesAt: string | null;
   billingInterval: "monthly" | "annual";
   authProvider: string;
 }) {
@@ -391,6 +395,24 @@ export default function SettingsClient({
           <div>
             <p className="text-sm font-medium text-[#D97706]">Payment past due</p>
             <p className="text-xs text-[#6B7280] mt-0.5">Please update your payment method to avoid service interruption.</p>
+          </div>
+        </div>
+      )}
+
+      {pendingPlan && planChangesAt && (
+        <div className="flex items-center gap-3 bg-[#FEF3C7] border border-[#FDE68A] rounded-xl p-4">
+          <Clock size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-[#92400E]">
+              {pendingPlan === "free"
+                ? `Your ${planInfo.label} plan has been canceled.`
+                : `You\u2019ve downgraded to ${PLAN_DISPLAY[pendingPlan as PlanName]?.label ?? pendingPlan}.`}
+            </p>
+            <p className="text-xs text-[#B45309] mt-0.5">
+              {pendingPlan === "free"
+                ? `You have access until ${new Date(planChangesAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. After that, you\u2019ll be moved to the Free plan.`
+                : `Your ${planInfo.label} features remain active until ${new Date(planChangesAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`}
+            </p>
           </div>
         </div>
       )}

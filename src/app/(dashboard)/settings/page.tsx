@@ -16,7 +16,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day, email_unsubscribed")
+    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day, email_unsubscribed, pending_plan, plan_changes_at")
     .eq("id", user.id)
     .single();
 
@@ -49,6 +49,8 @@ export default async function SettingsPage() {
       timezone={profile.timezone ?? "UTC"}
       digestDay={profile.digest_day ?? "monday"}
       emailUnsubscribed={profile.email_unsubscribed ?? false}
+      pendingPlan={profile.pending_plan ?? null}
+      planChangesAt={profile.plan_changes_at ?? null}
       billingInterval="monthly"
       authProvider={authProvider}
     />

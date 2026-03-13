@@ -127,49 +127,92 @@ export async function POST(request: Request) {
       };
       const planStatus = statusMap[subscription.status] ?? "active";
 
-      console.log(`[stripe/webhook] Updating profile: user=${userId}, plan=${plan}, status=${planStatus}`);
-
-      const { error: updateError } = await admin
-        .from("profiles")
-        .update({
-          plan,
-          plan_status: planStatus,
-          stripe_subscription_id: subscription.id,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
-
-      if (updateError) {
-        console.error(`[stripe/webhook] CRITICAL: Failed to update profile:`, updateError);
-      } else {
-        console.log(`[stripe/webhook] SUCCESS: user=${userId} updated to plan=${plan}, status=${planStatus}`);
-      }
-
-      // Handle downgrade: pause excess sites
+      // Determine if this is a downgrade by comparing plan tiers
       const planLimits = await import("@/lib/constants").then((m) => m.PLAN_LIMITS);
-      const siteLimit = planLimits[plan as keyof typeof planLimits]?.sites ?? 1;
+      const PLAN_TIER: Record<string, number> = { free: 0, starter: 1, pro: 2, agency: 3 };
 
-      const { data: userSites } = await admin
-        .from("sites")
-        .select("id, status")
-        .eq("user_id", userId)
-        .order("last_sync_at", { ascending: false, nullsFirst: false });
+      const { data: currentProfile } = await admin
+        .from("profiles")
+        .select("plan")
+        .eq("id", userId)
+        .single();
 
-      if (userSites && userSites.length > siteLimit) {
-        const sitesToPause = userSites
-          .filter((s) => s.status === "active")
-          .slice(siteLimit);
+      const currentTier = PLAN_TIER[currentProfile?.plan ?? "free"] ?? 0;
+      const newTier = PLAN_TIER[plan] ?? 0;
+      const isDowngrade = newTier < currentTier;
 
-        for (const s of sitesToPause) {
-          await admin.from("sites").update({ status: "paused" }).eq("id", s.id);
+      if (isDowngrade) {
+        // DOWNGRADE: defer the plan change until billing period ends
+        const itemPeriodEnd = subscription.items?.data?.[0]?.current_period_end;
+        const periodEnd = itemPeriodEnd
+          ? new Date(itemPeriodEnd * 1000).toISOString()
+          : new Date().toISOString();
+
+        console.log(`[stripe/webhook] DOWNGRADE detected: user=${userId}, ${currentProfile?.plan} → ${plan}, deferred until ${periodEnd}`);
+
+        const { error: updateError } = await admin
+          .from("profiles")
+          .update({
+            pending_plan: plan,
+            plan_changes_at: periodEnd,
+            plan_status: planStatus,
+            stripe_subscription_id: subscription.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.error(`[stripe/webhook] CRITICAL: Failed to set pending downgrade:`, updateError);
+        } else {
+          console.log(`[stripe/webhook] SUCCESS: user=${userId} pending downgrade to ${plan} at ${periodEnd}`);
+        }
+      } else {
+        // UPGRADE or same-tier change: apply immediately
+        console.log(`[stripe/webhook] Updating profile: user=${userId}, plan=${plan}, status=${planStatus}`);
+
+        const { error: updateError } = await admin
+          .from("profiles")
+          .update({
+            plan,
+            plan_status: planStatus,
+            pending_plan: null,
+            plan_changes_at: null,
+            stripe_subscription_id: subscription.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.error(`[stripe/webhook] CRITICAL: Failed to update profile:`, updateError);
+        } else {
+          console.log(`[stripe/webhook] SUCCESS: user=${userId} updated to plan=${plan}, status=${planStatus}`);
         }
 
-        if (sitesToPause.length > 0) {
-          console.log(`[stripe/webhook] Paused ${sitesToPause.length} excess sites for user=${userId} (limit=${siteLimit})`);
+        // Handle excess sites after upgrade (shouldn't happen, but defensive)
+        const siteLimit = planLimits[plan as keyof typeof planLimits]?.sites ?? 1;
+
+        const { data: userSites } = await admin
+          .from("sites")
+          .select("id, status")
+          .eq("user_id", userId)
+          .order("last_sync_at", { ascending: false, nullsFirst: false });
+
+        if (userSites && userSites.length > siteLimit) {
+          const sitesToPause = userSites
+            .filter((s) => s.status === "active")
+            .slice(siteLimit);
+
+          for (const s of sitesToPause) {
+            await admin.from("sites").update({ status: "paused" }).eq("id", s.id);
+          }
+
+          if (sitesToPause.length > 0) {
+            console.log(`[stripe/webhook] Paused ${sitesToPause.length} excess sites for user=${userId} (limit=${siteLimit})`);
+          }
         }
       }
 
-      getPostHogServer().capture({ distinctId: userId, event: "plan_changed", properties: { plan, planStatus } });
+      getPostHogServer().capture({ distinctId: userId, event: "plan_changed", properties: { plan, planStatus, isDowngrade } });
       break;
     }
 
@@ -199,46 +242,30 @@ export async function POST(request: Request) {
         break;
       }
 
+      // Defer cancellation: keep current plan until billing period ends
+      const itemPeriodEnd = subscription.items?.data?.[0]?.current_period_end;
+      const periodEnd = itemPeriodEnd
+        ? new Date(itemPeriodEnd * 1000).toISOString()
+        : new Date().toISOString();
+
+      console.log(`[stripe/webhook] subscription.deleted: user=${userId}, deferred free downgrade until ${periodEnd}`);
+
       const { error: deleteError } = await admin
         .from("profiles")
         .update({
-          plan: "free",
-          plan_status: "active",
-          free_since: new Date().toISOString(),
-          stripe_subscription_id: null,
+          pending_plan: "free",
+          plan_changes_at: periodEnd,
+          plan_status: "canceled",
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
 
       if (deleteError) {
-        console.error(`[stripe/webhook] CRITICAL: Failed to downgrade profile:`, deleteError);
+        console.error(`[stripe/webhook] CRITICAL: Failed to set pending cancellation:`, deleteError);
       }
 
-      // Pause excess sites (free plan = 1 site)
-      const { PLAN_LIMITS } = await import("@/lib/constants");
-      const freeSiteLimit = PLAN_LIMITS.free.sites;
-
-      const { data: userSites } = await admin
-        .from("sites")
-        .select("id, status")
-        .eq("user_id", userId)
-        .order("last_sync_at", { ascending: false, nullsFirst: false });
-
-      if (userSites && userSites.filter((s) => s.status === "active").length > freeSiteLimit) {
-        const activeSites = userSites.filter((s) => s.status === "active");
-        const sitesToPause = activeSites.slice(freeSiteLimit);
-
-        for (const s of sitesToPause) {
-          await admin.from("sites").update({ status: "paused" }).eq("id", s.id);
-        }
-
-        if (sitesToPause.length > 0) {
-          console.log(`[stripe/webhook] Paused ${sitesToPause.length} excess sites on cancellation for user=${userId}`);
-        }
-      }
-
-      getPostHogServer().capture({ distinctId: userId, event: "plan_downgraded", properties: { plan: "free" } });
-      console.log(`[stripe/webhook] SUCCESS: user=${userId} downgraded to free`);
+      getPostHogServer().capture({ distinctId: userId, event: "plan_canceled", properties: { effective_at: periodEnd } });
+      console.log(`[stripe/webhook] SUCCESS: user=${userId} cancellation deferred to ${periodEnd}`);
       break;
     }
 
