@@ -134,6 +134,7 @@ export default function PageDetailClient({
   plan,
   diagnosesUsed,
   diagnosesLimit,
+  timeZone,
 }: {
   page: PageData;
   siteDomain: string;
@@ -143,6 +144,7 @@ export default function PageDetailClient({
   plan: string;
   diagnosesUsed: number;
   diagnosesLimit: number;
+  timeZone: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -509,7 +511,7 @@ export default function PageDetailClient({
                 <div>
                   <p className="text-sm font-medium text-[#111827]">Refresh tracked</p>
                   <p className="text-xs text-[#6B7280]">
-                    Marked as updated on {new Date(refresh.refreshed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    Marked as updated on {new Date(refresh.refreshed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })}
                     {" — "}
                     Measuring... {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
                   </p>
@@ -547,7 +549,7 @@ export default function PageDetailClient({
                     <p className="text-sm font-medium text-[#111827]">Refresh Result: {resultCfg.label}</p>
                     <p className="text-xs text-[#6B7280]">
                       Measured on {refresh.result_calculated_at
-                        ? new Date(refresh.result_calculated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                        ? new Date(refresh.result_calculated_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone })
                         : "—"}
                     </p>
                   </div>
@@ -659,7 +661,7 @@ export default function PageDetailClient({
                 </h2>
               </div>
               <span className="text-xs text-[#9CA3AF]">
-                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone })}
               </span>
             </div>
 
@@ -670,7 +672,7 @@ export default function PageDetailClient({
             {previousDiagnoses.length > 0 && (() => {
               const prevCauses = previousDiagnoses[0]!.diagnosis.causes.length;
               const currCauses = diagnosis.diagnosis.causes.length;
-              const prevDate = new Date(previousDiagnoses[0]!.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+              const prevDate = new Date(previousDiagnoses[0]!.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone });
               const improved = currCauses < prevCauses;
               const worsened = currCauses > prevCauses;
               return (
@@ -894,7 +896,7 @@ export default function PageDetailClient({
                   <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-[#F9FAFB]">
                     <div className="flex-1 min-w-0 text-left">
                       <p className="text-sm font-medium text-[#111827]">
-                        Analysis from {new Date(prev.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        Analysis from {new Date(prev.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone })}
                       </p>
                       <p className="text-sm text-[#6B7280] mt-1 line-clamp-1">
                         &ldquo;{summaryPreview}&rdquo;

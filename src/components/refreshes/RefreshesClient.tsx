@@ -38,7 +38,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   declined:   { label: "Declined",          color: "#DC2626", bg: "#FEF2F2", icon: TrendingDown },
 };
 
-export default function RefreshesClient({ items }: { items: RefreshItem[] }) {
+export default function RefreshesClient({ items, timeZone = "UTC" }: { items: RefreshItem[]; timeZone?: string }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [now] = useState(() => Date.now());
@@ -112,9 +112,9 @@ export default function RefreshesClient({ items }: { items: RefreshItem[] }) {
                     {item.pagePath}
                   </Link>
                   <p className="text-xs text-[#9CA3AF] mt-0.5">
-                    Marked updated {new Date(item.refreshedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    Marked updated {new Date(item.refreshedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })}
                     {daysRemaining !== null && ` — ${daysRemaining} day${daysRemaining !== 1 ? "s" : ""} remaining`}
-                    {item.resultCalculatedAt && ` — Measured ${new Date(item.resultCalculatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
+                    {item.resultCalculatedAt && ` — Measured ${new Date(item.resultCalculatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone })}`}
                   </p>
                 </div>
 

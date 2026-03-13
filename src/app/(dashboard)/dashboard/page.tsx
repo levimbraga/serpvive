@@ -164,6 +164,7 @@ export default async function DashboardPage() {
         <FreePlanBanner
           siteStatus={site.status}
           lastSyncAt={site.last_sync_at}
+          timeZone={tz}
         />
       )}
 

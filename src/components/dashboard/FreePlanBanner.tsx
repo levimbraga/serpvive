@@ -6,14 +6,15 @@ import { AlertTriangle, ArrowUpRight, Zap } from "lucide-react";
 type FreePlanBannerProps = {
   siteStatus: string;
   lastSyncAt: string | null;
+  timeZone?: string;
 };
 
-export default function FreePlanBanner({ siteStatus, lastSyncAt }: FreePlanBannerProps) {
+export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC" }: FreePlanBannerProps) {
   const isPaused = siteStatus === "paused";
 
   if (isPaused) {
     const lastSyncDate = lastSyncAt
-      ? new Date(lastSyncAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      ? new Date(lastSyncAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })
       : "unknown";
 
     return (

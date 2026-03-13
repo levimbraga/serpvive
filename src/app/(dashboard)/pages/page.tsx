@@ -22,6 +22,15 @@ export default async function PagesListPage() {
   const activeSiteId = await getActiveSiteId(supabase, user.id);
   const site = activeSiteId ? { id: activeSiteId } : null;
 
+  // Fetch timezone
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("timezone")
+    .eq("id", user.id)
+    .single();
+
+  const timeZone = profile?.timezone ?? "UTC";
+
   if (!site) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -39,7 +48,7 @@ export default async function PagesListPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold text-[#111827] mb-4">Pages</h1>
-      <PagesTable pages={pages ?? []} />
+      <PagesTable pages={pages ?? []} timeZone={timeZone} />
     </div>
   );
 }

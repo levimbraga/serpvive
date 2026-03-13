@@ -53,7 +53,7 @@ export default async function PageDetailPage({
       .maybeSingle(),
     supabase
       .from("profiles")
-      .select("plan, diagnoses_used_this_month")
+      .select("plan, diagnoses_used_this_month, timezone")
       .eq("id", user.id)
       .single(),
   ]);
@@ -74,6 +74,7 @@ export default async function PageDetailPage({
       diagnosesLimit={
         ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[profileRes.data?.plan ?? "free"] ?? 0
       }
+      timeZone={profileRes.data?.timezone ?? "UTC"}
     />
   );
 }

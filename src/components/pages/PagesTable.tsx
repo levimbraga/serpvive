@@ -42,7 +42,7 @@ const SORT_PRESETS: { key: SortPreset; label: string }[] = [
   { key: "recent", label: "Recent" },
 ];
 
-export default function PagesTable({ pages }: { pages: PageData[] }) {
+export default function PagesTable({ pages, timeZone = "UTC" }: { pages: PageData[]; timeZone?: string }) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("decay_score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -261,6 +261,7 @@ export default function PagesTable({ pages }: { pages: PageData[] }) {
                         ? new Date(page.last_diagnosis_at).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
+                            timeZone,
                           })
                         : "Never"
                       }

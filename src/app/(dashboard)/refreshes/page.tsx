@@ -13,6 +13,14 @@ export default async function RefreshesPage() {
 
   if (!user) redirect("/login");
 
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("timezone")
+    .eq("id", user.id)
+    .single();
+
+  const timeZone = profileData?.timezone ?? "UTC";
+
   const { data: refreshes } = await supabase
     .from("refreshes")
     .select(`
@@ -72,5 +80,5 @@ export default async function RefreshesPage() {
     resultCalculatedAt: r.result_calculated_at as string | null,
   }));
 
-  return <RefreshesClient items={items} />;
+  return <RefreshesClient items={items} timeZone={timeZone} />;
 }
