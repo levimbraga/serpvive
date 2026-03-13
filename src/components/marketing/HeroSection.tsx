@@ -16,7 +16,7 @@ export default function HeroSection() {
       <h1>Revive your <span className="accent">rankings.</span></h1>
 
       <p className="hero-sub">
-        Your content is dying. We detect it, explain <strong>WHY</strong> with AI, and tell you exactly <strong>WHAT</strong> to do — so you can fix it in hours, not weeks.
+        We don&apos;t just tell you traffic is dropping. We tell you <strong>WHY</strong> with AI-powered diagnosis and exactly <strong>WHAT to fix</strong> — with evidence from your actual SERP competitors.
       </p>
 
       <a href="/signup" onClick={() => posthog.capture("cta_clicked", { location: "hero" })} className="hero-cta">

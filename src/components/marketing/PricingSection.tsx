@@ -201,14 +201,14 @@ export default function PricingSection() {
             <div className="pa" style={{ fontSize: 40 }}>Custom</div>
             <div className="pp">tailored to your needs</div>
             <ul className="pf">
-              <li>Unlimited sites & pages</li>
-              <li>Unlimited AI diagnoses</li>
+              <li>Custom number of sites</li>
+              <li>Custom page monitoring</li>
+              <li>Custom AI diagnoses</li>
               <li>Dedicated account manager</li>
-              <li>Custom integrations</li>
-              <li>Priority support & SLA</li>
               <li>White-label reports</li>
               <li>SSO / SAML</li>
               <li>Invoice billing</li>
+              <li>Priority support & SLA</li>
             </ul>
             <a
               href="mailto:hello@serpvive.com"

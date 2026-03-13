@@ -246,6 +246,7 @@ section, nav, footer { position: relative; z-index: 1; }
   font-weight: 600; font-size: 14px; transition: all .2s;
 }
 .nav-cta:hover { background: var(--blue-hover); box-shadow: 0 0 30px var(--blue-glow); }
+.nav-login { color: var(--text2) !important; font-weight: 500; font-size: 14px; }
 
 /* ═══════════════════════ HERO — CENTERED ═══════════════════════ */
 .hero {
@@ -487,6 +488,7 @@ section, nav, footer { position: relative; z-index: 1; }
 .price-card {
   background: var(--sv-card); border: 1px solid var(--sv-border); border-radius: 14px; padding: 40px 28px;
   text-align: center; transition: all .3s;
+  display: flex; flex-direction: column;
 }
 .price-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.3); }
 .price-card.pop { border-color: var(--sv-blue); position: relative; }
@@ -494,7 +496,7 @@ section, nav, footer { position: relative; z-index: 1; }
 .pn { font-size: 13px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
 .pa { font-size: 56px; font-weight: 800; letter-spacing: -2px; margin-bottom: 2px; }
 .pp { font-size: 14px; color: var(--text3); margin-bottom: 28px; }
-.pf { list-style: none; text-align: left; margin-bottom: 28px; }
+.pf { list-style: none; text-align: left; margin-bottom: 28px; flex: 1; }
 .pf li { padding: 8px 0; font-size: 14px; color: var(--text2); display: flex; align-items: center; gap: 10px; }
 .pf li::before { content: '✓'; color: var(--sv-blue); font-weight: 700; font-size: 13px; }
 .price-card .btn { width: 100%; justify-content: center; font-size: 14px; padding: 14px 0; }
@@ -623,7 +625,7 @@ section, nav, footer { position: relative; z-index: 1; }
   .showcase { padding-left: 20px; padding-right: 20px; }
   .hero-trust, .f-trust { flex-wrap: wrap; gap: 8px; justify-content: center; }
   .hero-trust span, .f-trust span { font-size: 12px; }
-  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links a:not(.nav-cta):not(.nav-login) { display: none; }
   .logo-wall { gap: 20px; }
   .logo-wall span { font-size: 12px; }
   .fl { display: none; }

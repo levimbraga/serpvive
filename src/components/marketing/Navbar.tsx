@@ -5,7 +5,8 @@ export default function Navbar() {
       <div className="nav-links">
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
-        <a href="#waitlist" className="nav-cta">Join Waitlist</a>
+        <a href="/login" className="nav-login">Log in</a>
+        <a href="/signup" className="nav-cta">Get Started Free</a>
       </div>
     </nav>
   );
