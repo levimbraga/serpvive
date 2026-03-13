@@ -1,4 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+
+const PAGE_SIZE = 25;
 
 type PageRow = {
   id: string;
@@ -25,6 +30,8 @@ const STATUS_CONFIG = {
 } as const;
 
 export default function DecayList({ pages, isNewSite }: DecayListProps) {
+  const [showAll, setShowAll] = useState(false);
+
   // Sort: for new sites sort by clicks desc; otherwise by urgency
   const sorted = [...pages].sort((a, b) => {
     if (isNewSite) {
@@ -48,6 +55,9 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
     );
   }
 
+  const displayPages = showAll ? sorted : sorted.slice(0, PAGE_SIZE);
+  const hasMore = sorted.length > PAGE_SIZE;
+
   return (
     <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
       {/* Header */}
@@ -64,7 +74,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
       </div>
 
       {/* Rows */}
-      {sorted.map((page) => {
+      {displayPages.map((page) => {
         const cfg = STATUS_CONFIG[page.status];
         return (
           <div key={page.id}>
@@ -165,6 +175,24 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
           </div>
         );
       })}
+
+      {/* Show more / View all */}
+      {hasMore && !showAll && (
+        <div className="flex items-center justify-center gap-4 py-3 border-t border-[#E5E7EB]">
+          <button
+            onClick={() => setShowAll(true)}
+            className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium transition-colors"
+          >
+            Show all {sorted.length} pages
+          </button>
+          <Link
+            href="/pages"
+            className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+          >
+            View in Pages table →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
