@@ -93,7 +93,7 @@ export async function GET() {
   const admin = getSupabaseAdmin();
   const { data: demos } = await admin
     .from("demo_analyses")
-    .select("id, url, keyword, created_at, expires_at, views")
+    .select("id, url, keyword, created_at, expires_at, views, diagnosis, refresh_brief")
     .order("created_at", { ascending: false });
 
   return NextResponse.json({ data: demos ?? [] });

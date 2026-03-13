@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Zap, Search, FileText, Brain, Sparkles, CheckCircle2, Loader2,
-  AlertCircle, Copy, Check, Trash2, ExternalLink, Eye,
+  AlertCircle, Copy, Check, Trash2, ExternalLink, Eye, Download,
 } from "lucide-react";
 
 type DemoItem = {
@@ -13,6 +13,8 @@ type DemoItem = {
   created_at: string;
   expires_at: string;
   views: number;
+  diagnosis: unknown;
+  refresh_brief: unknown;
 };
 
 export default function DemoClient() {
@@ -23,6 +25,7 @@ export default function DemoClient() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [generatedId, setGeneratedId] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<{ diagnosis: unknown; brief: unknown } | null>(null);
   const [copied, setCopied] = useState(false);
   const [demos, setDemos] = useState<DemoItem[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -70,6 +73,7 @@ export default function DemoClient() {
       if (!res.ok) throw new Error(json.error ?? "Failed");
 
       setGeneratedId(json.data.id);
+      setLastResult({ diagnosis: json.data.diagnosis, brief: json.data.brief });
       setStatus("done");
       fetchDemos();
     } catch (err) {
@@ -92,6 +96,19 @@ export default function DemoClient() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  }
+
+  function exportJson(data: { url: string; keyword: string; diagnosis: unknown; brief: unknown }) {
+    const blob = new Blob(
+      [JSON.stringify({ url: data.url, keyword: data.keyword, diagnosis: data.diagnosis, refresh_brief: data.brief }, null, 2)],
+      { type: "application/json" },
+    );
+    const slug = new URL(data.url).pathname.replace(/\//g, "_").replace(/^_/, "") || "page";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `serpvive-${slug}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
@@ -152,12 +169,22 @@ export default function DemoClient() {
                 {copied ? <Check size={14} strokeWidth={1.5} className="text-[#16A34A]" /> : <Copy size={14} strokeWidth={1.5} />}
               </button>
             </div>
-            <button
-              onClick={() => { setStatus("idle"); setUrl(""); setKeyword(""); }}
-              className="mt-4 text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
-            >
-              Generate another
-            </button>
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <button
+                onClick={() => { setStatus("idle"); setUrl(""); setKeyword(""); setLastResult(null); }}
+                className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
+              >
+                Generate another
+              </button>
+              {lastResult && (
+                <button
+                  onClick={() => exportJson({ url, keyword, diagnosis: lastResult.diagnosis, brief: lastResult.brief })}
+                  className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
+                >
+                  <Download size={14} strokeWidth={1.5} /> Export JSON
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -217,7 +244,7 @@ export default function DemoClient() {
                     <th className="text-left px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Keyword</th>
                     <th className="text-center px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Views</th>
                     <th className="text-right px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Expires</th>
-                    <th className="w-[100px] px-4 py-2.5"></th>
+                    <th className="w-[130px] px-4 py-2.5"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -254,6 +281,13 @@ export default function DemoClient() {
                             title="Copy link"
                           >
                             <Copy size={14} strokeWidth={1.5} />
+                          </button>
+                          <button
+                            onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
+                            title="Export JSON"
+                          >
+                            <Download size={14} strokeWidth={1.5} />
                           </button>
                           <button
                             onClick={() => handleDelete(demo.id)}
