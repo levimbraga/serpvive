@@ -122,7 +122,7 @@ export default function AnalysisResultView({
           {diagnosis.causes && diagnosis.causes.length > 0 && (
             <div className="space-y-3">
               {diagnosis.causes.map((cause, i) => {
-                const sev = SEVERITY_CONFIG[cause.severity] ?? SEVERITY_CONFIG.medium;
+                const sev = SEVERITY_CONFIG[cause.severity] ?? { color: "#D97706", bg: "#FFFBEB", label: "Medium" };
                 return (
                   <div key={i} className="rounded-lg border border-[#E5E7EB] p-4" style={{ borderLeftWidth: 3, borderLeftColor: sev.color }}>
                     <div className="flex items-start justify-between gap-3 mb-2">
@@ -176,7 +176,7 @@ export default function AnalysisResultView({
 
           <div className="space-y-2">
             {brief.actions.map((action, i) => {
-              const pri = PRIORITY_CONFIG[action.priority] ?? PRIORITY_CONFIG.important;
+              const pri = PRIORITY_CONFIG[action.priority] ?? { emoji: "\uD83D\uDFE1", label: "Important" };
               const isExpanded = expandedIdx === i;
               return (
                 <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
