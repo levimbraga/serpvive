@@ -8,6 +8,7 @@ import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
   CheckCircle2, Crown, Zap, Globe, FileText, BarChart3,
   Unlink, Plus, ArrowUpRight, Key, Trash2, Clock, Calendar, Mail,
+  Eye, EyeOff,
 } from "lucide-react";
 import {
   Dialog,
@@ -154,6 +155,7 @@ export default function SettingsClient({
 
   // Password state
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordText, setShowPasswordText] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
@@ -228,10 +230,13 @@ export default function SettingsClient({
     if (err) {
       setError(err.message);
     } else {
-      flash("Password updated successfully");
+      // Sign out all other devices
+      await fetch("/api/auth/signout-others", { method: "POST" }).catch(() => {});
+      flash("Password changed. All other devices have been signed out.");
       setNewPassword("");
       setConfirmPassword("");
       setShowPassword(false);
+      setShowPasswordText(false);
     }
     setSavingPassword(false);
   }
@@ -585,20 +590,40 @@ export default function SettingsClient({
               </div>
               {showPassword && (
                 <div className="mt-3 space-y-2 pl-0">
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="New password (min 8 chars)"
-                    className="h-9 w-full px-3 text-sm border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                  />
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    className="h-9 w-full px-3 text-sm border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPasswordText ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="New password (min 8 chars)"
+                      className="h-9 w-full px-3 pr-9 text-sm border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordText(!showPasswordText)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPasswordText ? <EyeOff size={14} strokeWidth={1.5} /> : <Eye size={14} strokeWidth={1.5} />}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPasswordText ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      className="h-9 w-full px-3 pr-9 text-sm border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordText(!showPasswordText)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPasswordText ? <EyeOff size={14} strokeWidth={1.5} /> : <Eye size={14} strokeWidth={1.5} />}
+                    </button>
+                  </div>
                   <button
                     onClick={handleChangePassword}
                     disabled={savingPassword || newPassword.length < 8}
