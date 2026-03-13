@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (!site) {
-      return NextResponse.redirect(`${origin}/onboarding`);
+      return NextResponse.redirect(`${origin}/onboarding/choose`);
     }
   }
 

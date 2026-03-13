@@ -17,7 +17,8 @@ import UpgradeSuccessBanner from "@/components/dashboard/UpgradeSuccessBanner";
 import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sparkles, Info, AlertTriangle } from "lucide-react";
+import { Sparkles, Info, AlertTriangle, Zap, BarChart3 } from "lucide-react";
+import ExternalAnalysesList from "@/components/dashboard/ExternalAnalysesList";
 
 export const metadata: Metadata = {
   title: "Dashboard — SerpVive",
@@ -61,12 +62,48 @@ export default async function DashboardPage() {
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
   const tz = profile?.timezone ?? "UTC";
 
-  // No active site → show setup message
+  // No active site → show simplified dashboard with analyze CTA
   if (!site) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <h1 className="text-2xl font-semibold text-[#111827] mb-2">Welcome to SerpVive</h1>
-        <p className="text-[#4B5563]">Connect your Google Search Console to get started.</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-xl font-semibold text-[#111827]">
+            {profile?.full_name ? `Welcome, ${profile.full_name.split(" ")[0]}!` : "Welcome to SerpVive!"}
+          </h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">
+            Start by analyzing a page or connect GSC for full monitoring.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a
+            href="/pages/analyze"
+            className="bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-md"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <Zap size={20} strokeWidth={1.5} className="text-[#3B82F6]" />
+              <h2 className="text-base font-semibold text-[#111827]">Analyze a page</h2>
+            </div>
+            <p className="text-sm text-[#4B5563]">
+              Paste any URL + keyword and get an AI diagnosis with actionable recommendations.
+            </p>
+          </a>
+
+          <a
+            href="/onboarding"
+            className="bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#0D9488] p-6 transition-all hover:shadow-md"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <BarChart3 size={20} strokeWidth={1.5} className="text-[#0D9488]" />
+              <h2 className="text-base font-semibold text-[#111827]">Connect Google Search Console</h2>
+            </div>
+            <p className="text-sm text-[#4B5563]">
+              Unlock automatic monitoring, Health Score, decay alerts, and more.
+            </p>
+          </a>
+        </div>
+
+        <ExternalAnalysesList userId={user.id} timeZone={tz} />
       </div>
     );
   }

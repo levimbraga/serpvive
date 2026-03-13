@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup") || path.startsWith("/forgot-password");
   // /reset-password is intentionally NOT in isAuthRoute (user needs active session from recovery link)
-  const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes");
+  const isDashboardRoute = path.startsWith("/dashboard") || path.startsWith("/pages") || path.startsWith("/settings") || path.startsWith("/onboarding") || path.startsWith("/refreshes") || path.startsWith("/feedback") || path.startsWith("/admin");
 
   // Not logged in → redirect to login
   if (!user && isDashboardRoute) {
@@ -45,19 +45,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Logged in + dashboard route (not onboarding) → check if site exists
-  if (user && isDashboardRoute && !path.startsWith("/onboarding")) {
-    const { data: site } = await supabase
-      .from("sites")
-      .select("id")
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle();
-
-    if (!site) {
-      return NextResponse.redirect(new URL("/onboarding", request.url));
-    }
-  }
+  // Note: we no longer force redirect to onboarding when no site exists.
+  // Users can now use "Analyze any URL" without connecting GSC.
+  // The auth callback handles the initial redirect to /onboarding/choose for new users.
 
   return response;
 }
