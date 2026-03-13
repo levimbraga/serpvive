@@ -745,10 +745,6 @@ export default function PageDetailClient({
                   </button>
                 </div>
               )}
-              <span className="text-[10px] text-[#D1D5DB]">
-                {diagnosis.cost_usd ? `$${diagnosis.cost_usd.toFixed(3)}` : ""}
-                {diagnosis.processing_time_ms ? ` · ${Math.round(diagnosis.processing_time_ms / 1000)}s` : ""}
-              </span>
             </div>
           </div>
 
