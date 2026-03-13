@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "SerpVive Feedback <feedback@serpvive.com>",
+      from: "SerpVive Feedback <hello@mail.serpvive.com>",
       to: "hello@serpvive.com",
       replyTo: profile?.email ?? user.email ?? undefined,
       subject: `[Feedback] from ${profile?.email ?? "user"} (${profile?.plan ?? "free"})`,
