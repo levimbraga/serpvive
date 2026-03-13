@@ -420,7 +420,7 @@ export default function SettingsClient({
             </p>
             <p className="text-xs text-[#B45309] mt-0.5">
               {pendingPlan === "free"
-                ? `You have access until ${new Date(planChangesAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. After that, you\u2019ll be moved to the Free plan.`
+                ? `You have access until ${new Date(planChangesAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. After that, you\u2019ll be moved to the Free plan with weekly syncs.`
                 : `Your ${planInfo.label} features remain active until ${new Date(planChangesAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`}
             </p>
           </div>
