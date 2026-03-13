@@ -16,13 +16,10 @@ type WelcomeCardProps = {
   hasDiagnosis: boolean;
   freeDiagPageId: string | null;
   freeDiagPagePath: string | null;
+  dismissed: boolean;
 };
 
 type Step = "pending" | "running" | "done";
-
-function getDismissKey(siteId: string) {
-  return `serpvive:welcome-dismissed:${siteId}`;
-}
 
 export default function WelcomeCard({
   siteId,
@@ -32,14 +29,13 @@ export default function WelcomeCard({
   hasDiagnosis,
   freeDiagPageId,
   freeDiagPagePath,
+  dismissed: initialDismissed,
 }: WelcomeCardProps) {
   const router = useRouter();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [dismissed, setDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    // Already dismissed explicitly
-    if (localStorage.getItem(getDismissKey(siteId)) === "true") return true;
+    if (initialDismissed) return true;
     // Returning user: engine already ran + has diagnosis = not a first visit
     if (hasEngineRun && hasDiagnosis && freeDiagPageId) return true;
     return false;
@@ -120,9 +116,13 @@ export default function WelcomeCard({
   }
 
   function handleDismiss() {
-    localStorage.setItem(getDismissKey(siteId), "true");
     setDismissed(true);
     stopPolling();
+    fetch("/api/sites/dismiss", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ siteId, field: "welcome_dismissed" }),
+    }).catch(() => {});
   }
 
   if (dismissed) return null;

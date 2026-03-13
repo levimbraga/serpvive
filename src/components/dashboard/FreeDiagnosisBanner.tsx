@@ -10,24 +10,18 @@ type FreeDiagnosisBannerProps = {
   pageId: string | null;
   pagePath: string | null;
   isProcessing: boolean;
+  dismissed: boolean;
 };
 
 const MAX_POLL_TIME_MS = 5 * 60 * 1000; // 5 minutes
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
 
-function getDismissKey(siteId: string) {
-  return `serpvive:free-diag-dismissed:${siteId}`;
-}
-
-export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProcessing }: FreeDiagnosisBannerProps) {
+export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProcessing, dismissed: initialDismissed }: FreeDiagnosisBannerProps) {
   const router = useRouter();
   const triggered = useRef(false);
   const startTime = useRef(Date.now());
   const [timedOut, setTimedOut] = useState(false);
-  const [dismissed, setDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(getDismissKey(siteId)) === "true";
-  });
+  const [dismissed, setDismissed] = useState(initialDismissed);
 
   // If processing, trigger the retry endpoint and poll for completion
   useEffect(() => {
@@ -95,6 +89,15 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
 
   if (!pageId || !pagePath || dismissed) return null;
 
+  async function handleDismiss() {
+    setDismissed(true);
+    await fetch("/api/sites/dismiss", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ siteId, field: "free_diag_dismissed" }),
+    }).catch(() => {});
+  }
+
   return (
     <div className="relative bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl px-5 py-4 hover:bg-[#EDE9FE] transition-colors group">
       <Link href={`/pages/${pageId}`} className="flex items-center gap-4">
@@ -120,8 +123,7 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
       <button
         onClick={(e) => {
           e.stopPropagation();
-          localStorage.setItem(getDismissKey(siteId), "true");
-          setDismissed(true);
+          handleDismiss();
         }}
         className="absolute top-3 right-3 p-1 rounded-lg text-[#A78BFA] hover:text-[#5B21B6] hover:bg-[#EDE9FE] transition-colors"
         aria-label="Dismiss"

@@ -47,7 +47,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at, token_error")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at, token_error, welcome_dismissed, free_diag_dismissed")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -193,6 +193,7 @@ export default async function DashboardPage() {
           hasDiagnosis={!!site.has_free_diagnosis}
           freeDiagPageId={freeDiagPageId}
           freeDiagPagePath={freeDiagPagePath}
+          dismissed={site.welcome_dismissed ?? false}
         />
       )}
 
@@ -211,6 +212,7 @@ export default async function DashboardPage() {
           pageId={freeDiagPageId}
           pagePath={freeDiagPagePath}
           isProcessing={isAutoProcessing}
+          dismissed={site.free_diag_dismissed ?? false}
         />
       )}
 
