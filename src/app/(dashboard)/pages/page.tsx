@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getActiveSiteId } from "@/lib/active-site";
 import PagesTable from "@/components/pages/PagesTable";
+import ExternalAnalysesList from "@/components/dashboard/ExternalAnalysesList";
+import { Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Pages — SerpVive",
@@ -33,8 +36,26 @@ export default async function PagesListPage() {
 
   if (!site) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <p className="text-[#6B7280]">No active site found.</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-[#111827]">Pages</h1>
+          <Link
+            href="/pages/analyze"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+          >
+            <Zap size={14} strokeWidth={1.5} /> Analyze a URL
+          </Link>
+        </div>
+        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
+          <p className="text-[#6B7280] mb-2">No site connected yet.</p>
+          <p className="text-sm text-[#9CA3AF]">
+            <Link href="/onboarding" className="text-[#3B82F6] hover:text-[#2563EB] font-medium">
+              Connect Google Search Console
+            </Link>{" "}
+            to monitor your pages, or analyze individual URLs above.
+          </p>
+        </div>
+        <ExternalAnalysesList userId={user.id} timeZone={timeZone} />
       </div>
     );
   }
@@ -46,9 +67,18 @@ export default async function PagesListPage() {
     .order("decay_score", { ascending: false });
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold text-[#111827] mb-4">Pages</h1>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-[#111827]">Pages</h1>
+        <Link
+          href="/pages/analyze"
+          className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+        >
+          <Zap size={14} strokeWidth={1.5} /> Analyze a URL
+        </Link>
+      </div>
       <PagesTable pages={pages ?? []} timeZone={timeZone} />
+      <ExternalAnalysesList userId={user.id} timeZone={timeZone} />
     </div>
   );
 }
