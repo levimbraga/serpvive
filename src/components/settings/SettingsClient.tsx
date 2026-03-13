@@ -174,9 +174,14 @@ export default function SettingsClient({
   const isPasswordAuth = authProvider === "email";
 
   // Plans available for upgrade
+  // Monthly: only show plans ABOVE current
+  // Annual: show plans >= current (same plan on annual = valid switch)
   const currentPlanIndex = PLAN_ORDER.indexOf(plan);
   const upgradePlans = PLANS_FOR_UPGRADE.filter((p) => {
     const targetIndex = PLAN_ORDER.indexOf(p.key);
+    if (isAnnual) {
+      return targetIndex >= currentPlanIndex && p.key !== "free";
+    }
     return targetIndex > currentPlanIndex;
   });
 
@@ -830,7 +835,13 @@ export default function SettingsClient({
                     disabled={loadingPlan !== null}
                     className="mt-4 w-full h-9 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loadingPlan === p.key ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : "Upgrade"}
+                    {loadingPlan === p.key ? (
+                      <Loader2 size={14} strokeWidth={1.5} className="animate-spin" />
+                    ) : isAnnual && p.key === plan ? (
+                      `Switch to annual — save ${Math.round(((p.monthly * 12 - p.annualTotal) / (p.monthly * 12)) * 100)}%`
+                    ) : (
+                      "Upgrade"
+                    )}
                   </button>
                 </div>
               );
