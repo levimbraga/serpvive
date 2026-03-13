@@ -129,6 +129,15 @@ CRITICAL RULES FOR OUTPUT:
 - top_competitors is an array of objects with url, title, and strengths (array of strings).
 - Return the COMPLETE JSON in a single response. Do not stop mid-response.
 
+AI SEARCH VISIBILITY:
+When relevant, note that well-structured, factual, and frequently updated content also increases visibility in AI search tools (ChatGPT, Perplexity, Google AI Overviews). Specifically:
+- Content updated within the last 30 days is 25x more likely to be cited by ChatGPT
+- Clear, quotable statements with specific data get cited more often by LLMs
+- FAQ sections with concise answers are prime targets for AI extraction
+- Structured data (schema markup) helps both Google and AI tools parse content
+
+Do NOT make this the focus of the diagnosis — Google organic is still the primary goal. But when a recommendation would ALSO improve AI search visibility, mention it briefly as a bonus benefit. Example: 'This also makes your content more likely to be cited by ChatGPT and Perplexity.'
+
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string",
@@ -207,6 +216,15 @@ CRITICAL RULES FOR OUTPUT:
 - serp_analysis MUST have: intent_type and content_format_trend.
 - top_competitors is an array of objects with url, title, and strengths (array of strings).
 - Return the COMPLETE JSON in a single response. Do not stop mid-response.
+
+AI SEARCH VISIBILITY:
+When relevant, note that well-structured, factual, and frequently updated content also increases visibility in AI search tools (ChatGPT, Perplexity, Google AI Overviews). Specifically:
+- Content updated within the last 30 days is 25x more likely to be cited by ChatGPT
+- Clear, quotable statements with specific data get cited more often by LLMs
+- FAQ sections with concise answers are prime targets for AI extraction
+- Structured data (schema markup) helps both Google and AI tools parse content
+
+Do NOT make this the focus of the diagnosis — Google organic is still the primary goal. But when a recommendation would ALSO improve AI search visibility, mention it briefly as a bonus benefit. Example: 'This also makes your content more likely to be cited by ChatGPT and Perplexity.'
 
 Return ONLY valid JSON matching this schema:
 {
