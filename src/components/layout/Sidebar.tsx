@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, RefreshCw, Settings, Zap, Globe, ChevronDown, Check } from "lucide-react";
+import { LayoutDashboard, FileText, RefreshCw, Settings, Zap, Globe, ChevronDown, Check, MessageSquare } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/pages", icon: FileText, label: "Pages" },
   { href: "/refreshes", icon: RefreshCw, label: "Refreshes" },
   { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/feedback", icon: MessageSquare, label: "Feedback" },
 ];
 
 const STATUS_DOT: Record<string, string> = {
