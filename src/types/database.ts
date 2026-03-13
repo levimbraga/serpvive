@@ -142,3 +142,31 @@ export type Waitlist = {
   source: string | null;
   created_at: string;
 };
+
+export type ExternalAnalysis = {
+  id: string;
+  user_id: string;
+  url: string;
+  keyword: string;
+  diagnosis: Record<string, unknown>;
+  refresh_brief: Record<string, unknown> | null;
+  serp_snapshot: Record<string, unknown> | null;
+  model_used: string;
+  tokens_input: number | null;
+  tokens_output: number | null;
+  cost_usd: number | null;
+  created_at: string;
+};
+
+export type DemoAnalysis = {
+  id: string;
+  url: string;
+  keyword: string;
+  diagnosis: Record<string, unknown>;
+  refresh_brief: Record<string, unknown> | null;
+  serp_snapshot: Record<string, unknown> | null;
+  created_by: string | null;
+  created_at: string;
+  expires_at: string;
+  views: number;
+};

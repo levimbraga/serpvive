@@ -13,6 +13,16 @@ export type PipelineResult = {
   processingTimeMs: number;
 };
 
+export type ExternalPipelineResult = {
+  diagnosis: DiagnosisResult;
+  brief: RefreshBriefResult;
+  serpSnapshot: { keyword: string; results: unknown[]; fetched_at: string };
+  tokensInput: number;
+  tokensOutput: number;
+  totalCostUsd: number;
+  processingTimeMs: number;
+};
+
 /**
  * Full AI diagnosis pipeline:
  * 1. Get primary keyword from page data
@@ -164,6 +174,107 @@ export async function runDiagnosisPipeline(
     diagnosisId: diagnosisRecord.id,
     diagnosis: diagResult.diagnosis,
     brief: briefResult.brief,
+    totalCostUsd,
+    processingTimeMs,
+  };
+}
+
+/**
+ * External URL analysis pipeline (no GSC data required):
+ * 1. User provides URL + keyword
+ * 2. Search Google via Serper
+ * 3. Fetch competitors + user content (Cheerio)
+ * 4. Run Claude Opus diagnosis (new page prompt, no GSC data)
+ * 5. Run Claude Opus refresh brief
+ * Returns result without saving — caller decides where to store.
+ */
+export async function runExternalPipeline(
+  url: string,
+  keyword: string,
+): Promise<ExternalPipelineResult> {
+  const startTime = Date.now();
+
+  // Step 1: Search Google
+  console.log(`[external-pipeline] Searching Google for "${keyword}"...`);
+  let serpResults: Awaited<ReturnType<typeof searchGoogle>> = [];
+  try {
+    serpResults = await searchGoogle(keyword);
+  } catch (err) {
+    console.error("[external-pipeline] Serper failed:", err);
+  }
+
+  const serpResultsStr = serpResults.length > 0
+    ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
+    : "No SERP data available";
+
+  // Step 2: Fetch content (user + top 3 competitors)
+  console.log("[external-pipeline] Fetching content...");
+  let userHostname: string;
+  try {
+    userHostname = new URL(url).hostname;
+  } catch {
+    userHostname = "";
+  }
+
+  const competitorUrls = serpResults
+    .filter((r) => !r.url.includes(userHostname))
+    .slice(0, 3);
+
+  const [userContent, ...competitorContents] = await Promise.all([
+    fetchPageContent(url),
+    ...competitorUrls.map((r) => fetchPageContent(r.url)),
+  ]);
+
+  const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, url));
+  const competitorsStr = sanitizeForPrompt(
+    competitorUrls
+      .map((r, i) => formatContentForPrompt(competitorContents[i] ?? null, r.url))
+      .join("\n\n---\n\n")
+  );
+
+  // Step 3: Build GSC-less query data note
+  const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'. Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR, or click data — instead estimate traffic potential based on keyword search volume indicators from the SERP.`;
+
+  // Step 4: Run AI diagnosis (always uses "new page" style since no decay data)
+  console.log("[external-pipeline] Running AI diagnosis...");
+  const diagResult = await runDiagnosis({
+    isNewPage: true,
+    url,
+    keyword,
+    clicks28d: 0,
+    position: null,
+    serpResults: serpResultsStr,
+    competitors: competitorsStr,
+    userContent: userContentStr,
+    queryData: queryDataStr,
+  });
+
+  // Step 5: Run AI brief
+  console.log("[external-pipeline] Generating refresh brief...");
+  const briefResult = await generateBrief({
+    url,
+    diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
+    userContent: userContentStr,
+    competitors: competitorsStr,
+  });
+
+  const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
+  const processingTimeMs = Date.now() - startTime;
+  const tokensInput = diagResult.tokensInput + briefResult.tokensInput;
+  const tokensOutput = diagResult.tokensOutput + briefResult.tokensOutput;
+
+  console.log(`[external-pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}`);
+
+  return {
+    diagnosis: diagResult.diagnosis,
+    brief: briefResult.brief,
+    serpSnapshot: {
+      keyword,
+      results: serpResults,
+      fetched_at: new Date().toISOString(),
+    },
+    tokensInput,
+    tokensOutput,
     totalCostUsd,
     processingTimeMs,
   };
