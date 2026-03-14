@@ -242,7 +242,16 @@ export async function runExternalPipeline(
   );
 
   // Step 3: Build GSC-less query data note
-  const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'. Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR, or click data — instead estimate traffic potential based on keyword search volume indicators from the SERP.`;
+  const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'. Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR, or click data — instead estimate traffic potential based on keyword search volume indicators from the SERP.
+
+Even without GSC data, you MUST still include:
+- Topic coverage score: 'Your page covers X of Y subtopics = Z%'
+- Intent satisfaction score: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
+- Impact × Ease × Priority scores on each cause
+- Traffic estimates based on typical search volume for the keyword and expected CTR at target positions. Use your knowledge of typical search volumes for the niche. Example: 'sempervivum care guide' likely gets 500-1,000 searches/month based on the niche. At position #5 with ~5% CTR = ~25-50 clicks/month potential.
+- Sort causes by Priority score descending
+
+These quantitative elements are NON-NEGOTIABLE regardless of whether GSC data is available.`;
 
   // Step 4: Run AI diagnosis (always uses "new page" style since no decay data)
   console.log("[external-pipeline] Running AI diagnosis...");
