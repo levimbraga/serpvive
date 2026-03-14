@@ -35,6 +35,7 @@ export type BriefParams = {
   diagnosisJson: string;
   userContent: string;
   competitors: string;
+  noGscData?: boolean;
 };
 
 export type BriefOutput = {
@@ -100,7 +101,12 @@ PRIORITIZATION:
 - Include word count estimates for new sections
 - Reference specific competitors when relevant
 
-CRITICAL RULES FOR OUTPUT:
+${params.noGscData ? `MANDATORY FOR EVERY ACTION (even without GSC data):
+- Traffic recovery estimate: 'Fix this → ~X clicks/month'
+- Use niche search volume estimates, not GSC data
+- Be transparent about estimates being based on niche knowledge
+- Base estimates on typical search volume for the keyword, SERP competition level, and expected CTR at target positions
+` : ""}CRITICAL RULES FOR OUTPUT:
 - Every action MUST have: priority, title, description, effort_minutes, category, and micro_draft.
 - Every micro_draft MUST have: type and suggestions (array with at least 1 item).
 - competitor_references in micro_draft is OPTIONAL — include only when relevant.

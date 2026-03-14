@@ -242,16 +242,43 @@ export async function runExternalPipeline(
   );
 
   // Step 3: Build GSC-less query data note
-  const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'. Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR, or click data — instead estimate traffic potential based on keyword search volume indicators from the SERP.
+  const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'.
 
-Even without GSC data, you MUST still include:
-- Topic coverage score: 'Your page covers X of Y subtopics = Z%'
-- Intent satisfaction score: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
-- Impact × Ease × Priority scores on each cause
-- Traffic estimates based on typical search volume for the keyword and expected CTR at target positions. Use your knowledge of typical search volumes for the niche. Example: 'sempervivum care guide' likely gets 500-1,000 searches/month based on the niche. At position #5 with ~5% CTR = ~25-50 clicks/month potential.
-- Sort causes by Priority score descending
+IMPORTANT — EVEN WITHOUT GSC DATA, THE FOLLOWING ARE MANDATORY AND MUST APPEAR IN YOUR RESPONSE. DO NOT SKIP THESE:
 
-These quantitative elements are NON-NEGOTIABLE regardless of whether GSC data is available.`;
+1. TOPIC COVERAGE SCORE (mandatory):
+   Map all subtopics covered across the top 10 SERP results.
+   Score your page: 'Your page covers X of Y key subtopics = Z%'
+   List which are covered, partially covered, and missing.
+
+2. INTENT SATISFACTION SCORE (mandatory):
+   Rate: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
+   Based on how well each page satisfies the searcher's need.
+
+3. IMPACT × EASE × PRIORITY SCORES (mandatory on every cause):
+   Impact (1-10): How much this affects ranking/traffic
+   Ease (1-10): How easy to fix (10 = 5min, 1 = 4hr+)
+   Priority = Impact × Ease
+   Format: 'Impact: X | Ease: Y | Priority: Z'
+   Sort causes by Priority descending.
+
+4. TRAFFIC ESTIMATES (mandatory on every cause):
+   Without GSC impressions, estimate based on:
+   - Typical search volume for this keyword/niche
+   - Number of related long-tail keywords visible in SERP
+   - Current SERP competition level
+   Format: 'Estimated traffic opportunity: X-Y clicks/month'
+   Be transparent: 'Based on estimated search volume for this niche'
+
+   For the brief actions, also include:
+   'Fix this → potentially recover ~X clicks/month'
+
+5. WORD COUNT ACCURACY:
+   If the content was truncated during fetch, say so explicitly:
+   'Note: content may have been truncated during analysis. Actual word count may be higher than reported.'
+   Do NOT present a truncated word count as the real word count.
+
+Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR from GSC, or actual click data.`;
 
   // Step 4: Run AI diagnosis (always uses "new page" style since no decay data)
   console.log("[external-pipeline] Running AI diagnosis...");
@@ -274,6 +301,7 @@ These quantitative elements are NON-NEGOTIABLE regardless of whether GSC data is
     diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
     userContent: userContentStr,
     competitors: competitorsStr,
+    noGscData: true,
   });
 
   const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
