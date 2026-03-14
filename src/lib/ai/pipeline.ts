@@ -39,13 +39,14 @@ export async function runDiagnosisPipeline(
   pageId: string,
   userId: string,
   triggeredBy: "manual" | "auto" | "cron" = "manual",
+  keywordOverride?: string,
 ): Promise<PipelineResult> {
   const startTime = Date.now();
 
   // Get page data
   const { data: page, error: pageErr } = await admin
     .from("pages")
-    .select("url, path, status, primary_keyword, primary_position, current_clicks_28d, current_impressions_28d, current_ctr, current_avg_position, peak_clicks_monthly, peak_month, decay_score, site_id")
+    .select("url, path, status, primary_keyword, keyword_source, primary_position, current_clicks_28d, current_impressions_28d, current_ctr, current_avg_position, peak_clicks_monthly, peak_month, decay_score, site_id")
     .eq("id", pageId)
     .single();
 
@@ -54,7 +55,12 @@ export async function runDiagnosisPipeline(
   }
 
   const isNewPage = page.status === "new" || page.status === "unknown";
-  const keyword = page.primary_keyword ?? page.path.split("/").pop()?.replace(/-/g, " ") ?? "unknown";
+  const keyword = keywordOverride ?? page.primary_keyword ?? page.path.split("/").pop()?.replace(/-/g, " ") ?? "unknown";
+  const keywordSource = keywordOverride
+    ? "override"
+    : page.primary_keyword
+      ? (page.keyword_source === "title" || page.keyword_source === "url" ? "estimated" : "gsc")
+      : "estimated";
 
   // Step 1: Search Google
   console.log(`[pipeline] Searching Google for "${keyword}"...`);
@@ -152,6 +158,8 @@ export async function runDiagnosisPipeline(
       cost_usd: totalCostUsd,
       processing_time_ms: processingTimeMs,
       triggered_by: triggeredBy,
+      keyword_used: keyword,
+      keyword_source: keywordSource,
     })
     .select("id")
     .single();

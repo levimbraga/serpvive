@@ -11,7 +11,7 @@ import {
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
   Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
-  Download,
+  Download, Pencil,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -97,6 +97,8 @@ type DiagnosisRecord = {
   cost_usd: number | null;
   processing_time_ms: number | null;
   created_at: string;
+  keyword_used: string | null;
+  keyword_source: string | null;
 };
 
 type RefreshRecord = {
@@ -181,6 +183,8 @@ export default function PageDetailClient({
   const [expandedActions, setExpandedActions] = useState<Set<number>>(new Set());
   const [checkedActions, setCheckedActions] = useState<Set<number>>(new Set());
   const [showConfettiMsg, setShowConfettiMsg] = useState(false);
+  const [keywordOverride, setKeywordOverride] = useState("");
+  const [showKeywordOverride, setShowKeywordOverride] = useState(false);
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
@@ -257,7 +261,10 @@ export default function PageDetailClient({
       const res = await fetch("/api/diagnose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pageId: page.id }),
+        body: JSON.stringify({
+          pageId: page.id,
+          ...(keywordOverride.trim() ? { keywordOverride: keywordOverride.trim() } : {}),
+        }),
       });
 
       const json = (await res.json()) as { data?: { diagnosisId: string; diagnosis: DiagnosisData; brief: BriefData; costUsd: number; processingTimeMs: number }; error?: string };
@@ -268,6 +275,8 @@ export default function PageDetailClient({
       }
 
       if (json.data) {
+        const usedKeyword = keywordOverride.trim() || page.primary_keyword || null;
+        const usedSource = keywordOverride.trim() ? "override" : "gsc";
         setDiagnosis({
           id: json.data.diagnosisId,
           diagnosis: json.data.diagnosis,
@@ -275,13 +284,18 @@ export default function PageDetailClient({
           cost_usd: json.data.costUsd,
           processing_time_ms: json.data.processingTimeMs,
           created_at: new Date().toISOString(),
+          keyword_used: usedKeyword,
+          keyword_source: usedSource,
         });
         setRefresh(null);
         setCheckedActions(new Set());
+        setKeywordOverride("");
+        setShowKeywordOverride(false);
         posthog.capture("diagnosis_run", {
           page_url: page.url,
           triggered_by: "manual",
           cost_usd: json.data.costUsd,
+          keyword_override: keywordOverride.trim() || undefined,
         });
       }
 
@@ -498,7 +512,7 @@ export default function PageDetailClient({
           Data from Google Search Console (2–3 day delay)
         </p>
 
-        {/* Keyword — full width so long keywords can wrap */}
+        {/* Keyword + override */}
         {page.primary_keyword && (
           <div className="mt-3">
             <p className="text-xs text-[#9CA3AF] mb-0.5">Keyword</p>
@@ -510,6 +524,39 @@ export default function PageDetailClient({
                 </span>
               )}
             </p>
+            {!showKeywordOverride ? (
+              <button
+                onClick={() => setShowKeywordOverride(true)}
+                className="flex items-center gap-1 mt-1.5 text-xs text-[#6B7280] hover:text-[#3B82F6] transition-colors"
+              >
+                <Pencil size={11} strokeWidth={1.5} /> Use a different keyword
+              </button>
+            ) : (
+              <div className="mt-2 space-y-2">
+                <label className="block text-xs text-[#6B7280]">
+                  Target a different keyword (optional)
+                </label>
+                <input
+                  type="text"
+                  value={keywordOverride}
+                  onChange={(e) => setKeywordOverride(e.target.value)}
+                  placeholder="e.g. hen and chicks succulent guide"
+                  className="w-full h-8 px-2.5 rounded-md border border-[#E5E7EB] bg-[#F9FAFB] text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
+                />
+                <p className="text-[10px] text-[#9CA3AF] flex items-center gap-1">
+                  <Info size={10} strokeWidth={1.5} />
+                  The analysis will use this keyword instead of the one from GSC. Leave empty to use the default.
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowKeywordOverride(false)}
+                    className="h-7 px-3 rounded-md text-xs font-medium text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -726,6 +773,16 @@ export default function PageDetailClient({
                 </span>
               </div>
             </div>
+
+            {/* Keyword used */}
+            {diagnosis.keyword_used && (
+              <p className="text-xs text-[#6B7280] mb-3">
+                Analyzed for: <span className="font-medium text-[#111827]">{diagnosis.keyword_used}</span>
+                <span className="text-[#9CA3AF] ml-1">
+                  ({diagnosis.keyword_source === "override" ? "custom" : diagnosis.keyword_source === "estimated" ? "estimated" : "from GSC"})
+                </span>
+              </p>
+            )}
 
             {/* Summary */}
             <p className="text-[#4B5563] mb-4">{diagnosis.diagnosis.summary}</p>
@@ -995,6 +1052,13 @@ export default function PageDetailClient({
                         &ldquo;{summaryPreview}&rdquo;
                       </p>
                       <p className="text-xs text-[#9CA3AF] mt-1.5">
+                        {prev.keyword_used && (
+                          <>
+                            keyword: {prev.keyword_used}
+                            {prev.keyword_source === "override" && " (custom)"}
+                            {" · "}
+                          </>
+                        )}
                         {causesCount} cause{causesCount !== 1 ? "s" : ""}
                         {actionsCount > 0 && ` · ${actionsCount} action${actionsCount !== 1 ? "s" : ""}`}
                         {effort > 0 && ` · Est. ${effort}h total`}

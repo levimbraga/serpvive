@@ -40,7 +40,7 @@ export default async function PageDetailPage({
   const [diagnosisRes, refreshRes, profileRes] = await Promise.all([
     supabase
       .from("diagnoses")
-      .select("id, diagnosis, refresh_brief, cost_usd, processing_time_ms, created_at")
+      .select("id, diagnosis, refresh_brief, cost_usd, processing_time_ms, created_at, keyword_used, keyword_source")
       .eq("page_id", id)
       .order("created_at", { ascending: false })
       .limit(11),

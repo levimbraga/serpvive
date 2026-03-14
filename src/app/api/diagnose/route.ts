@@ -12,6 +12,7 @@ import { getPostHogServer } from "@/lib/posthog/server";
 
 const DiagnoseInputSchema = z.object({
   pageId: z.string().uuid(),
+  keywordOverride: z.string().min(2).max(200).optional(),
 });
 
 export async function POST(request: Request) {
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
     .eq("id", user.id);
 
   try {
-    const result = await runDiagnosisPipeline(admin, pageId, user.id);
+    const result = await runDiagnosisPipeline(admin, pageId, user.id, "manual", parsed.data.keywordOverride);
 
     return NextResponse.json({
       data: {
