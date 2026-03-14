@@ -11,9 +11,21 @@ import {
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
   Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
+  Download,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  formatAnalysisMarkdown,
+  formatAnalysisJson,
+  buildExportFilename,
+} from "@/lib/export/format-analysis";
 
 type PageData = {
   id: string;
@@ -135,6 +147,7 @@ export default function PageDetailClient({
   diagnosesUsed,
   diagnosesLimit,
   timeZone,
+  userEmail,
 }: {
   page: PageData;
   siteDomain: string;
@@ -145,6 +158,7 @@ export default function PageDetailClient({
   diagnosesUsed: number;
   diagnosesLimit: number;
   timeZone: string;
+  userEmail: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -164,6 +178,29 @@ export default function PageDetailClient({
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const isFree = plan === "free";
   const atLimit = isFree || diagnosesUsed >= diagnosesLimit;
+  const isAdmin = userEmail === "levimaiabraga@gmail.com";
+
+  function handleExport(format: "md" | "json") {
+    if (!diagnosis) return;
+    const pageData = {
+      url: page.url,
+      path: page.path,
+      keyword: page.primary_keyword,
+      clicks28d: page.current_clicks_28d,
+      impressions28d: page.current_impressions_28d,
+      position: page.primary_position,
+    };
+    const content = format === "md"
+      ? formatAnalysisMarkdown(pageData, diagnosis.diagnosis, diagnosis.refresh_brief, diagnosis.created_at)
+      : formatAnalysisJson(pageData, diagnosis.diagnosis, diagnosis.refresh_brief, diagnosis.created_at);
+    const filename = buildExportFilename(page.path, diagnosis.created_at, format);
+    const blob = new Blob([content], { type: format === "md" ? "text/markdown" : "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 
   // Loading step animation: simulate progress through pipeline stages
   useEffect(() => {
@@ -660,9 +697,26 @@ export default function PageDetailClient({
                   {isNew ? "Content Analysis" : "Decay Diagnosis"}
                 </h2>
               </div>
-              <span className="text-xs text-[#9CA3AF]">
-                {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone })}
-              </span>
+              <div className="flex items-center gap-3">
+                {isAdmin && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-[#E5E7EB] text-xs font-medium text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] transition-colors">
+                      <Download size={12} strokeWidth={1.5} /> Export
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExport("md")}>
+                        Export as Markdown
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport("json")}>
+                        Export as JSON
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <span className="text-xs text-[#9CA3AF]">
+                  {new Date(diagnosis.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone })}
+                </span>
+              </div>
             </div>
 
             {/* Summary */}

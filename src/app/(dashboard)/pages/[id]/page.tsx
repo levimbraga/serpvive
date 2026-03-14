@@ -75,6 +75,7 @@ export default async function PageDetailPage({
         ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[profileRes.data?.plan ?? "free"] ?? 0
       }
       timeZone={profileRes.data?.timezone ?? "UTC"}
+      userEmail={user.email ?? ""}
     />
   );
 }
