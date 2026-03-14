@@ -6,8 +6,16 @@ import {
   Brain, Sparkles, ChevronDown, ChevronUp, Copy, Check, ArrowLeft, ExternalLink,
 } from "lucide-react";
 
+type TopicCoverage = {
+  covered: number;
+  total: number;
+  percentage: number;
+  missing: string[];
+};
+
 type DiagnosisData = {
   summary?: string;
+  topic_coverage?: TopicCoverage;
   causes?: {
     title: string;
     description: string;
@@ -118,6 +126,33 @@ export default function AnalysisResultView({
           </h2>
 
           <p className="text-sm text-[#374151] leading-relaxed">{diagnosis.summary}</p>
+
+          {/* Topic Coverage */}
+          {diagnosis.topic_coverage && (
+            <div className="bg-[#F9FAFB] rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Topic Coverage</h3>
+                <span className="text-sm font-semibold text-[#111827]">
+                  {diagnosis.topic_coverage.covered} / {diagnosis.topic_coverage.total} ({diagnosis.topic_coverage.percentage}%)
+                </span>
+              </div>
+              <div className="w-full h-2 bg-[#E5E7EB] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${Math.min(diagnosis.topic_coverage.percentage, 100)}%`,
+                    backgroundColor: diagnosis.topic_coverage.percentage >= 80 ? "#16A34A" : diagnosis.topic_coverage.percentage >= 50 ? "#D97706" : "#DC2626",
+                  }}
+                />
+              </div>
+              {diagnosis.topic_coverage.missing.length > 0 && (
+                <p className="text-xs text-[#6B7280] mt-2">
+                  <span className="font-medium text-[#374151]">Missing:</span>{" "}
+                  {diagnosis.topic_coverage.missing.join(", ")}
+                </p>
+              )}
+            </div>
+          )}
 
           {diagnosis.causes && diagnosis.causes.length > 0 && (
             <div className="space-y-3">

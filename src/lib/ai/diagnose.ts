@@ -9,6 +9,12 @@ const anthropic = new Anthropic();
 
 export const DiagnosisSchema = z.object({
   summary: z.string().max(5000),
+  topic_coverage: z.object({
+    covered: z.number(),
+    total: z.number(),
+    percentage: z.number(),
+    missing: z.array(z.string()),
+  }),
   causes: z.array(z.object({
     title: z.string().max(5000),
     description: z.string().max(5000),
@@ -95,33 +101,27 @@ SPECIFICITY RULES (non-negotiable):
 - Every cause MUST include at least one direct quote or data point from a competitor
 - If you cannot be specific with evidence, DO NOT include that cause
 
-TOPIC COVERAGE ANALYSIS (include in every diagnosis):
-- Map all subtopics the SERP covers across top competitors
-- Score: 'Your page covers X of Y key subtopics = Z%'
-- List which are covered, partially covered, and missing
+TOPIC COVERAGE (mandatory — returned as structured JSON):
+- Map ALL subtopics the top SERP results cover
+- Return in topic_coverage: { covered: X, total: Y, percentage: Z, missing: ["topic1", "topic2"] }
+- List which subtopics are covered vs missing
 
 COMPETITIVE STRENGTHS (always include):
 - What does YOUR page do better than competitors? Find at least 1 thing.
 - What opportunity exists that NO competitor covers? (your differentiator)
 
 INTENT ANALYSIS:
-- Rate intent satisfaction: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
 - Explain what the searcher REALLY needs (beyond the surface query)
 - Frame each cause as an intent gap when possible
 
 GSC DATA USAGE:
 - Reference specific queries from the GSC data with positions and impressions
 - Identify clusters of related queries the page could capture
-- Calculate combined potential for secondary keywords
+- When possible, estimate traffic impact per cause in clicks/month. Be transparent if these are estimates.
 
-PRIORITIZATION:
-- Impact (1-10): How much this affects ranking/traffic
-- Ease (1-10): How easy to fix (10 = 5min, 1 = 4hr+)
-- Priority = Impact × Ease
-- Include scores in each cause: 'Impact: X | Ease: Y | Priority: Z'
-- Only include causes with Priority >= 20
-- Sort causes by Priority descending
+CAUSE SELECTION:
 - Maximum 5 causes, minimum 2
+- Order by severity: high → medium → low
 
 CRITICAL RULES FOR OUTPUT:
 - Every cause MUST have: title, description, severity, evidence, and category.
@@ -141,6 +141,7 @@ Do NOT make this the focus of the diagnosis — Google organic is still the prim
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string",
+  "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "outdated_content|new_competitors|intent_shift|missing_topic|format_gap|technical_issue|cannibalization|thin_content" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
 }
@@ -197,19 +198,21 @@ SPECIFICITY RULES (non-negotiable):
 - Every cause MUST include at least one direct quote or data point from a competitor
 - If you cannot be specific with evidence, DO NOT include that cause
 
-TOPIC COVERAGE ANALYSIS:
-- Map all subtopics the SERP covers across top competitors
-- Score: 'Your page covers X of Y key subtopics = Z%'
+TOPIC COVERAGE (mandatory — returned as structured JSON):
+- Map ALL subtopics the top SERP results cover
+- Return in topic_coverage: { covered: X, total: Y, percentage: Z, missing: ["topic1", "topic2"] }
+- List which subtopics are covered vs missing
 
 COMPETITIVE STRENGTHS:
 - What does YOUR page do better than competitors? Find at least 1 thing.
 - What opportunity exists that NO competitor covers?
 
 INTENT ANALYSIS:
-- Rate intent satisfaction: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
 - Explain what the searcher REALLY needs (beyond the surface query)
 
-Maximum 5 causes, minimum 2.
+When possible, estimate traffic impact per cause in clicks/month. Be transparent if these are estimates.
+
+Maximum 5 causes, minimum 2. Order by severity: high → medium → low.
 
 CRITICAL RULES FOR OUTPUT:
 - Every cause MUST have: title, description, severity, evidence, and category.
@@ -229,6 +232,7 @@ Do NOT make this the focus of the diagnosis — Google organic is still the prim
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string",
+  "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "content_gap|format_gap|thin_content|title_meta|internal_linking|content_structure" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
 }

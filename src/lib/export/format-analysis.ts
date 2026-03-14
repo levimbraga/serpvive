@@ -8,6 +8,12 @@ type Cause = {
 
 type DiagnosisData = {
   summary: string;
+  topic_coverage?: {
+    covered: number;
+    total: number;
+    percentage: number;
+    missing: string[];
+  };
   causes: Cause[];
   serp_analysis: {
     top_competitors: { url: string; title: string; strengths: string[] }[];
@@ -70,6 +76,16 @@ export function formatAnalysisMarkdown(
   lines.push("## Summary");
   lines.push(diagnosis.summary);
   lines.push("");
+
+  // Topic Coverage
+  if (diagnosis.topic_coverage) {
+    const tc = diagnosis.topic_coverage;
+    lines.push(`## Topic Coverage: ${tc.covered} / ${tc.total} (${tc.percentage}%)`);
+    if (tc.missing.length > 0) {
+      lines.push(`**Missing topics:** ${tc.missing.join(", ")}`);
+    }
+    lines.push("");
+  }
 
   // Causes
   lines.push(`## Causes Found (${diagnosis.causes.length})`);

@@ -244,41 +244,11 @@ export async function runExternalPipeline(
   // Step 3: Build GSC-less query data note
   const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'.
 
-IMPORTANT — EVEN WITHOUT GSC DATA, THE FOLLOWING ARE MANDATORY AND MUST APPEAR IN YOUR RESPONSE. DO NOT SKIP THESE:
+Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR from GSC, or actual click data.
 
-1. TOPIC COVERAGE SCORE (mandatory):
-   Map all subtopics covered across the top 10 SERP results.
-   Score your page: 'Your page covers X of Y key subtopics = Z%'
-   List which are covered, partially covered, and missing.
+When possible, estimate traffic impact per cause in clicks/month based on typical search volume for this keyword/niche. Be transparent that these are estimates.
 
-2. INTENT SATISFACTION SCORE (mandatory):
-   Rate: 'Your page: X/10 | #1: Y/10 | #2: Z/10'
-   Based on how well each page satisfies the searcher's need.
-
-3. IMPACT × EASE × PRIORITY SCORES (mandatory on every cause):
-   Impact (1-10): How much this affects ranking/traffic
-   Ease (1-10): How easy to fix (10 = 5min, 1 = 4hr+)
-   Priority = Impact × Ease
-   Format: 'Impact: X | Ease: Y | Priority: Z'
-   Sort causes by Priority descending.
-
-4. TRAFFIC ESTIMATES (mandatory on every cause):
-   Without GSC impressions, estimate based on:
-   - Typical search volume for this keyword/niche
-   - Number of related long-tail keywords visible in SERP
-   - Current SERP competition level
-   Format: 'Estimated traffic opportunity: X-Y clicks/month'
-   Be transparent: 'Based on estimated search volume for this niche'
-
-   For the brief actions, also include:
-   'Fix this → potentially recover ~X clicks/month'
-
-5. WORD COUNT ACCURACY:
-   If the content was truncated during fetch, say so explicitly:
-   'Note: content may have been truncated during analysis. Actual word count may be higher than reported.'
-   Do NOT present a truncated word count as the real word count.
-
-Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR from GSC, or actual click data.`;
+If the content was truncated during fetch, note it: 'Content may have been truncated during analysis.'`;
 
   // Step 4: Run AI diagnosis (always uses "new page" style since no decay data)
   console.log("[external-pipeline] Running AI diagnosis...");
