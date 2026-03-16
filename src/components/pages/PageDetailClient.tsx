@@ -11,7 +11,7 @@ import {
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
   Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
-  Download, Pencil,
+  Download, Pencil, CheckCircle2, Shield,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -838,7 +838,42 @@ export default function PageDetailClient({
               );
             })()}
 
+            {/* Healthy page — no causes */}
+            {diagnosis.diagnosis.causes.length === 0 && (
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 size={22} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-base font-semibold text-[#166534]">Your page is in great shape!</h3>
+                    <p className="text-sm text-[#15803D] mt-2 leading-relaxed">
+                      We analyzed your content against the top 10 SERP results and found no critical issues. Your page is well-optimized for &ldquo;{diagnosis.keyword_used ?? page.primary_keyword ?? "this keyword"}&rdquo;.
+                    </p>
+                    {diagnosis.diagnosis.topic_coverage && (
+                      <p className="text-sm text-[#15803D] mt-2">
+                        Topic Coverage: {diagnosis.diagnosis.topic_coverage.covered} / {diagnosis.diagnosis.topic_coverage.total} ({diagnosis.diagnosis.topic_coverage.percentage}%)
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-3 text-xs text-[#16A34A]">
+                      <Shield size={12} strokeWidth={1.5} />
+                      <span>Keep monitoring — we&apos;ll alert you if anything changes in the SERP.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Single low-severity cause — healthy header */}
+            {diagnosis.diagnosis.causes.length === 1 && diagnosis.diagnosis.causes[0]?.severity === "low" && (
+              <div className="flex items-center gap-2 bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg px-4 py-3 mb-1">
+                <CheckCircle2 size={16} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
+                <p className="text-sm text-[#166534]">
+                  Your page is performing well. We found 1 optional improvement:
+                </p>
+              </div>
+            )}
+
             {/* Causes */}
+            {diagnosis.diagnosis.causes.length > 0 && (
             <div className="space-y-3">
               {diagnosis.diagnosis.causes.map((cause, i) => {
                 const sev = SEVERITY_CONFIG[cause.severity] ?? SEVERITY_CONFIG["medium"]!;
@@ -859,6 +894,7 @@ export default function PageDetailClient({
                 );
               })}
             </div>
+            )}
 
             {/* SERP Analysis */}
             {diagnosis.diagnosis.serp_analysis && (
@@ -896,8 +932,23 @@ export default function PageDetailClient({
             </div>
           </div>
 
+          {/* Refresh Brief — empty (healthy page) */}
+          {diagnosis.refresh_brief && diagnosis.refresh_brief.actions.length === 0 && (
+            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+              <h2 className="text-lg font-semibold text-[#111827] mb-3">Refresh Brief</h2>
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Shield size={18} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-[#166534] leading-relaxed">
+                    No urgent actions needed. Your content is competitive. We&apos;ll continue monitoring and alert you if competitors make moves that affect your position.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Refresh Brief */}
-          {diagnosis.refresh_brief && (
+          {diagnosis.refresh_brief && diagnosis.refresh_brief.actions.length > 0 && (
             <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-[#111827]">Refresh Brief</h2>

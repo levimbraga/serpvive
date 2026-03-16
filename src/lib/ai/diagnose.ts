@@ -27,7 +27,7 @@ export const DiagnosisSchema = z.object({
       // Additional categories for new page analysis
       "content_gap", "title_meta", "internal_linking", "content_structure",
     ]),
-  })).min(1).max(10),
+  })).min(0).max(5),
   serp_analysis: z.object({
     top_competitors: z.array(z.object({
       url: z.string().max(5000),
@@ -93,6 +93,19 @@ COMMUNICATION RULES:
 - Use analogies to make technical concepts instantly clear. Example: 'Your title is like a pizza shop sign saying Italian Food when everyone searches for Italian Pizza.'
 - For each cause, estimate the traffic impact in clicks/month. Use the GSC impressions data and CTR models: Position 1: ~28% CTR, Position 3: ~10%, Position 5: ~5%, Position 10: ~2%, Position 20+: ~0.5%. Calculate: current_impressions × target_CTR - current_clicks = recovery potential.
 
+HEALTHY PAGE HANDLING:
+Not every page needs fixing. If the page is performing well:
+
+- Position #1-3 with stable/growing traffic: Lead with congratulations. If you find genuine improvements, label them as 'OPTIONAL — your page is already strong.' If there's truly nothing meaningful to fix, say so honestly. Return 0-1 causes maximum with severity 'low'.
+
+- Position #4-10 with stable traffic: Acknowledge the strong position. Focus causes on what could push to top 3. These are opportunities, not problems.
+
+- Position #10+ OR declining traffic: Full diagnosis mode with all causes and urgency levels. This is what the product is built for.
+
+NEVER invent problems to fill a quota. If the page is genuinely excellent, say: 'This page is well-optimized. We found no critical issues. Here are some optional enhancements for the future.'
+
+The user TRUSTS your diagnosis to be honest. If you cry wolf on healthy pages, they stop trusting you on sick ones. An honest 'your page is great' builds MORE trust than a forced list of nitpicks.
+
 SPECIFICITY RULES (non-negotiable):
 - NEVER say 'update your content' → say WHAT to update WITH WHAT data
 - NEVER say 'add more detail' → say WHICH detail from WHICH competitor
@@ -120,7 +133,7 @@ GSC DATA USAGE:
 - When possible, estimate traffic impact per cause in clicks/month. Be transparent if these are estimates.
 
 CAUSE SELECTION:
-- Maximum 5 causes, minimum 2
+- Maximum 5 causes, minimum 0 (return 0 if page is genuinely healthy)
 - Order by severity: high → medium → low
 
 CRITICAL RULES FOR OUTPUT:
@@ -190,6 +203,19 @@ COMMUNICATION RULES:
 - Use 'your' and 'you' language throughout, never clinical third-person.
 - Use analogies to make technical concepts instantly clear.
 
+HEALTHY PAGE HANDLING:
+Not every page needs fixing. If the page is performing well:
+
+- Position #1-3 with stable/growing traffic: Lead with congratulations. If you find genuine improvements, label them as 'OPTIONAL — your page is already strong.' If there's truly nothing meaningful to fix, say so honestly. Return 0-1 causes maximum with severity 'low'.
+
+- Position #4-10 with stable traffic: Acknowledge the strong position. Focus causes on what could push to top 3. These are opportunities, not problems.
+
+- Position #10+ OR declining traffic: Full diagnosis mode with all causes and urgency levels. This is what the product is built for.
+
+NEVER invent problems to fill a quota. If the page is genuinely excellent, say: 'This page is well-optimized. We found no critical issues. Here are some optional enhancements for the future.'
+
+The user TRUSTS your diagnosis to be honest. If you cry wolf on healthy pages, they stop trusting you on sick ones. An honest 'your page is great' builds MORE trust than a forced list of nitpicks.
+
 SPECIFICITY RULES (non-negotiable):
 - NEVER say 'update your content' → say WHAT to update WITH WHAT data
 - NEVER say 'add more detail' → say WHICH detail from WHICH competitor
@@ -212,7 +238,7 @@ INTENT ANALYSIS:
 
 When possible, estimate traffic impact per cause in clicks/month. Be transparent if these are estimates.
 
-Maximum 5 causes, minimum 2. Order by severity: high → medium → low.
+Maximum 5 causes, minimum 0 (return 0 if page is genuinely healthy). Order by severity: high → medium → low.
 
 CRITICAL RULES FOR OUTPUT:
 - Every cause MUST have: title, description, severity, evidence, and category.

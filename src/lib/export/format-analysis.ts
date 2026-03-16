@@ -88,21 +88,27 @@ export function formatAnalysisMarkdown(
   }
 
   // Causes
-  lines.push(`## Causes Found (${diagnosis.causes.length})`);
-  lines.push("");
+  if (diagnosis.causes.length === 0) {
+    lines.push("## Diagnosis: Healthy Page");
+    lines.push("No critical issues found. The page is well-optimized.");
+    lines.push("");
+  } else {
+    lines.push(`## Causes Found (${diagnosis.causes.length})`);
+    lines.push("");
 
-  diagnosis.causes.forEach((cause, i) => {
-    lines.push(`### ${i + 1}. ${cause.title}`);
-    lines.push(
-      `**Severity:** ${cause.severity} | **Category:** ${cause.category.replace(/_/g, " ")}`,
-    );
-    lines.push(cause.description);
-    lines.push("");
-    lines.push(`**Evidence:** ${cause.evidence}`);
-    lines.push("");
-    lines.push("---");
-    lines.push("");
-  });
+    diagnosis.causes.forEach((cause, i) => {
+      lines.push(`### ${i + 1}. ${cause.title}`);
+      lines.push(
+        `**Severity:** ${cause.severity} | **Category:** ${cause.category.replace(/_/g, " ")}`,
+      );
+      lines.push(cause.description);
+      lines.push("");
+      lines.push(`**Evidence:** ${cause.evidence}`);
+      lines.push("");
+      lines.push("---");
+      lines.push("");
+    });
+  }
 
   // SERP Analysis
   lines.push("## SERP Analysis");
@@ -124,7 +130,11 @@ export function formatAnalysisMarkdown(
   }
 
   // Refresh Brief
-  if (brief) {
+  if (brief && brief.actions.length === 0) {
+    lines.push("## Refresh Brief");
+    lines.push("No urgent actions needed. Content is competitive.");
+    lines.push("");
+  } else if (brief) {
     lines.push(
       `## Refresh Brief (Est. ${brief.total_effort_hours}h)`,
     );

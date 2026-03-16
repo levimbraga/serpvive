@@ -23,7 +23,7 @@ export const RefreshBriefSchema = z.object({
       suggestions: z.array(z.string().max(5000)).default([]),
       competitor_references: z.array(z.string().max(5000)).optional(),
     }),
-  })).min(1).max(15),
+  })).min(0).max(8),
 });
 
 export type RefreshBriefResult = z.infer<typeof RefreshBriefSchema>;
@@ -92,12 +92,16 @@ CONTENT DIFFERENTIATION:
 - If the page has a hook or unique voice, suggest how to amplify it.
 - If the first paragraph is weak, suggest a better opening hook.
 
+HEALTHY PAGE HANDLING:
+If the diagnosis found 0 causes (page is healthy), return 0 actions and total_effort_hours: 0. Do NOT invent actions for a healthy page. Simply return an empty actions array.
+
+If the diagnosis found only 1 low-severity cause, return 0-2 optional actions maximum. Frame them as 'nice to have', not urgent.
+
 PRIORITIZATION:
 - Sort actions by Impact × Ease priority score
 - Each action includes: priority (urgent/important/nice_to_have), effort_minutes, estimated traffic recovery
-- Maximum 8 actions, minimum 2
+- Maximum 8 actions, minimum 0 (return 0 if page is healthy)
 - Total effort should be realistic (4-8 hours for comprehensive refresh)
-- You MUST return between 2 and 8 actions. Never fewer than 2.
 - Include word count estimates for new sections
 - Reference specific competitors when relevant
 

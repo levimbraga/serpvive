@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Brain, Sparkles, ChevronDown, ChevronUp, Copy, Check, ArrowLeft, ExternalLink,
+  CheckCircle2, Shield,
 } from "lucide-react";
 
 type TopicCoverage = {
@@ -154,6 +155,40 @@ export default function AnalysisResultView({
             </div>
           )}
 
+          {/* Healthy page — no causes */}
+          {(!diagnosis.causes || diagnosis.causes.length === 0) && (
+            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 size={22} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-base font-semibold text-[#166534]">Your page is in great shape!</h3>
+                  <p className="text-sm text-[#15803D] mt-2 leading-relaxed">
+                    We analyzed your content against the top 10 SERP results and found no critical issues. Your page is well-optimized for &ldquo;{keyword}&rdquo;.
+                  </p>
+                  {diagnosis.topic_coverage && (
+                    <p className="text-sm text-[#15803D] mt-2">
+                      Topic Coverage: {diagnosis.topic_coverage.covered} / {diagnosis.topic_coverage.total} ({diagnosis.topic_coverage.percentage}%)
+                    </p>
+                  )}
+                  <div className="flex items-center gap-1.5 mt-3 text-xs text-[#16A34A]">
+                    <Shield size={12} strokeWidth={1.5} />
+                    <span>Keep monitoring — we&apos;ll alert you if anything changes in the SERP.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Single low-severity cause — healthy header */}
+          {diagnosis.causes && diagnosis.causes.length === 1 && diagnosis.causes[0]?.severity === "low" && (
+            <div className="flex items-center gap-2 bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg px-4 py-3 mb-1">
+              <CheckCircle2 size={16} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
+              <p className="text-sm text-[#166534]">
+                Your page is performing well. We found 1 optional improvement:
+              </p>
+            </div>
+          )}
+
           {diagnosis.causes && diagnosis.causes.length > 0 && (
             <div className="space-y-3">
               {diagnosis.causes.map((cause, i) => {
@@ -193,6 +228,24 @@ export default function AnalysisResultView({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Brief — empty actions (healthy page) */}
+      {brief && (!brief.actions || brief.actions.length === 0) && (
+        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+          <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2 mb-3">
+            <Sparkles size={18} strokeWidth={1.5} className="text-[#D97706]" />
+            Refresh Brief
+          </h2>
+          <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Shield size={18} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[#166534] leading-relaxed">
+                No urgent actions needed. Your content is competitive. We&apos;ll continue monitoring and alert you if competitors make moves that affect your position.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
