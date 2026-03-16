@@ -63,6 +63,7 @@ type TopicCoverage = {
 
 type DiagnosisData = {
   summary: string;
+  strengths?: string[];
   topic_coverage?: TopicCoverage;
   causes: Cause[];
   serp_analysis: {
@@ -843,22 +844,53 @@ export default function PageDetailClient({
               <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 size={22} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
-                  <div>
+                  <div className="space-y-3">
                     <h3 className="text-base font-semibold text-[#166534]">Your page is in great shape!</h3>
-                    <p className="text-sm text-[#15803D] mt-2 leading-relaxed">
+                    <p className="text-sm text-[#15803D] leading-relaxed">
                       We analyzed your content against the top 10 SERP results and found no critical issues. Your page is well-optimized for &ldquo;{diagnosis.keyword_used ?? page.primary_keyword ?? "this keyword"}&rdquo;.
                     </p>
+
+                    {/* Strengths — proof of analysis */}
+                    {diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-[#166534] uppercase tracking-wider mb-2">What you&apos;re doing right</p>
+                        <ul className="space-y-1.5">
+                          {diagnosis.diagnosis.strengths.map((s, i) => (
+                            <li key={i} className="text-sm text-[#15803D] flex gap-2">
+                              <span className="text-[#16A34A] flex-shrink-0">✓</span>
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {diagnosis.diagnosis.topic_coverage && (
-                      <p className="text-sm text-[#15803D] mt-2">
+                      <p className="text-sm text-[#15803D]">
                         Topic Coverage: {diagnosis.diagnosis.topic_coverage.covered} / {diagnosis.diagnosis.topic_coverage.total} ({diagnosis.diagnosis.topic_coverage.percentage}%)
                       </p>
                     )}
-                    <div className="flex items-center gap-1.5 mt-3 text-xs text-[#16A34A]">
+                    <div className="flex items-center gap-1.5 text-xs text-[#16A34A]">
                       <Shield size={12} strokeWidth={1.5} />
                       <span>Keep monitoring — we&apos;ll alert you if anything changes in the SERP.</span>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Strengths — always shown when causes > 0 */}
+            {diagnosis.diagnosis.causes.length > 0 && diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-1">
+                <p className="text-xs font-semibold text-[#166534] uppercase tracking-wider mb-2">What you&apos;re doing right</p>
+                <ul className="space-y-1.5">
+                  {diagnosis.diagnosis.strengths.map((s, i) => (
+                    <li key={i} className="text-sm text-[#15803D] flex gap-2">
+                      <span className="text-[#16A34A] flex-shrink-0">✓</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 

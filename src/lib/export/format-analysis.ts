@@ -8,6 +8,7 @@ type Cause = {
 
 type DiagnosisData = {
   summary: string;
+  strengths?: string[];
   topic_coverage?: {
     covered: number;
     total: number;
@@ -76,6 +77,15 @@ export function formatAnalysisMarkdown(
   lines.push("## Summary");
   lines.push(diagnosis.summary);
   lines.push("");
+
+  // Strengths
+  if (diagnosis.strengths && diagnosis.strengths.length > 0) {
+    lines.push("## Strengths");
+    diagnosis.strengths.forEach((s) => {
+      lines.push(`- ${s}`);
+    });
+    lines.push("");
+  }
 
   // Topic Coverage
   if (diagnosis.topic_coverage) {

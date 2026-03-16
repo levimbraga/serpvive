@@ -9,6 +9,7 @@ const anthropic = new Anthropic();
 
 export const DiagnosisSchema = z.object({
   summary: z.string().max(5000),
+  strengths: z.array(z.string().max(5000)).min(1).max(5),
   topic_coverage: z.object({
     covered: z.number(),
     total: z.number(),
@@ -119,9 +120,12 @@ TOPIC COVERAGE (mandatory — returned as structured JSON):
 - Return in topic_coverage: { covered: X, total: Y, percentage: Z, missing: ["topic1", "topic2"] }
 - List which subtopics are covered vs missing
 
-COMPETITIVE STRENGTHS (always include):
-- What does YOUR page do better than competitors? Find at least 1 thing.
-- What opportunity exists that NO competitor covers? (your differentiator)
+STRENGTHS (mandatory — returned as structured JSON):
+- Return 1-5 specific things the page does WELL in a "strengths" array.
+- Be specific: NOT 'good content' → BUT 'Your step-by-step propagation guide is more detailed than any competitor, covering 4 methods vs their 2.'
+- Include at least 1 competitive advantage over SERP rivals.
+- For healthy pages (0 causes), strengths become the PRIMARY value of the diagnosis — the user needs to see proof that you actually analyzed their page.
+- Examples: 'Your page is the only result with original photography', 'Your FAQ section answers 3 questions no competitor covers', 'Your word count (3,200) exceeds the SERP average (2,100) with better structure'.
 
 INTENT ANALYSIS:
 - Explain what the searcher REALLY needs (beyond the surface query)
@@ -154,6 +158,7 @@ Do NOT make this the focus of the diagnosis — Google organic is still the prim
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string",
+  "strengths": ["string (1-5 specific things this page does well)"],
   "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "outdated_content|new_competitors|intent_shift|missing_topic|format_gap|technical_issue|cannibalization|thin_content" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
@@ -229,9 +234,11 @@ TOPIC COVERAGE (mandatory — returned as structured JSON):
 - Return in topic_coverage: { covered: X, total: Y, percentage: Z, missing: ["topic1", "topic2"] }
 - List which subtopics are covered vs missing
 
-COMPETITIVE STRENGTHS:
-- What does YOUR page do better than competitors? Find at least 1 thing.
-- What opportunity exists that NO competitor covers?
+STRENGTHS (mandatory — returned as structured JSON):
+- Return 1-5 specific things the page does WELL in a "strengths" array.
+- Be specific: NOT 'good content' → BUT 'Your step-by-step guide is more detailed than any competitor, covering 4 methods vs their 2.'
+- Include at least 1 competitive advantage over SERP rivals.
+- For healthy pages (0 causes), strengths become the PRIMARY value of the diagnosis — the user needs to see proof that you actually analyzed their page.
 
 INTENT ANALYSIS:
 - Explain what the searcher REALLY needs (beyond the surface query)
@@ -258,6 +265,7 @@ Do NOT make this the focus of the diagnosis — Google organic is still the prim
 Return ONLY valid JSON matching this schema:
 {
   "summary": "string",
+  "strengths": ["string (1-5 specific things this page does well)"],
   "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "content_gap|format_gap|thin_content|title_meta|internal_linking|content_structure" }],
   "serp_analysis": { "top_competitors": [{ "url": "string", "title": "string", "strengths": ["string"] }], "intent_type": "informational|commercial|transactional|navigational", "content_format_trend": "string" }
