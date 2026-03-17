@@ -4,7 +4,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -21,18 +21,6 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Rate limit: max 3 diagnoses per minute per user
-  if (!checkRateLimit(`diagnose:${user.id}`, 3, 60_000)) {
-    return NextResponse.json(
-      {
-        error: "Please wait a moment before running another analysis. Each diagnosis takes significant processing power.",
-        code: "slow_down",
-        retry_after: 60,
-      },
-      { status: 429 },
-    );
   }
 
   // Validate input
@@ -78,6 +66,15 @@ export async function POST(request: Request) {
   }
 
   const plan = profile.plan as PlanName;
+
+  // Rate limit per plan
+  const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
+  if (!checkRateLimit(`diagnose:${user.id}`, hourlyLimit, 3_600_000)) {
+    return NextResponse.json(
+      { error: "You're analyzing too fast. Please wait a few minutes before running another diagnosis.", code: "slow_down" },
+      { status: 429 },
+    );
+  }
 
   // Block free plan users — they get 1 auto-diagnosis only
   if (plan === "free") {

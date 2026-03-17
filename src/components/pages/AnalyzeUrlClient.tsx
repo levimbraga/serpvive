@@ -261,7 +261,6 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
               </div>
               <p className="text-[10px] text-[#D1D5DB] leading-relaxed">
                 Only public HTTPS pages are supported. We fetch the page content server-side to run the analysis.
-                Max 3 analyses per hour.
               </p>
             </div>
           )}

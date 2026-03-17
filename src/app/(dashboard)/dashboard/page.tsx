@@ -290,7 +290,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-4">
-          <UsageMeter used={diagnosesUsed} limit={diagnosesLimit} plan={plan} />
+          <UsageMeter used={diagnosesUsed} limit={diagnosesLimit} plan={plan} hasGsc={!!site} />
           {hasEngineRun && (
             <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
               <p className="text-xs text-[#9CA3AF] mb-1">Last engine run</p>

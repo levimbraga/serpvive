@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -22,14 +22,6 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Rate limit: max 3 per hour
-  if (!checkRateLimit(`analyze-url:${user.id}`, 3, 3_600_000)) {
-    return NextResponse.json(
-      { error: "You can run up to 3 analyses per hour. Please wait before trying again.", code: "slow_down", retry_after: 3600 },
-      { status: 429 },
-    );
   }
 
   const body = (await request.json()) as unknown;
@@ -63,6 +55,15 @@ export async function POST(request: Request) {
   }
 
   const plan = profile.plan as PlanName;
+
+  // Rate limit per plan
+  const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
+  if (!checkRateLimit(`analyze-url:${user.id}`, hourlyLimit, 3_600_000)) {
+    return NextResponse.json(
+      { error: "You're analyzing too fast. Please wait a few minutes before running another diagnosis.", code: "slow_down" },
+      { status: 429 },
+    );
+  }
 
   if (plan === "free") {
     return NextResponse.json(

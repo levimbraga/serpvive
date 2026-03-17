@@ -7,6 +7,14 @@ export const PLAN_LIMITS = {
 
 export type PlanName = keyof typeof PLAN_LIMITS;
 
+/** Max AI diagnoses per hour per plan (rate limit, not monthly quota). */
+export const RATE_LIMITS_PER_HOUR: Record<PlanName, number> = {
+  free: 1,
+  starter: 5,
+  pro: 10,
+  agency: 20,
+};
+
 export const DECAY_THRESHOLDS = {
   healthy_max: 15,
   warning_max: 30,
