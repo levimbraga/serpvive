@@ -59,25 +59,27 @@ export default function Navbar() {
         }`}
         style={{ backdropFilter: "blur(24px)" }}
       >
-        <Link href="/" className="text-[26px] font-extrabold tracking-tight text-white no-underline" style={{ letterSpacing: "-0.5px" }}>
+        <Link href="/" className="font-extrabold tracking-tight text-white no-underline" style={{ fontSize: "clamp(20px, 1.8vw, 28px)", letterSpacing: "-0.5px" }}>
           Serp<span className="text-[#3B82F6]">Vive</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-9">
-          <a href="#features" className="text-[14px] font-medium text-[#94A3B8] hover:text-white transition-colors no-underline">Features</a>
-          <a href="#pricing" className="text-[14px] font-medium text-[#94A3B8] hover:text-white transition-colors no-underline">Pricing</a>
+          <a href="#features" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Features</a>
+          <a href="#pricing" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Pricing</a>
         </div>
 
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="hidden sm:inline-flex text-[14px] font-medium text-[#94A3B8] hover:text-white transition-colors no-underline"
+            className="hidden sm:inline-flex font-medium text-[#94A3B8] hover:text-white transition-colors no-underline"
+            style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center h-10 px-6 rounded-lg bg-[#3B82F6] text-white text-[14px] font-semibold hover:bg-[#2563EB] transition-all no-underline hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+            className="inline-flex items-center rounded-lg bg-[#3B82F6] text-white font-semibold hover:bg-[#2563EB] transition-all no-underline hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+            style={{ fontSize: "clamp(14px, 1.1vw, 17px)", padding: "clamp(8px, 0.8vw, 12px) clamp(20px, 1.8vw, 28px)" }}
             onClick={() => posthog.capture("cta_clicked", { location: "nav" })}
           >
             Get Started Free

@@ -88,11 +88,11 @@ export default function PricingSection() {
 
   return (
     <section className="py-20 sm:py-28 px-5 sm:px-12" id="pricing">
-      <div className="max-w-[1400px] mx-auto text-center">
+      <div className="mx-auto text-center" style={{ maxWidth: "min(1600px, 90vw)" }}>
         <Reveal>
           <h2
             className="font-extrabold leading-[1.1] mb-5"
-            style={{ fontSize: "clamp(1.75rem, 3.5vw, 3.5rem)", letterSpacing: "-0.04em" }}
+            style={{ fontSize: "clamp(2rem, 4vw, 4rem)", letterSpacing: "-0.04em" }}
           >
             Simple pricing. Powerful results.
           </h2>

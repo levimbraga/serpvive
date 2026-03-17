@@ -56,11 +56,11 @@ const STEPS = [
 export default function StepsSection() {
   return (
     <section className="py-20 sm:py-28 px-5 sm:px-12" id="features">
-      <div className="max-w-[1200px] mx-auto text-center">
+      <div className="mx-auto text-center" style={{ maxWidth: "min(1600px, 90vw)" }}>
         <Reveal>
           <h2
             className="font-extrabold leading-[1.1] mb-5"
-            style={{ fontSize: "clamp(1.75rem, 3.5vw, 3.5rem)", letterSpacing: "-0.04em" }}
+            style={{ fontSize: "clamp(2rem, 4vw, 4rem)", letterSpacing: "-0.04em" }}
           >
             Five steps. Two minutes to set up.
           </h2>
@@ -130,10 +130,11 @@ export default function StepsSection() {
           <div className="mt-12">
             <a
               href="/signup"
-              className="inline-flex items-center gap-2.5 h-[52px] px-10 rounded-xl bg-[#3B82F6] text-white text-[16px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5"
+              style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(12px, 1.3vw, 18px) clamp(24px, 2.5vw, 40px)" }}
             >
               Get Started Free
-              <span className="text-[18px]">&rarr;</span>
+              <span style={{ fontSize: "clamp(16px, 1.3vw, 22px)" }}>&rarr;</span>
             </a>
           </div>
         </Reveal>

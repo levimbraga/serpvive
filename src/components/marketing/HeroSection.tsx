@@ -34,17 +34,17 @@ export default function HeroSection() {
 
       {/* ── Tag pill ── */}
       <div
-        className="relative inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
-        style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.2)" }}
+        className="relative inline-flex items-center gap-2 rounded-full font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
+        style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.2)", fontSize: "clamp(0.875rem, 1.2vw, 1.125rem)", padding: "clamp(8px, 0.8vw, 12px) clamp(20px, 2vw, 32px)" }}
       >
-        <span className="text-[14px]">&#x2726;</span>
+        <span style={{ fontSize: "clamp(14px, 1.2vw, 18px)" }}>&#x2726;</span>
         AI Content Decay Monitor
       </div>
 
       {/* ── Headline with gradient text ── */}
       <h1
-        className="relative font-extrabold leading-[1.05] max-w-[1200px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
-        style={{ fontSize: "clamp(2.5rem, 5.5vw, 6rem)", letterSpacing: "-0.05em" }}
+        className="relative font-extrabold leading-[1.05] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
+        style={{ fontSize: "clamp(3.5rem, 7vw, 6.875rem)", letterSpacing: "-0.05em", maxWidth: "min(1600px, 90vw)" }}
       >
         Your posts are losing traffic.
         <br />
@@ -57,7 +57,7 @@ export default function HeroSection() {
       </h1>
 
       {/* ── Subtitle ── */}
-      <p className="relative leading-[1.7] text-[#94A3B8] max-w-[700px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)" }}>
+      <p className="relative leading-[1.7] text-[#94A3B8] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1.125rem, 1.8vw, 1.5rem)", maxWidth: "min(750px, 60vw)" }}>
         SerpVive monitors every page on your blog. When traffic drops, our AI reads your competitors, compares with your content, and delivers a{" "}
         <strong className="text-[#F1F5F9] font-semibold">specific action plan</strong> — not generic advice.
       </p>
@@ -67,16 +67,17 @@ export default function HeroSection() {
         <a
           href="/signup"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "primary" })}
-          className="inline-flex items-center gap-2.5 h-[60px] px-12 rounded-xl bg-[#3B82F6] text-white text-[18px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+          style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
         >
           Get Started Free
-          <span className="text-[20px]">&rarr;</span>
+          <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
         </a>
         <a
           href="#features"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "secondary" })}
-          className="inline-flex items-center gap-2 h-[60px] px-12 rounded-xl text-[#94A3B8] text-[18px] font-medium no-underline transition-all duration-200 hover:text-white hover:border-[rgba(59,130,246,0.4)] hover:bg-[rgba(59,130,246,0.06)] w-full sm:w-auto justify-center"
-          style={{ border: "1.5px solid #1E293B" }}
+          className="inline-flex items-center gap-2 rounded-xl text-[#94A3B8] font-medium no-underline transition-all duration-200 hover:text-white hover:border-[rgba(59,130,246,0.4)] hover:bg-[rgba(59,130,246,0.06)] w-full sm:w-auto justify-center"
+          style={{ border: "1.5px solid #1E293B", fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
         >
           See how it works
         </a>
@@ -85,15 +86,15 @@ export default function HeroSection() {
       {/* ── Trust signals ── */}
       <div className="relative flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]">
         {["No credit card required", "1 free AI diagnosis included", "Setup in under 5 minutes"].map((text) => (
-          <span key={text} className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
-            <span className="text-[#3B82F6] font-bold text-[12px]">&#x2713;</span>
+          <span key={text} className="flex items-center gap-1.5 text-[#64748B]" style={{ fontSize: "clamp(13px, 1.1vw, 16px)" }}>
+            <span className="text-[#3B82F6] font-bold" style={{ fontSize: "clamp(12px, 1vw, 15px)" }}>&#x2713;</span>
             {text}
           </span>
         ))}
       </div>
 
       {/* ── 2. Product screenshot with strong blue glow ── */}
-      <div className="relative mt-16 w-full max-w-[1200px] mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]">
+      <div className="relative mt-16 mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]" style={{ width: "clamp(700px, 75vw, 1400px)", maxWidth: "95vw" }}>
         {/* Blue glow — stronger, visible */}
         <div
           className="absolute -inset-6 rounded-3xl pointer-events-none"

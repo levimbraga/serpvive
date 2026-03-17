@@ -3,11 +3,11 @@ import { Reveal } from "@/hooks/useReveal";
 export default function ExampleSection() {
   return (
     <section className="py-20 sm:py-28 px-5 sm:px-12 bg-white">
-      <div className="max-w-[960px] mx-auto">
+      <div className="mx-auto" style={{ maxWidth: "min(1100px, 85vw)" }}>
         <Reveal>
           <h2
             className="font-extrabold leading-[1.1] text-center text-[#0F172A] mb-4"
-            style={{ fontSize: "clamp(1.75rem, 3.5vw, 3.5rem)", letterSpacing: "-0.04em" }}
+            style={{ fontSize: "clamp(2rem, 4vw, 4rem)", letterSpacing: "-0.04em" }}
           >
             See a real diagnosis in action.
           </h2>

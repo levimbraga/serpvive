@@ -30,7 +30,7 @@ const LINKS = {
 export default function Footer() {
   return (
     <footer className="py-14 sm:py-16 px-5 sm:px-12 border-t border-[#1E293B]" style={{ background: "#050710" }}>
-      <div className="max-w-[1200px] mx-auto">
+      <div className="mx-auto" style={{ maxWidth: "min(1600px, 90vw)" }}>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 md:gap-16">
           {/* Logo + tagline */}
           <div className="flex-shrink-0">

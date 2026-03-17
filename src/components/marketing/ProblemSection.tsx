@@ -24,9 +24,9 @@ const STATS = [
 export default function ProblemSection() {
   return (
     <section className="py-20 sm:py-28 px-5 sm:px-12" style={{ background: "#0C0F18" }}>
-      <div className="max-w-[1200px] mx-auto text-center">
+      <div className="mx-auto text-center" style={{ maxWidth: "min(1600px, 90vw)" }}>
         <Reveal>
-          <h2 className="font-extrabold leading-[1.1] mb-5" style={{ fontSize: "clamp(1.75rem, 3.5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
+          <h2 className="font-extrabold leading-[1.1] mb-5" style={{ fontSize: "clamp(2rem, 4vw, 4rem)", letterSpacing: "-0.04em" }}>
             Your blog is losing traffic right now.
             <br />
             <span className="text-[#475569]">And AI Search is making it worse.</span>
@@ -46,7 +46,7 @@ export default function ProblemSection() {
                 className="rounded-xl p-7 sm:p-8 text-center border border-[#1E293B] transition-all duration-300 hover:border-[#334155] hover:-translate-y-0.5"
                 style={{ background: "#0F1219" }}
               >
-                <div className={`font-extrabold leading-none mb-3 ${stat.color}`} style={{ fontSize: "clamp(2rem, 4vw, 4.5rem)", letterSpacing: "-0.04em" }}>
+                <div className={`font-extrabold leading-none mb-3 ${stat.color}`} style={{ fontSize: "clamp(2.25rem, 5vw, 5rem)", letterSpacing: "-0.04em" }}>
                   {stat.value}
                 </div>
                 <p className="text-[14px] sm:text-[15px] text-[#94A3B8] leading-relaxed mb-3">

@@ -22,11 +22,11 @@ export default function FinalCTA() {
         }}
       />
 
-      <div className="relative max-w-[800px] mx-auto text-center">
+      <div className="relative mx-auto text-center" style={{ maxWidth: "min(900px, 80vw)" }}>
         <Reveal>
           <h2
             className="font-extrabold leading-[1.08] mb-5"
-            style={{ fontSize: "clamp(2rem, 3.8vw, 3.75rem)", letterSpacing: "-0.04em" }}
+            style={{ fontSize: "clamp(2rem, 4.2vw, 4rem)", letterSpacing: "-0.04em" }}
           >
             Stop losing traffic{" "}
             <span className="text-[#3B82F6]">you already earned.</span>
@@ -43,10 +43,11 @@ export default function FinalCTA() {
           <a
             href="/signup"
             onClick={() => posthog.capture("cta_clicked", { location: "final" })}
-            className="inline-flex items-center gap-2.5 h-[60px] px-14 rounded-xl bg-[#3B82F6] text-white text-[18px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5"
+            style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
           >
             Get Started Free
-            <span className="text-[20px]">&rarr;</span>
+            <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
           </a>
         </Reveal>
 
