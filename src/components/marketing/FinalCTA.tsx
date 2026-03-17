@@ -5,13 +5,20 @@ import { Reveal } from "@/hooks/useReveal";
 
 export default function FinalCTA() {
   return (
-    <section className="relative py-24 sm:py-32 px-5 sm:px-12 overflow-hidden" id="cta">
-      {/* Blue glow effect */}
+    <section className="relative py-24 sm:py-32 px-5 sm:px-12 overflow-hidden" id="cta" style={{ background: "#070810" }}>
+      {/* Outer glow — wide ambient */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[700px] pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%)",
-          filter: "blur(60px)",
+          background: "radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 65%)",
+        }}
+      />
+      {/* Inner glow — focused behind headline */}
+      <div
+        className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 60%)",
+          filter: "blur(40px)",
         }}
       />
 

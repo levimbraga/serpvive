@@ -138,7 +138,7 @@ export default function PricingSection() {
         </Reveal>
 
         {/* Plan cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 items-stretch [&>*]:h-full">
           {PLANS.map((plan) => {
             const price = plan.key === "free" ? 0 : isAnnual ? plan.annual : plan.monthly;
             const showSavings = isAnnual && plan.key !== "free";
