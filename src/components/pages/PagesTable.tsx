@@ -183,7 +183,7 @@ export default function PagesTable({ pages, timeZone = "UTC" }: { pages: PageDat
       {/* Table */}
       <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
                 <th className="text-left px-5 py-3 text-xs font-medium text-[#6B7280] uppercase tracking-wider">

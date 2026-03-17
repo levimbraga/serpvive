@@ -38,7 +38,7 @@ export default function DashboardLoading() {
       </div>
 
       {/* Stats row skeleton */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center gap-3">
             <Skeleton className="w-10 h-10 rounded-lg" />
@@ -54,19 +54,30 @@ export default function DashboardLoading() {
       <div>
         <Skeleton className="w-40 h-6 mb-3" />
         <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
-          {/* Header */}
-          <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+          {/* Header — desktop only */}
+          <div className="hidden md:block px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
             <Skeleton className="w-full h-4" />
           </div>
-          {/* Rows */}
+          {/* Desktop rows */}
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="px-5 py-3.5 border-b border-[#F3F4F6] flex items-center gap-4">
+            <div key={i} className="hidden md:flex px-5 py-3.5 border-b border-[#F3F4F6] items-center gap-4">
               <Skeleton className="w-2 h-2 rounded-full flex-shrink-0" />
               <Skeleton className="flex-1 h-4" />
               <Skeleton className="w-16 h-4" />
               <Skeleton className="w-16 h-4" />
               <Skeleton className="w-16 h-4" />
               <Skeleton className="w-16 h-6 rounded-full" />
+            </div>
+          ))}
+          {/* Mobile rows */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-[#F3F4F6]">
+              <Skeleton className="w-2 h-2 rounded-full flex-shrink-0" />
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <Skeleton className="w-3/4 h-4" />
+                <Skeleton className="w-24 h-3" />
+              </div>
+              <Skeleton className="w-14 h-5 rounded-full flex-shrink-0" />
             </div>
           ))}
         </div>

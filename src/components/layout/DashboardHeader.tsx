@@ -93,7 +93,7 @@ export default function DashboardHeader({
             {/* Mobile logo */}
             <div className="px-5 pt-5 pb-3">
               <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="no-underline">
-                <span className="text-lg font-extrabold text-white tracking-tight">
+                <span className="text-xl font-extrabold text-white tracking-tight">
                   Serp<span className="text-[#3B82F6]">Vive</span>
                 </span>
               </Link>
@@ -104,7 +104,7 @@ export default function DashboardHeader({
               <div className="px-4 pb-4 border-b border-[#1E293B]">
                 {hasMultipleSites ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="w-full flex items-center gap-2 text-xs text-[#94A3B8] hover:text-white rounded-md px-2 py-2 hover:bg-[#1E293B] transition-colors duration-150 outline-none truncate">
+                    <DropdownMenuTrigger className="w-full flex items-center gap-2 text-[13px] text-[#94A3B8] hover:text-white rounded-md px-2 py-2 hover:bg-[#1E293B] transition-colors duration-150 outline-none truncate">
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[activeSite.status] ?? "bg-[#6B7280]"}`} />
                       <span className="truncate flex-1 text-left font-medium">{activeSite.domain}</span>
                       <ChevronDown size={12} strokeWidth={1.5} className="flex-shrink-0 opacity-50" />
@@ -126,7 +126,7 @@ export default function DashboardHeader({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs text-[#94A3B8] px-2 py-2 truncate">
+                  <div className="flex items-center gap-2 text-[13px] text-[#94A3B8] px-2 py-2 truncate">
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[activeSite.status] ?? "bg-[#6B7280]"}`} />
                     <span className="truncate font-medium">{activeSite.domain}</span>
                   </div>
@@ -143,7 +143,7 @@ export default function DashboardHeader({
                     key={href}
                     href={href}
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors duration-150 no-underline ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors duration-150 no-underline ${
                       isActive
                         ? "bg-[#1E293B] text-white border-l-[3px] border-[#3B82F6] pl-[9px]"
                         : "text-[#94A3B8] hover:text-white hover:bg-[#1E293B]"
@@ -160,7 +160,7 @@ export default function DashboardHeader({
             <div className="px-4 pb-4 pt-3 mt-auto border-t border-[#1E293B]">
               <div className="flex items-center gap-2 mb-2">
                 <Zap size={13} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
-                <span className={`text-[11px] font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
+                <span className={`text-[13px] font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
                   {diagnosesUsed}/{diagnosesLimit} diagnoses
                 </span>
               </div>

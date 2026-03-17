@@ -77,7 +77,7 @@ export default function HealthScoreRing({ score, delta, size = 200 }: HealthScor
           <span className="text-5xl font-bold text-[#111827]" style={{ fontFamily: "var(--font-mono, monospace)" }}>
             {animatedScore}
           </span>
-          <span className="text-sm text-[#6B7280] mt-0.5">Health Score</span>
+          <span className="text-[13px] text-[#6B7280] mt-0.5">Health Score</span>
         </div>
       </div>
 

@@ -39,8 +39,8 @@ export default function StatsRow({ totalPages, healthy, warning, critical, dead 
             <Icon size={20} strokeWidth={1.5} style={{ color }} />
           </div>
           <div>
-            <p className="text-2xl font-bold text-[#111827]">{values[key]}</p>
-            <p className="text-xs text-[#6B7280]">{label}</p>
+            <p className="text-[28px] font-extrabold text-[#111827]">{values[key]}</p>
+            <p className="text-[13px] text-[#6B7280]">{label}</p>
           </div>
         </div>
       ))}

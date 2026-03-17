@@ -442,7 +442,7 @@ export default function PageDetailClient({
               <span className="text-xs text-[#9CA3AF]">{siteDomain}</span>
             </div>
             <h1
-              className="text-lg font-semibold text-[#111827] truncate"
+              className="text-xl font-semibold text-[#111827] truncate break-all"
               style={{ fontFamily: "var(--font-mono, monospace)" }}
             >
               {page.path}
@@ -486,20 +486,20 @@ export default function PageDetailClient({
         {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#F3F4F6]">
           <div>
-            <p className="text-xs text-[#9CA3AF]">Clicks (28d)</p>
-            <p className="text-lg font-bold text-[#111827] tabular-nums">{page.current_clicks_28d}</p>
+            <p className="text-[13px] text-[#9CA3AF]">Clicks (28d)</p>
+            <p className="text-[28px] font-bold text-[#111827] tabular-nums">{page.current_clicks_28d}</p>
           </div>
           <div>
-            <p className="text-xs text-[#9CA3AF]">Impressions</p>
-            <p className="text-lg font-bold text-[#111827] tabular-nums">{page.current_impressions_28d}</p>
+            <p className="text-[13px] text-[#9CA3AF]">Impressions</p>
+            <p className="text-[28px] font-bold text-[#111827] tabular-nums">{page.current_impressions_28d}</p>
           </div>
           <div>
-            <p className="text-xs text-[#9CA3AF]">Avg Position</p>
-            <p className="text-lg font-bold text-[#111827] tabular-nums">#{page.current_avg_position.toFixed(1)}</p>
+            <p className="text-[13px] text-[#9CA3AF]">Avg Position</p>
+            <p className="text-[28px] font-bold text-[#111827] tabular-nums">#{page.current_avg_position.toFixed(1)}</p>
           </div>
           <div>
-            <p className="text-xs text-[#9CA3AF]">{isNew ? "Peak" : "Decay"}</p>
-            <p className={`text-lg font-bold tabular-nums ${
+            <p className="text-[13px] text-[#9CA3AF]">{isNew ? "Peak" : "Decay"}</p>
+            <p className={`text-[28px] font-bold tabular-nums ${
               page.decay_score >= 30 ? "text-[#DC2626]" :
               page.decay_score >= 15 ? "text-[#D97706]" :
               "text-[#111827]"

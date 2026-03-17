@@ -42,7 +42,7 @@ export default function SettingsLoading() {
           <Skeleton className="w-28 h-5" />
           <Skeleton className="w-24 h-5" />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-[#F9FAFB] rounded-lg p-3 space-y-2">
               <Skeleton className="w-16 h-3" />

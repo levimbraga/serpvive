@@ -166,7 +166,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
               </div>
             </div>
             <span
-              className="text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+              className="text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0"
               style={{ color: cfg.color, backgroundColor: cfg.bg }}
             >
               {cfg.label}
