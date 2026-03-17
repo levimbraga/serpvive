@@ -161,7 +161,7 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
         </div>
 
         {/* Usage */}
-        {diagnosesLimit > 0 ? (
+        {plan !== "free" && diagnosesLimit > 0 ? (
           <>
             <div className="flex items-center gap-2 mb-2">
               <Zap size={13} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />

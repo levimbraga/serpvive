@@ -35,9 +35,7 @@ export default async function DashboardLayout({
   const plan = (profile?.plan ?? "free") as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const sites = sitesRes.data ?? [];
-  const diagnosesLimitRaw = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-  // Free plan with GSC connected gets 1 free diagnosis
-  const diagnosesLimit = (plan === "free" && sites.length > 0) ? 1 : diagnosesLimitRaw;
+  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
 
   // Onboarding redirects are handled by middleware (middleware.ts)
   // Layout only needs to provide activeSiteId for the sidebar/header
