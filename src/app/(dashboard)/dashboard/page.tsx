@@ -257,7 +257,7 @@ export default async function DashboardPage() {
       {/* Greeting */}
       <div>
         <h1 className="text-xl font-semibold text-[#111827]">
-          {greeting} {isFirstAccess ? "\uD83C\uDF89" : "\uD83D\uDC4B"}
+          {greeting}
         </h1>
         <p className="text-sm text-[#6B7280] mt-0.5">
           Here&apos;s how your blog is doing today.
