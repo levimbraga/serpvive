@@ -60,7 +60,7 @@ export default async function DashboardLayout({
           diagnosesUsed={diagnosesUsed}
           diagnosesLimit={diagnosesLimit}
         />
-        <main className="p-4 sm:p-6 max-w-[1200px] mx-auto">
+        <main className="p-4 sm:p-6 max-w-[1400px] mx-auto">
           {children}
         </main>
       </div>

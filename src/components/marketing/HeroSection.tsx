@@ -43,8 +43,8 @@ export default function HeroSection() {
 
       {/* ── Headline with gradient text ── */}
       <h1
-        className="relative text-[40px] sm:text-[64px] lg:text-[84px] font-extrabold leading-[1.05] max-w-[1000px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
-        style={{ letterSpacing: "-0.05em" }}
+        className="relative font-extrabold leading-[1.05] max-w-[1200px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
+        style={{ fontSize: "clamp(2.5rem, 5.5vw, 6rem)", letterSpacing: "-0.05em" }}
       >
         Your posts are losing traffic.
         <br />
@@ -57,7 +57,7 @@ export default function HeroSection() {
       </h1>
 
       {/* ── Subtitle ── */}
-      <p className="relative text-[16px] sm:text-[20px] leading-[1.7] text-[#94A3B8] max-w-[660px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]">
+      <p className="relative leading-[1.7] text-[#94A3B8] max-w-[700px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)" }}>
         SerpVive monitors every page on your blog. When traffic drops, our AI reads your competitors, compares with your content, and delivers a{" "}
         <strong className="text-[#F1F5F9] font-semibold">specific action plan</strong> — not generic advice.
       </p>
@@ -93,7 +93,7 @@ export default function HeroSection() {
       </div>
 
       {/* ── 2. Product screenshot with strong blue glow ── */}
-      <div className="relative mt-16 w-full max-w-[1000px] mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]">
+      <div className="relative mt-16 w-full max-w-[1200px] mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]">
         {/* Blue glow — stronger, visible */}
         <div
           className="absolute -inset-6 rounded-3xl pointer-events-none"

@@ -38,11 +38,11 @@ const BLOCKS = [
 export default function WhatWeDoSection() {
   return (
     <section className="py-20 sm:py-28 px-5 sm:px-12 bg-white">
-      <div className="max-w-[960px] mx-auto">
+      <div className="max-w-[1200px] mx-auto">
         <Reveal>
           <h2
-            className="text-[32px] sm:text-[44px] lg:text-[52px] font-extrabold leading-[1.1] text-center text-[#0F172A] mb-4"
-            style={{ letterSpacing: "-0.04em" }}
+            className="font-extrabold leading-[1.1] text-center text-[#0F172A] mb-4"
+            style={{ fontSize: "clamp(1.75rem, 3.5vw, 3.5rem)", letterSpacing: "-0.04em" }}
           >
             What SerpVive actually does
           </h2>

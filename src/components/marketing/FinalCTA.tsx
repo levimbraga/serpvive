@@ -22,11 +22,11 @@ export default function FinalCTA() {
         }}
       />
 
-      <div className="relative max-w-[700px] mx-auto text-center">
+      <div className="relative max-w-[800px] mx-auto text-center">
         <Reveal>
           <h2
-            className="text-[32px] sm:text-[44px] lg:text-[56px] font-extrabold leading-[1.08] mb-5"
-            style={{ letterSpacing: "-0.04em" }}
+            className="font-extrabold leading-[1.08] mb-5"
+            style={{ fontSize: "clamp(2rem, 3.8vw, 3.75rem)", letterSpacing: "-0.04em" }}
           >
             Stop losing traffic{" "}
             <span className="text-[#3B82F6]">you already earned.</span>

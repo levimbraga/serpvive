@@ -19,7 +19,7 @@ const CATEGORIES = [
 export default function SocialProof() {
   return (
     <section className="py-12 sm:py-16 px-5 sm:px-12">
-      <div className="max-w-[800px] mx-auto flex flex-col items-center gap-8">
+      <div className="max-w-[960px] mx-auto flex flex-col items-center gap-8">
         {/* Stars + text */}
         <div className="flex flex-col sm:flex-row items-center gap-3 text-center">
           <div className="flex gap-0.5">
