@@ -86,6 +86,7 @@ export default function AnalysisResultView({
   const diagnosis = rawDiag as DiagnosisData;
   const brief = rawBrief as BriefData | null;
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [expandedEvidence, setExpandedEvidence] = useState<Set<number>>(new Set());
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -234,7 +235,22 @@ export default function AnalysisResultView({
                       </span>
                     </div>
                     <p className="text-sm text-[#4B5563] mb-2">{cause.description}</p>
-                    <p className="text-xs text-[#6B7280] italic">{cause.evidence}</p>
+                    <button
+                      onClick={() => setExpandedEvidence(prev => {
+                        const next = new Set(prev);
+                        next.has(i) ? next.delete(i) : next.add(i);
+                        return next;
+                      })}
+                      className="flex items-center gap-1 mt-2 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
+                    >
+                      {expandedEvidence.has(i) ? "Hide evidence" : "Show evidence"}
+                      <ChevronDown size={12} strokeWidth={1.5} className={`transition-transform duration-150 ${expandedEvidence.has(i) ? "rotate-180" : ""}`} />
+                    </button>
+                    {expandedEvidence.has(i) && (
+                      <p className="text-xs text-[#6B7280] mt-2 italic leading-relaxed bg-[#F9FAFB] rounded-md p-3">
+                        {cause.evidence}
+                      </p>
+                    )}
                   </div>
                 );
               })}

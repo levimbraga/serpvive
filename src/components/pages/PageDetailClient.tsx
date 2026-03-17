@@ -186,6 +186,8 @@ export default function PageDetailClient({
   const [showConfettiMsg, setShowConfettiMsg] = useState(false);
   const [keywordOverride, setKeywordOverride] = useState("");
   const [showKeywordOverride, setShowKeywordOverride] = useState(false);
+  const [expandedEvidence, setExpandedEvidence] = useState<Set<number>>(new Set());
+  const [expandedPrevEvidence, setExpandedPrevEvidence] = useState<Set<string>>(new Set());
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
@@ -917,7 +919,22 @@ export default function PageDetailClient({
                     <div>
                       <p className="font-medium text-[#111827]">{cause.title}</p>
                       <p className="text-sm text-[#4B5563] mt-1">{cause.description}</p>
-                      <p className="text-xs text-[#6B7280] mt-2 italic">Evidence: {cause.evidence}</p>
+                      <button
+                        onClick={() => setExpandedEvidence(prev => {
+                          const next = new Set(prev);
+                          next.has(i) ? next.delete(i) : next.add(i);
+                          return next;
+                        })}
+                        className="flex items-center gap-1 mt-2 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
+                      >
+                        {expandedEvidence.has(i) ? "Hide evidence" : "Show evidence"}
+                        <ChevronDown size={12} strokeWidth={1.5} className={`transition-transform duration-150 ${expandedEvidence.has(i) ? "rotate-180" : ""}`} />
+                      </button>
+                      {expandedEvidence.has(i) && (
+                        <p className="text-xs text-[#6B7280] mt-2 italic leading-relaxed bg-[#F9FAFB] rounded-md p-3">
+                          {cause.evidence}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
@@ -1166,7 +1183,23 @@ export default function PageDetailClient({
                                 <div>
                                   <p className="text-sm font-medium text-[#111827]">{cause.title}</p>
                                   <p className="text-xs text-[#4B5563] mt-1">{cause.description}</p>
-                                  <p className="text-xs text-[#6B7280] mt-1.5 italic">Evidence: {cause.evidence}</p>
+                                  <button
+                                    onClick={() => setExpandedPrevEvidence(prevSet => {
+                                      const key = `${prev.id}-${i}`;
+                                      const next = new Set(prevSet);
+                                      next.has(key) ? next.delete(key) : next.add(key);
+                                      return next;
+                                    })}
+                                    className="flex items-center gap-1 mt-1.5 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
+                                  >
+                                    {expandedPrevEvidence.has(`${prev.id}-${i}`) ? "Hide evidence" : "Show evidence"}
+                                    <ChevronDown size={12} strokeWidth={1.5} className={`transition-transform duration-150 ${expandedPrevEvidence.has(`${prev.id}-${i}`) ? "rotate-180" : ""}`} />
+                                  </button>
+                                  {expandedPrevEvidence.has(`${prev.id}-${i}`) && (
+                                    <p className="text-xs text-[#6B7280] mt-1.5 italic leading-relaxed bg-[#F9FAFB] rounded-md p-3">
+                                      {cause.evidence}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             );

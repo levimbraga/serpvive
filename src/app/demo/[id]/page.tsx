@@ -51,10 +51,10 @@ export default async function DemoPage({ params }: Props) {
   if (!demo || new Date(demo.expires_at) < new Date()) {
     return (
       <div className="min-h-screen bg-[#F5F7FA]">
-        <header className="border-b border-[#E5E7EB] bg-white">
+        <header className="border-b border-[#1E293B] bg-[#0F172A]">
           <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
             <Link href="/">
-              <span className="text-lg font-extrabold text-[#111827] tracking-tight">
+              <span className="text-lg font-extrabold text-white tracking-tight">
                 Serp<span className="text-[#3B82F6]">Vive</span>
               </span>
             </Link>
@@ -88,14 +88,14 @@ export default async function DemoPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       {/* Header */}
-      <header className="border-b border-[#E5E7EB] bg-white">
+      <header className="border-b border-[#1E293B] bg-[#0F172A]">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/">
-            <span className="text-lg font-extrabold text-[#111827] tracking-tight">
+            <span className="text-lg font-extrabold text-white tracking-tight">
               Serp<span className="text-[#3B82F6]">Vive</span>
             </span>
           </Link>
-          <span className="text-xs text-[#6B7280] bg-[#F3F4F6] px-3 py-1 rounded-full font-medium">
+          <span className="text-xs text-[#94A3B8] bg-[#1E293B] px-3 py-1 rounded-full font-medium">
             Free Content Analysis
           </span>
         </div>
@@ -127,44 +127,46 @@ export default async function DemoPage({ params }: Props) {
       </main>
 
       {/* CTA Section */}
-      <section className="bg-white border-t border-[#E5E7EB]">
+      <section className="border-t border-[#E5E7EB]" style={{ background: "linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)" }}>
         <div className="max-w-2xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-2xl font-semibold text-[#111827] mb-3">
-            Want this for your entire blog?
-          </h2>
-          <p className="text-[#4B5563] mb-8 max-w-md mx-auto">
-            SerpVive monitors your blog automatically, detects pages losing traffic, and tells you exactly WHY and WHAT to fix — with AI.
-          </p>
+          <div className="border border-[#BFDBFE] rounded-xl p-8">
+            <h2 className="text-2xl font-semibold text-[#111827] mb-3">
+              Want this for your entire blog?
+            </h2>
+            <p className="text-[#4B5563] mb-8 max-w-md mx-auto">
+              SerpVive monitors your blog automatically, detects pages losing traffic, and tells you exactly WHY and WHAT to fix — with AI.
+            </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto mb-8 text-left">
-            {[
-              "Automatic daily monitoring",
-              "AI diagnosis with competitor analysis",
-              "Micro-drafts so you write without researching",
-              "Before/after proof that fixes worked",
-            ].map((item) => (
-              <div key={item} className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-[#16A34A] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-sm text-[#374151]">{item}</span>
-              </div>
-            ))}
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto mb-8 text-left">
+              {[
+                "Automatic daily monitoring",
+                "AI diagnosis with competitor analysis",
+                "Micro-drafts so you write without researching",
+                "Before/after proof that fixes worked",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-[#16A34A] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm text-[#374151]">{item}</span>
+                </div>
+              ))}
+            </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
-            >
-              Get Started Free &rarr;
-            </Link>
-            <Link
-              href="/#pricing"
-              className="inline-flex items-center justify-center h-11 px-8 rounded-lg border border-[#E5E7EB] hover:border-[#3B82F6] text-[#374151] text-sm font-medium transition-colors"
-            >
-              See Pricing
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
+              >
+                Get Started Free &rarr;
+              </Link>
+              <Link
+                href="/#pricing"
+                className="inline-flex items-center justify-center h-11 px-8 rounded-lg border border-[#E5E7EB] hover:border-[#3B82F6] text-[#374151] text-sm font-medium transition-colors"
+              >
+                See Pricing
+              </Link>
+            </div>
           </div>
         </div>
       </section>
