@@ -34,11 +34,11 @@ function scoreColor(score: number): string {
 
 function statusBadge(status: string): string {
   const map: Record<string, string> = {
-    critical: "🔴 Critical",
-    dead: "⚫ Dead",
-    warning: "🟡 Warning",
-    healthy: "🟢 Healthy",
-    new: "🔵 New",
+    critical: "Critical",
+    dead: "Dead",
+    warning: "Warning",
+    healthy: "Healthy",
+    new: "New",
   };
   return map[status] ?? status;
 }
@@ -114,7 +114,7 @@ export default function WeeklyDigest({
                       <Text style={pageUrl}>{r.url}</Text>
                       <Text style={{ ...pageInfo, color: isPositive ? "#16A34A" : "#DC2626" }}>
                         {isPositive ? "+" : ""}{r.clicksDeltaPct.toFixed(1)}% clicks{" "}
-                        {r.resultStatus === "success" ? "✅" : r.resultStatus === "declined" ? "🔴" : "🟡"}
+                        {r.resultStatus === "success" ? "\u2191" : r.resultStatus === "declined" ? "\u2193" : "\u2192"}
                       </Text>
                     </Section>
                   );

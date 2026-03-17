@@ -129,16 +129,16 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }
   unknown:  { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
 };
 
-const SEVERITY_CONFIG: Record<string, { color: string; border: string; emoji: string }> = {
-  high:   { color: "#DC2626", border: "border-l-[#DC2626]", emoji: "🔴" },
-  medium: { color: "#D97706", border: "border-l-[#D97706]", emoji: "🟡" },
-  low:    { color: "#16A34A", border: "border-l-[#16A34A]", emoji: "🟢" },
+const SEVERITY_CONFIG: Record<string, { color: string; border: string }> = {
+  high:   { color: "#DC2626", border: "border-l-[#DC2626]" },
+  medium: { color: "#D97706", border: "border-l-[#D97706]" },
+  low:    { color: "#16A34A", border: "border-l-[#16A34A]" },
 };
 
-const PRIORITY_CONFIG: Record<string, { emoji: string; label: string }> = {
-  urgent:      { emoji: "🔴", label: "Urgent" },
-  important:   { emoji: "🟡", label: "Important" },
-  nice_to_have: { emoji: "🟢", label: "Nice to have" },
+const PRIORITY_CONFIG: Record<string, { dot: string; label: string }> = {
+  urgent:      { dot: "bg-[#DC2626]", label: "Urgent" },
+  important:   { dot: "bg-[#D97706]", label: "Important" },
+  nice_to_have: { dot: "bg-[#16A34A]", label: "Nice to have" },
 };
 
 const RESULT_CONFIG: Record<string, { color: string; bg: string; icon: typeof TrendingUp; label: string }> = {
@@ -914,13 +914,10 @@ export default function PageDetailClient({
                     key={i}
                     className={`border-l-4 ${sev.border} bg-[#F9FAFB] rounded-r-xl p-4`}
                   >
-                    <div className="flex items-start gap-2">
-                      <span>{sev.emoji}</span>
-                      <div>
-                        <p className="font-medium text-[#111827]">{cause.title}</p>
-                        <p className="text-sm text-[#4B5563] mt-1">{cause.description}</p>
-                        <p className="text-xs text-[#6B7280] mt-2 italic">Evidence: {cause.evidence}</p>
-                      </div>
+                    <div>
+                      <p className="font-medium text-[#111827]">{cause.title}</p>
+                      <p className="text-sm text-[#4B5563] mt-1">{cause.description}</p>
+                      <p className="text-xs text-[#6B7280] mt-2 italic">Evidence: {cause.evidence}</p>
                     </div>
                   </div>
                 );
@@ -1018,7 +1015,7 @@ export default function PageDetailClient({
                           onClick={() => toggleAction(i)}
                           className="flex-1 flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
                         >
-                          <span>{pri.emoji}</span>
+                          <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-[#111827]">{action.title}</p>
                             <p className="text-xs text-[#9CA3AF] mt-0.5">
@@ -1164,13 +1161,10 @@ export default function PageDetailClient({
                             const sev = SEVERITY_CONFIG[cause.severity] ?? SEVERITY_CONFIG["medium"]!;
                             return (
                               <div key={i} className={`border-l-4 ${sev.border} bg-white rounded-r-lg p-3`}>
-                                <div className="flex items-start gap-2">
-                                  <span className="text-sm">{sev.emoji}</span>
-                                  <div>
-                                    <p className="text-sm font-medium text-[#111827]">{cause.title}</p>
-                                    <p className="text-xs text-[#4B5563] mt-1">{cause.description}</p>
-                                    <p className="text-xs text-[#6B7280] mt-1.5 italic">Evidence: {cause.evidence}</p>
-                                  </div>
+                                <div>
+                                  <p className="text-sm font-medium text-[#111827]">{cause.title}</p>
+                                  <p className="text-xs text-[#4B5563] mt-1">{cause.description}</p>
+                                  <p className="text-xs text-[#6B7280] mt-1.5 italic">Evidence: {cause.evidence}</p>
                                 </div>
                               </div>
                             );
@@ -1256,7 +1250,7 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
                 }}
                 className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
               >
-                <span>{pri.emoji}</span>
+                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[#111827]">{action.title}</p>
                   <p className="text-xs text-[#9CA3AF] mt-0.5">

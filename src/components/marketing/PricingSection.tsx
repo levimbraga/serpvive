@@ -138,16 +138,16 @@ export default function PricingSection() {
         </Reveal>
 
         {/* Plan cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 items-stretch">
           {PLANS.map((plan) => {
             const price = plan.key === "free" ? 0 : isAnnual ? plan.annual : plan.monthly;
             const showSavings = isAnnual && plan.key !== "free";
             const annualSavings = (plan.monthly * 12) - plan.annualTotal;
 
             return (
-              <Reveal key={plan.key}>
+              <Reveal key={plan.key} className="h-full">
                 <div
-                  className={`rounded-xl p-6 sm:p-7 text-left border transition-all duration-300 hover:-translate-y-0.5 relative ${
+                  className={`rounded-xl p-6 sm:p-7 text-left border transition-all duration-300 hover:-translate-y-0.5 relative flex flex-col h-full ${
                     plan.popular
                       ? "border-[#3B82F6] shadow-[0_0_40px_rgba(59,130,246,0.1)]"
                       : "border-[#1E293B] hover:border-[#334155]"
@@ -214,6 +214,9 @@ export default function PricingSection() {
                     ))}
                   </ul>
 
+                  {/* Spacer to push CTA to bottom */}
+                  <div className="flex-1" />
+
                   {/* CTA */}
                   <a
                     href={plan.href}
@@ -224,7 +227,7 @@ export default function PricingSection() {
                         interval: isAnnual ? "annual" : "monthly",
                       })
                     }
-                    className={`block w-full text-center py-3 rounded-lg text-[14px] font-semibold no-underline transition-all duration-200 ${
+                    className={`block w-full text-center py-3 rounded-lg text-[14px] font-semibold no-underline transition-all duration-200 mt-auto ${
                       plan.outline
                         ? "text-[#94A3B8] border border-[#334155] hover:border-[#3B82F6] hover:text-[#3B82F6]"
                         : plan.popular
@@ -240,9 +243,9 @@ export default function PricingSection() {
           })}
 
           {/* Enterprise */}
-          <Reveal>
+          <Reveal className="h-full">
             <div
-              className="rounded-xl p-6 sm:p-7 text-left border border-[#1E293B] hover:border-[#334155] transition-all duration-300 hover:-translate-y-0.5"
+              className="rounded-xl p-6 sm:p-7 text-left border border-[#1E293B] hover:border-[#334155] transition-all duration-300 hover:-translate-y-0.5 flex flex-col h-full"
               style={{
                 background: "linear-gradient(180deg, rgba(15,18,25,1) 0%, rgba(15,18,25,0.7) 100%)",
               }}
@@ -276,6 +279,8 @@ export default function PricingSection() {
                   </li>
                 ))}
               </ul>
+              {/* Spacer to push CTA to bottom */}
+              <div className="flex-1" />
               <a
                 href="mailto:hello@serpvive.com"
                 onClick={() =>

@@ -58,9 +58,9 @@ const SEVERITY_CONFIG = {
 };
 
 const PRIORITY_CONFIG = {
-  urgent:       { emoji: "\uD83D\uDD34", label: "Urgent" },
-  important:    { emoji: "\uD83D\uDFE1", label: "Important" },
-  nice_to_have: { emoji: "\uD83D\uDFE2", label: "Nice to have" },
+  urgent:       { dot: "bg-[#DC2626]", label: "Urgent" },
+  important:    { dot: "bg-[#D97706]", label: "Important" },
+  nice_to_have: { dot: "bg-[#16A34A]", label: "Nice to have" },
 };
 
 type AnalyzeUrlClientProps = {
@@ -411,7 +411,7 @@ function BriefCard({ brief }: { brief: BriefData }) {
                 onClick={() => setExpandedIdx(isExpanded ? null : i)}
                 className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
               >
-                <span className="text-sm">{pri.emoji}</span>
+                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-medium text-[#111827] truncate">{action.title}</h3>
                   <div className="flex items-center gap-3 text-xs text-[#9CA3AF] mt-0.5">

@@ -54,10 +54,10 @@ const SEVERITY_CONFIG: Record<string, { color: string; bg: string; label: string
   low:    { color: "#16A34A", bg: "#F0FDF4", label: "Low" },
 };
 
-const PRIORITY_CONFIG: Record<string, { emoji: string; label: string }> = {
-  urgent:       { emoji: "\uD83D\uDD34", label: "Urgent" },
-  important:    { emoji: "\uD83D\uDFE1", label: "Important" },
-  nice_to_have: { emoji: "\uD83D\uDFE2", label: "Nice to have" },
+const PRIORITY_CONFIG: Record<string, { dot: string; label: string }> = {
+  urgent:       { dot: "bg-[#DC2626]", label: "Urgent" },
+  important:    { dot: "bg-[#D97706]", label: "Important" },
+  nice_to_have: { dot: "bg-[#16A34A]", label: "Nice to have" },
 };
 
 type Props = {
@@ -296,7 +296,7 @@ export default function AnalysisResultView({
 
           <div className="space-y-2">
             {brief.actions.map((action, i) => {
-              const pri = PRIORITY_CONFIG[action.priority] ?? { emoji: "\uD83D\uDFE1", label: "Important" };
+              const pri = PRIORITY_CONFIG[action.priority] ?? { dot: "bg-[#D97706]", label: "Important" };
               const isExpanded = expandedIdx === i;
               return (
                 <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
@@ -304,7 +304,7 @@ export default function AnalysisResultView({
                     onClick={() => setExpandedIdx(isExpanded ? null : i)}
                     className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
                   >
-                    <span className="text-sm">{pri.emoji}</span>
+                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium text-[#111827] truncate">{action.title}</h3>
                       <div className="flex items-center gap-3 text-xs text-[#9CA3AF] mt-0.5">

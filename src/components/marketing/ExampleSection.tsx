@@ -80,15 +80,15 @@ export default function ExampleSection() {
                 </div>
                 <div className="px-5 py-4 flex flex-col gap-2.5">
                   {[
-                    { priority: "high", emoji: "\uD83D\uDD34", text: 'Update title \u2192 "Best PM Tools in 2026 (Compared)"' },
-                    { priority: "high", emoji: "\uD83D\uDD34", text: "Add ~400 word section about AI features in PM tools" },
-                    { priority: "high", emoji: "\uD83D\uDD34", text: "Fix Monday.com pricing: $8 \u2192 $12/seat" },
-                    { priority: "med", emoji: "\uD83D\uDFE1", text: "Add comparison table (12 tools \u00D7 6 columns)" },
-                    { priority: "med", emoji: "\uD83D\uDFE1", text: "Fix 2 broken external links" },
-                    { priority: "low", emoji: "\uD83D\uDFE2", text: "Update meta description with 2026 keywords" },
+                    { priority: "high", dot: "bg-[#DC2626]", text: 'Update title \u2192 "Best PM Tools in 2026 (Compared)"' },
+                    { priority: "high", dot: "bg-[#DC2626]", text: "Add ~400 word section about AI features in PM tools" },
+                    { priority: "high", dot: "bg-[#DC2626]", text: "Fix Monday.com pricing: $8 \u2192 $12/seat" },
+                    { priority: "med", dot: "bg-[#D97706]", text: "Add comparison table (12 tools \u00D7 6 columns)" },
+                    { priority: "med", dot: "bg-[#D97706]", text: "Fix 2 broken external links" },
+                    { priority: "low", dot: "bg-[#16A34A]", text: "Update meta description with 2026 keywords" },
                   ].map((action) => (
-                    <div key={action.text} className="flex items-start gap-2.5">
-                      <span className="text-[13px] flex-shrink-0">{action.emoji}</span>
+                    <div key={action.text} className="flex items-center gap-2.5">
+                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${action.dot}`} />
                       <span className="text-[13px] sm:text-[14px] text-[#475569] leading-relaxed">{action.text}</span>
                     </div>
                   ))}
@@ -100,7 +100,7 @@ export default function ExampleSection() {
                 <span className="text-[16px] sm:text-[18px] font-bold text-[#64748B]">167 clicks/mo</span>
                 <span className="text-[#94A3B8]">&rarr;</span>
                 <span className="text-[16px] sm:text-[18px] font-bold text-[#22C55E]">298 clicks/mo</span>
-                <span className="text-[14px] font-bold text-[#22C55E]">(+78%) &#x2705;</span>
+                <span className="text-[14px] font-bold text-[#22C55E]">(+78%)</span>
               </div>
             </div>
           </div>
