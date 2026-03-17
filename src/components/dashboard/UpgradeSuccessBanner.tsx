@@ -22,7 +22,7 @@ export default function UpgradeSuccessBanner() {
   if (!show) return null;
 
   return (
-    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+    <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg px-5 py-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <CheckCircle2 size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
         <div>

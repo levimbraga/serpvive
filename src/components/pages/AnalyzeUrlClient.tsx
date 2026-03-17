@@ -157,9 +157,9 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
           <ArrowLeft size={14} strokeWidth={1.5} /> Back to Pages
         </Link>
 
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-[#EFF6FF] flex items-center justify-center">
               <Zap size={20} strokeWidth={1.5} className="text-[#3B82F6]" />
             </div>
             <div>
@@ -289,7 +289,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
       </div>
 
       {/* URL + keyword header */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-5">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
             Page Analysis
@@ -313,7 +313,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
 // ── DiagnosisCard ──
 function DiagnosisCard({ diagnosis }: { diagnosis: DiagnosisData }) {
   return (
-    <div className="bg-white rounded-xl border-2 border-[#7C3AED]/20 p-6 space-y-5">
+    <div className="bg-white rounded-lg border-2 border-[#7C3AED]/20 p-6 space-y-5">
       <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
         <Brain size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
         Content Analysis
@@ -389,7 +389,7 @@ function BriefCard({ brief }: { brief: BriefData }) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
+    <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
           <Sparkles size={18} strokeWidth={1.5} className="text-[#D97706]" />

@@ -128,7 +128,7 @@ export default function DemoClient() {
       </div>
 
       {/* Generator form */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         {status === "loading" ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
@@ -220,7 +220,7 @@ export default function DemoClient() {
             <button
               onClick={handleGenerate}
               disabled={!url.trim() || keyword.trim().length < 2}
-              className="w-full h-10 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full h-10 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Zap size={16} strokeWidth={1.5} /> Generate Demo Analysis
             </button>
@@ -235,7 +235,7 @@ export default function DemoClient() {
       {demos.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-[#111827] mb-3">Previous Demos</h2>
-          <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+          <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>

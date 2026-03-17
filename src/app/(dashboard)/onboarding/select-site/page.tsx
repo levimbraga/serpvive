@@ -98,7 +98,7 @@ export default function SelectSitePage() {
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-sm text-red-700">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -106,11 +106,11 @@ export default function SelectSitePage() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-xl bg-white border border-[#E5E7EB] animate-pulse" />
+              <div key={i} className="h-16 rounded-lg bg-white border border-[#E5E7EB] animate-pulse" />
             ))}
           </div>
         ) : properties.length === 0 ? (
-          <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 text-center">
+          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 text-center">
             <p className="text-[#4B5563] mb-2">No sites found in your Search Console.</p>
             <p className="text-sm text-[#9CA3AF]">
               Add a site at{" "}
@@ -127,7 +127,7 @@ export default function SelectSitePage() {
                 <button
                   key={property.siteUrl}
                   onClick={() => setSelected(property.siteUrl)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 bg-white text-left transition-all ${
+                  className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 bg-white text-left transition-all ${
                     selected === property.siteUrl
                       ? "border-[#3B82F6] shadow-md"
                       : "border-[#E5E7EB] hover:border-[#D1D5DB]"
@@ -161,7 +161,7 @@ export default function SelectSitePage() {
             <button
               onClick={handleSelect}
               disabled={!selected || submitting}
-              className="w-full h-12 mt-6 rounded-xl bg-[#3B82F6] text-white text-[15px] font-semibold hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full h-12 mt-6 rounded-lg bg-[#3B82F6] text-white text-[15px] font-semibold hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "Starting import..." : "Continue with this site"}
             </button>

@@ -34,7 +34,7 @@ export default function FeedbackClient({ email, plan }: { email: string; plan: s
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         {status === "sent" ? (
           <div className="text-center py-8">
             <CheckCircle2 size={40} strokeWidth={1.5} className="text-[#16A34A] mx-auto mb-3" />

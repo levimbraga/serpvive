@@ -80,7 +80,7 @@ export default function OnboardingTour() {
     <button
       onClick={startTour}
       title="Take a tour"
-      className="fixed bottom-5 right-5 z-50 w-10 h-10 rounded-full bg-[#0D9488] hover:bg-[#0F766E] text-white shadow-lg flex items-center justify-center transition-colors"
+      className="fixed bottom-5 right-5 z-50 w-10 h-10 rounded-full bg-[#3B82F6] hover:bg-[#2563EB] text-white shadow-lg flex items-center justify-center transition-colors"
     >
       <HelpCircle size={20} strokeWidth={1.5} />
     </button>

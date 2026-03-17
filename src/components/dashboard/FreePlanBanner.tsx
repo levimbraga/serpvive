@@ -18,7 +18,7 @@ export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC
       : "unknown";
 
     return (
-      <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+      <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg px-5 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <AlertTriangle size={20} strokeWidth={1.5} className="text-[#DC2626] flex-shrink-0" />
           <div>
@@ -32,7 +32,7 @@ export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC
         </div>
         <Link
           href="/settings#upgrade-section"
-          className="flex items-center gap-1 h-9 px-4 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors whitespace-nowrap"
+          className="flex items-center gap-1 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors whitespace-nowrap"
         >
           Upgrade Now
         </Link>
@@ -41,7 +41,7 @@ export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC
   }
 
   return (
-    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-5 py-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <Zap size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
         <div>

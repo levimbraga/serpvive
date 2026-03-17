@@ -22,9 +22,9 @@ export default function OnboardingChoosePage() {
         {/* Card 1 — Quick Analysis */}
         <Link
           href="/pages/analyze"
-          className="group bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 text-left transition-all hover:shadow-lg"
+          className="group bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 text-left transition-all hover:shadow-lg"
         >
-          <div className="w-12 h-12 rounded-xl bg-[#EFF6FF] flex items-center justify-center mb-4 group-hover:bg-[#DBEAFE] transition-colors">
+          <div className="w-12 h-12 rounded-lg bg-[#EFF6FF] flex items-center justify-center mb-4 group-hover:bg-[#DBEAFE] transition-colors">
             <Zap size={24} strokeWidth={1.5} className="text-[#3B82F6]" />
           </div>
           <h2 className="text-lg font-semibold text-[#111827] mb-2">
@@ -42,10 +42,10 @@ export default function OnboardingChoosePage() {
         {/* Card 2 — Connect GSC */}
         <Link
           href="/onboarding"
-          className="group bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#0D9488] p-6 text-left transition-all hover:shadow-lg"
+          className="group bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 text-left transition-all hover:shadow-lg"
         >
-          <div className="w-12 h-12 rounded-xl bg-[#F0FDFA] flex items-center justify-center mb-4 group-hover:bg-[#CCFBF1] transition-colors">
-            <BarChart3 size={24} strokeWidth={1.5} className="text-[#0D9488]" />
+          <div className="w-12 h-12 rounded-lg bg-[#EFF6FF] flex items-center justify-center mb-4 group-hover:bg-[#DBEAFE] transition-colors">
+            <BarChart3 size={24} strokeWidth={1.5} className="text-[#3B82F6]" />
           </div>
           <h2 className="text-lg font-semibold text-[#111827] mb-2">
             Connect Google Search Console
@@ -54,7 +54,7 @@ export default function OnboardingChoosePage() {
             Automatic monitoring, Health Score, and decay alerts
             for your entire blog.
           </p>
-          <span className="inline-flex items-center gap-2 text-sm font-medium text-[#0D9488] group-hover:gap-3 transition-all">
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-[#3B82F6] group-hover:gap-3 transition-all">
             Connect GSC <ArrowRight size={16} strokeWidth={1.5} />
           </span>
         </Link>

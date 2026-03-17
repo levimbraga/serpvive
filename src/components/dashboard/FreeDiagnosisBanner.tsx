@@ -47,8 +47,8 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
 
   if (timedOut) {
     return (
-      <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-5 py-4 flex items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#FEF9C3] flex items-center justify-center flex-shrink-0">
+      <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-lg px-5 py-4 flex items-center gap-4">
+        <div className="w-10 h-10 rounded-lg bg-[#FEF9C3] flex items-center justify-center flex-shrink-0">
           <AlertCircle size={20} strokeWidth={1.5} className="text-[#D97706]" />
         </div>
         <div className="flex-1">
@@ -71,8 +71,8 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
 
   if (isProcessing) {
     return (
-      <div className="bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl px-5 py-4 flex items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#EDE9FE] flex items-center justify-center flex-shrink-0">
+      <div className="bg-[#F5F3FF] border border-[#DDD6FE] rounded-lg px-5 py-4 flex items-center gap-4">
+        <div className="w-10 h-10 rounded-lg bg-[#EDE9FE] flex items-center justify-center flex-shrink-0">
           <Loader2 size={20} strokeWidth={1.5} className="text-[#7C3AED] animate-spin" />
         </div>
         <div>
@@ -99,9 +99,9 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
   }
 
   return (
-    <div className="relative bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl px-5 py-4 hover:bg-[#EDE9FE] transition-colors group">
+    <div className="relative bg-[#F5F3FF] border border-[#DDD6FE] rounded-lg px-5 py-4 hover:bg-[#EDE9FE] transition-colors group">
       <Link href={`/pages/${pageId}`} className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#EDE9FE] flex items-center justify-center flex-shrink-0 group-hover:bg-[#DDD6FE] transition-colors">
+        <div className="w-10 h-10 rounded-lg bg-[#EDE9FE] flex items-center justify-center flex-shrink-0 group-hover:bg-[#DDD6FE] transition-colors">
           <Sparkles size={20} strokeWidth={1.5} className="text-[#7C3AED]" />
         </div>
         <div className="flex-1 min-w-0">

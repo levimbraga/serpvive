@@ -151,7 +151,7 @@ export default function PagesTable({ pages, timeZone = "UTC" }: { pages: PageDat
             placeholder="Search by URL..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-            className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
+            className="w-full h-10 pl-9 pr-9 rounded-lg border border-[#E5E7EB] bg-white text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]"
           />
           {search && (
             <button
@@ -181,7 +181,7 @@ export default function PagesTable({ pages, timeZone = "UTC" }: { pages: PageDat
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -214,7 +214,7 @@ export default function PagesTable({ pages, timeZone = "UTC" }: { pages: PageDat
                 return (
                   <tr
                     key={page.id}
-                    className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors"
+                    className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors duration-150"
                   >
                     <td className="px-5 py-3">
                       <Link

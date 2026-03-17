@@ -42,13 +42,13 @@ export default function RecentResults({ results, measuring = [], timeZone = "UTC
       </div>
 
       {!hasContent ? (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] px-5 py-8 text-center">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] px-5 py-8 text-center">
           <p className="text-sm text-[#6B7280]">
             No results yet. Refresh a post and check back in 28 days!
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
           {results.map((r, i) => {
             const cfg = STATUS_CONFIG[r.resultStatus];
             const Icon = cfg.icon;

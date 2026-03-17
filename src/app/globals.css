@@ -119,8 +119,8 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /* SerpVive Design System */
-  --brand:            #0D9488;
-  --brand-hover:      #0F766E;
+  --brand:            #3B82F6;
+  --brand-hover:      #2563EB;
   --ai:               #7C3AED;
   --ai-hover:         #6D28D9;
   --ai-light:         #F5F3FF;
@@ -563,7 +563,7 @@ section, nav, footer { position: relative; z-index: 1; }
 .driver-popover.serpvive-tour-popover .driver-popover-progress-text {
   font-size: 12px;
   font-weight: 600;
-  color: #0D9488;
+  color: #3B82F6;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -583,7 +583,7 @@ section, nav, footer { position: relative; z-index: 1; }
   font-size: 14px;
   font-weight: 500;
   color: white;
-  background: #0D9488;
+  background: #3B82F6;
   border: none;
   border-radius: 8px;
   padding: 6px 16px;
@@ -592,7 +592,7 @@ section, nav, footer { position: relative; z-index: 1; }
 }
 .driver-popover.serpvive-tour-popover .driver-popover-next-btn:hover,
 .driver-popover.serpvive-tour-popover .driver-popover-close-btn:hover {
-  background: #0F766E;
+  background: #2563EB;
 }
 .driver-popover.serpvive-tour-popover .driver-popover-arrow {
   border: 1px solid #E5E7EB;

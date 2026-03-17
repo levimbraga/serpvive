@@ -35,7 +35,7 @@ export default function RunEngineButton() {
       <button
         onClick={handleRun}
         disabled={loading}
-        className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-[#3B82F6] text-white text-sm font-semibold hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <RefreshCw size={16} strokeWidth={1.5} className={loading ? "animate-spin" : ""} />
         {loading ? "Running..." : "Run Engine"}

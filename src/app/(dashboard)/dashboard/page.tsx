@@ -78,7 +78,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <a
             href="/pages/analyze"
-            className="bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-md"
+            className="bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-sm"
           >
             <div className="flex items-center gap-3 mb-3">
               <Zap size={20} strokeWidth={1.5} className="text-[#3B82F6]" />
@@ -91,10 +91,10 @@ export default async function DashboardPage() {
 
           <a
             href="/onboarding"
-            className="bg-white rounded-xl border-2 border-[#E5E7EB] hover:border-[#0D9488] p-6 transition-all hover:shadow-md"
+            className="bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-sm"
           >
             <div className="flex items-center gap-3 mb-3">
-              <BarChart3 size={20} strokeWidth={1.5} className="text-[#0D9488]" />
+              <BarChart3 size={20} strokeWidth={1.5} className="text-[#3B82F6]" />
               <h2 className="text-base font-semibold text-[#111827]">Connect Google Search Console</h2>
             </div>
             <p className="text-sm text-[#4B5563]">
@@ -266,12 +266,12 @@ export default async function DashboardPage() {
 
       {/* Top section: Health Score + Usage */}
       <div className="flex flex-col lg:grid lg:grid-cols-[1fr_300px] gap-6">
-        <div data-tour="health-score" className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex items-center justify-center">
+        <div data-tour="health-score" className="bg-white rounded-lg border border-[#E5E7EB] p-8 flex items-center justify-center">
           {hasEngineRun ? (
             <div className="flex flex-col items-center gap-4">
               <HealthScoreRing score={healthScore} delta={healthDelta} />
               {allPagesNew && (
-                <div className="flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl px-4 py-3 max-w-sm">
+                <div className="flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg px-4 py-3 max-w-sm">
                   <Sparkles size={18} strokeWidth={1.5} className="text-[#2563EB] flex-shrink-0" />
                   <p className="text-sm text-[#1E40AF]">
                     Your site is new! Decay analysis starts when we have 3+ months of traffic data. You can still analyze individual pages.
@@ -292,7 +292,7 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <UsageMeter used={diagnosesUsed} limit={diagnosesLimit} plan={plan} />
           {hasEngineRun && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-5">
+            <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
               <p className="text-xs text-[#9CA3AF] mb-1">Last engine run</p>
               <p className="text-sm text-[#111827] font-medium">
                 {new Date(site.last_engine_run_at!).toLocaleDateString("en-US", {

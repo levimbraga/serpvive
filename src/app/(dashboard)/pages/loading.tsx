@@ -5,8 +5,8 @@ export default function PagesLoading() {
     <div>
       <Skeleton className="w-20 h-7 mb-4" />
       <div className="space-y-3">
-        <Skeleton className="w-64 h-10 rounded-xl" />
-        <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+        <Skeleton className="w-64 h-10 rounded-lg" />
+        <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
           <div className="px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
             <Skeleton className="w-full h-4" />
           </div>

@@ -48,7 +48,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
 
   if (sorted.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center">
         <p className="text-lg mb-1">All clear!</p>
         <p className="text-[#6B7280]">No pages are losing traffic right now. We&apos;ll alert you if anything changes.</p>
       </div>
@@ -59,7 +59,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
   const hasMore = sorted.length > PAGE_SIZE;
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+    <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
       {/* Header */}
       <div className="hidden md:grid grid-cols-[1fr_100px_100px_100px_120px] gap-4 px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
         <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Page</span>
@@ -80,7 +80,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
           <div key={page.id}>
           <Link
             href={`/pages/${page.id}`}
-            className="hidden md:grid grid-cols-[1fr_100px_100px_100px_120px] gap-4 px-5 py-3.5 border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors items-center"
+            className="hidden md:grid grid-cols-[1fr_100px_100px_100px_120px] gap-4 px-5 py-3.5 border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors duration-150 items-center"
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div

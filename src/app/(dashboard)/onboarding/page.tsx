@@ -28,14 +28,14 @@ export default function OnboardingConnectPage() {
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-sm text-red-700">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-sm text-red-700">
             {ERROR_MESSAGES[error] ?? "An error occurred. Please try again."}
           </div>
         )}
 
         <a
           href="/api/auth/google-gsc"
-          className="inline-flex items-center justify-center gap-3 w-full h-14 rounded-xl bg-white border-2 border-[#E5E7EB] text-[#111827] text-[15px] font-semibold hover:border-[#3B82F6] hover:shadow-md transition-all"
+          className="inline-flex items-center justify-center gap-3 w-full h-14 rounded-lg bg-white border-2 border-[#E5E7EB] text-[#111827] text-[15px] font-semibold hover:border-[#3B82F6] hover:shadow-md transition-all"
         >
           <svg viewBox="0 0 24 24" width="22" height="22">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>

@@ -250,7 +250,7 @@ export default function PageDetailClient({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ["#16A34A", "#0D9488", "#2563EB", "#7C3AED"],
+      colors: ["#16A34A", "#3B82F6", "#2563EB", "#7C3AED"],
     });
   }, []);
 
@@ -427,7 +427,7 @@ export default function PageDetailClient({
       </Link>
 
       {/* Page header */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="min-w-0 w-full sm:w-auto">
             <div className="flex items-center gap-3 mb-2">
@@ -460,7 +460,7 @@ export default function PageDetailClient({
             <button
               onClick={handleDiagnose}
               disabled={loading || atLimit}
-              className={`flex items-center gap-2 h-10 px-5 rounded-xl text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`flex items-center gap-2 h-10 px-5 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 isNew
                   ? "bg-[#2563EB] hover:bg-[#1D4ED8]"
                   : "bg-[#D97706] hover:bg-[#B45309]"
@@ -564,11 +564,11 @@ export default function PageDetailClient({
 
       {/* Refresh tracking card */}
       {refresh && !loading && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
           {/* Confetti success message */}
           {showConfettiMsg && refresh.result_status === "pending" && (
             <div className="space-y-3 mb-4">
-              <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4">
+              <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
                 <PartyPopper size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-[#16A34A]">Great! We&apos;ll measure your results in 28 days.</p>
@@ -577,7 +577,7 @@ export default function PageDetailClient({
               </div>
 
               {/* Post-refresh info tip */}
-              <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4">
+              <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <BarChart3 size={18} strokeWidth={1.5} className="text-[#2563EB] flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-[#1E40AF] leading-relaxed">
@@ -616,7 +616,7 @@ export default function PageDetailClient({
                 Want to see how your changes stack up?{" "}
                 <button
                   onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="text-[#0D9488] hover:text-[#0F766E] font-medium transition-colors"
+                  className="text-[#3B82F6] hover:text-[#2563EB] font-medium transition-colors"
                 >
                   Run a new analysis &rarr;
                 </button>
@@ -688,7 +688,7 @@ export default function PageDetailClient({
 
       {/* Loading state — step-by-step progress */}
       {loading && (
-        <div className="bg-white rounded-xl border-2 border-[#7C3AED]/20 p-6">
+        <div className="bg-white rounded-lg border-2 border-[#7C3AED]/20 p-6">
           <div className="flex items-center justify-between mb-5">
             <p className="text-[#111827] font-semibold">Analyzing your page...</p>
             <span className="text-xs text-[#9CA3AF] tabular-nums">
@@ -736,7 +736,7 @@ export default function PageDetailClient({
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -745,7 +745,7 @@ export default function PageDetailClient({
       {diagnosis && !loading && (
         <>
           {/* Diagnosis card */}
-          <div className="bg-white rounded-xl border-2 border-[#7C3AED]/30 p-6">
+          <div className="bg-white rounded-lg border-2 border-[#7C3AED]/30 p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Zap size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
@@ -841,7 +841,7 @@ export default function PageDetailClient({
 
             {/* Healthy page — no causes */}
             {diagnosis.diagnosis.causes.length === 0 && (
-              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5">
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-5">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 size={22} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
                   <div className="space-y-3">
@@ -881,7 +881,7 @@ export default function PageDetailClient({
 
             {/* Strengths — always shown when causes > 0 */}
             {diagnosis.diagnosis.causes.length > 0 && diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
-              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-1">
+              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4 mb-1">
                 <p className="text-xs font-semibold text-[#166534] uppercase tracking-wider mb-2">What you&apos;re doing right</p>
                 <ul className="space-y-1.5">
                   {diagnosis.diagnosis.strengths.map((s, i) => (
@@ -963,7 +963,7 @@ export default function PageDetailClient({
 
           {/* Refresh Brief — empty (healthy page) */}
           {diagnosis.refresh_brief && diagnosis.refresh_brief.actions.length === 0 && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+            <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
               <h2 className="text-lg font-semibold text-[#111827] mb-3">Refresh Brief</h2>
               <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
                 <div className="flex items-start gap-3">
@@ -978,7 +978,7 @@ export default function PageDetailClient({
 
           {/* Refresh Brief */}
           {diagnosis.refresh_brief && diagnosis.refresh_brief.actions.length > 0 && (
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+            <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-[#111827]">Refresh Brief</h2>
                 <span className="text-xs text-[#9CA3AF]">
@@ -993,7 +993,7 @@ export default function PageDetailClient({
                   const isChecked = checkedActions.has(i);
 
                   return (
-                    <div key={i} className="border border-[#E5E7EB] rounded-xl overflow-hidden">
+                    <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
                       <div className="flex items-center">
                         {/* Checkbox — only show if no pending/completed refresh */}
                         {!refresh && (
@@ -1077,7 +1077,7 @@ export default function PageDetailClient({
                   <button
                     onClick={handleMarkAsUpdated}
                     disabled={refreshLoading}
-                    className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 h-12 rounded-lg bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {refreshLoading ? (
                       <>
@@ -1124,7 +1124,7 @@ export default function PageDetailClient({
               const effort = prev.refresh_brief?.total_effort_hours ?? 0;
 
               return (
-                <AccordionItem key={prev.id} className="bg-white rounded-xl border border-[#E5E7EB] mb-2 overflow-hidden">
+                <AccordionItem key={prev.id} className="bg-white rounded-lg border border-[#E5E7EB] mb-2 overflow-hidden">
                   <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-[#F9FAFB]">
                     <div className="flex-1 min-w-0 text-left">
                       <p className="text-sm font-medium text-[#111827]">
@@ -1150,7 +1150,7 @@ export default function PageDetailClient({
                   <AccordionContent className="px-5 pb-5">
                     <div className="space-y-4 pt-2">
                       {/* Diagnosis */}
-                      <div className="bg-[#F9FAFB] rounded-xl border border-[#E5E7EB] p-5">
+                      <div className="bg-[#F9FAFB] rounded-lg border border-[#E5E7EB] p-5">
                         <div className="flex items-center gap-2 mb-3">
                           <Zap size={16} strokeWidth={1.5} className="text-[#7C3AED]" />
                           <p className="text-sm font-semibold text-[#111827]">
@@ -1199,7 +1199,7 @@ export default function PageDetailClient({
 
       {/* Empty state — no diagnosis yet */}
       {!diagnosis && !loading && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center">
           <Zap size={32} strokeWidth={1.5} className="text-[#9CA3AF] mx-auto mb-3" />
           <p className="text-[#6B7280]">
             {isNew
@@ -1226,7 +1226,7 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+    <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-[#111827]">Refresh Brief</h2>
         <span className="text-xs text-[#9CA3AF]">
@@ -1240,7 +1240,7 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
           const isExpanded = expanded.has(i);
 
           return (
-            <div key={i} className="border border-[#E5E7EB] rounded-xl overflow-hidden">
+            <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
               <button
                 onClick={() => {
                   setExpanded((prev) => {

@@ -66,7 +66,7 @@ export default function OnboardingDay3({
 
             <Section style={ctaSection}>
               <Button
-                style={{ ...ctaButton, backgroundColor: "#0D9488" }}
+                style={{ ...ctaButton, backgroundColor: "#3B82F6" }}
                 href={`${dashboardUrl.replace(/\/dashboard.*/, "")}/settings`}
               >
                 Upgrade Now

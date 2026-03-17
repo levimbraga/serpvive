@@ -51,7 +51,7 @@ export default function RefreshesClient({ items, timeZone = "UTC" }: { items: Re
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-semibold text-[#111827]">Refresh History</h1>
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-12 text-center">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-12 text-center">
           <RefreshCw size={40} strokeWidth={1.5} className="text-[#D1D5DB] mx-auto mb-4" />
           <p className="text-[#6B7280] mb-2">No refreshes yet.</p>
           <p className="text-sm text-[#9CA3AF] max-w-md mx-auto">
@@ -89,7 +89,7 @@ export default function RefreshesClient({ items, timeZone = "UTC" }: { items: Re
             : null;
 
           return (
-            <div key={item.id} className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+            <div key={item.id} className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
               {/* Row header */}
               <button
                 onClick={() => setExpandedId(isExpanded ? null : item.id)}
@@ -211,7 +211,7 @@ export default function RefreshesClient({ items, timeZone = "UTC" }: { items: Re
       </div>
 
       {filtered.length === 0 && search && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center">
           <p className="text-sm text-[#6B7280]">No refreshes match your search.</p>
         </div>
       )}

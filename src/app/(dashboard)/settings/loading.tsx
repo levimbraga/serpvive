@@ -6,7 +6,7 @@ export default function SettingsLoading() {
       <Skeleton className="w-24 h-7" />
 
       {/* Connected Sites */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="w-32 h-5" />
           <Skeleton className="w-12 h-4" />
@@ -24,7 +24,7 @@ export default function SettingsLoading() {
       </div>
 
       {/* Account */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 space-y-4">
         <Skeleton className="w-20 h-5" />
         <div className="divide-y divide-[#F3F4F6]">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -37,7 +37,7 @@ export default function SettingsLoading() {
       </div>
 
       {/* Plan & Usage */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="w-28 h-5" />
           <Skeleton className="w-24 h-5" />

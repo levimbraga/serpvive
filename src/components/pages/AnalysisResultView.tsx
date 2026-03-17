@@ -99,7 +99,7 @@ export default function AnalysisResultView({
       )}
 
       {/* Header */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-5">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
             {badge}
@@ -121,7 +121,7 @@ export default function AnalysisResultView({
 
       {/* Diagnosis */}
       {diagnosis.summary && (
-        <div className="bg-white rounded-xl border-2 border-[#7C3AED]/20 p-6 space-y-5">
+        <div className="bg-white rounded-lg border-2 border-[#7C3AED]/20 p-6 space-y-5">
           <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
             <Brain size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
             Content Analysis
@@ -158,7 +158,7 @@ export default function AnalysisResultView({
 
           {/* Healthy page — no causes */}
           {(!diagnosis.causes || diagnosis.causes.length === 0) && (
-            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5">
+            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-5">
               <div className="flex items-start gap-3">
                 <CheckCircle2 size={22} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
                 <div className="space-y-3">
@@ -198,7 +198,7 @@ export default function AnalysisResultView({
 
           {/* Strengths — always shown when causes > 0 */}
           {diagnosis.causes && diagnosis.causes.length > 0 && diagnosis.strengths && diagnosis.strengths.length > 0 && (
-            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-1">
+            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4 mb-1">
               <p className="text-xs font-semibold text-[#166534] uppercase tracking-wider mb-2">What you&apos;re doing right</p>
               <ul className="space-y-1.5">
                 {diagnosis.strengths.map((s, i) => (
@@ -265,7 +265,7 @@ export default function AnalysisResultView({
 
       {/* Brief — empty actions (healthy page) */}
       {brief && (!brief.actions || brief.actions.length === 0) && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
           <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2 mb-3">
             <Sparkles size={18} strokeWidth={1.5} className="text-[#D97706]" />
             Refresh Brief
@@ -283,7 +283,7 @@ export default function AnalysisResultView({
 
       {/* Brief */}
       {brief?.actions && brief.actions.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-[#111827] flex items-center gap-2">
               <Sparkles size={18} strokeWidth={1.5} className="text-[#D97706]" />

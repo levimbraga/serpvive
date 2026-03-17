@@ -37,7 +37,7 @@ export default async function ExternalAnalysesList({ userId, timeZone }: Externa
             <Link
               key={a.id}
               href={`/pages/analyze/${a.id}`}
-              className="block bg-white rounded-xl border border-[#E5E7EB] hover:border-[#3B82F6] p-4 transition-colors"
+              className="block bg-white rounded-lg border border-[#E5E7EB] hover:border-[#3B82F6] p-4 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">

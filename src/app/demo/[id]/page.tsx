@@ -69,7 +69,7 @@ export default async function DemoPage({ params }: Props) {
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center h-11 px-6 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
           >
             Get Started Free &rarr;
           </Link>
@@ -155,13 +155,13 @@ export default async function DemoPage({ params }: Props) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center h-11 px-8 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
+              className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
             >
               Get Started Free &rarr;
             </Link>
             <Link
               href="/#pricing"
-              className="inline-flex items-center justify-center h-11 px-8 rounded-xl border border-[#E5E7EB] hover:border-[#3B82F6] text-[#374151] text-sm font-medium transition-colors"
+              className="inline-flex items-center justify-center h-11 px-8 rounded-lg border border-[#E5E7EB] hover:border-[#3B82F6] text-[#374151] text-sm font-medium transition-colors"
             >
               See Pricing
             </Link>

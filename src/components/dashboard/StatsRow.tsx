@@ -30,10 +30,10 @@ export default function StatsRow({ totalPages, healthy, warning, critical, dead 
       {stats.map(({ key, label, icon: Icon, color, bgColor }) => (
         <div
           key={key}
-          className="bg-white rounded-xl border border-[#E5E7EB] p-4 flex items-center gap-3"
+          className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center gap-3 transition-shadow duration-150 hover:shadow-sm"
         >
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            className="w-9 h-9 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: bgColor }}
           >
             <Icon size={20} strokeWidth={1.5} style={{ color }} />

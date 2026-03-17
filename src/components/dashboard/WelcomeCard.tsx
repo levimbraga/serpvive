@@ -130,7 +130,7 @@ export default function WelcomeCard({
   const allDone = engineStep === "done" && diagStep === "done" && diagPageId;
 
   return (
-    <div className="relative bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-sm">
+    <div className="relative bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
       {/* Dismiss button */}
       {allDone && (
         <button
@@ -207,7 +207,7 @@ export default function WelcomeCard({
         <div>
           <button
             onClick={handleRunEngine}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-semibold transition-colors"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
           >
             <Play size={16} strokeWidth={1.5} />
             Run Decay Engine
@@ -221,7 +221,7 @@ export default function WelcomeCard({
       {engineStep === "running" && (
         <button
           disabled
-          className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-[#0D9488] text-white text-sm font-semibold opacity-70 cursor-not-allowed"
+          className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold opacity-70 cursor-not-allowed"
         >
           <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
           Running...
@@ -239,7 +239,7 @@ export default function WelcomeCard({
         <div className="flex items-center gap-3">
           <Link
             href={`/pages/${diagPageId}`}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-xl bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
           >
             View diagnosis
             <ArrowRight size={16} strokeWidth={1.5} />

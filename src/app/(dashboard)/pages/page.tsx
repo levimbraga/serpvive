@@ -46,7 +46,7 @@ export default async function PagesListPage() {
             <Zap size={14} strokeWidth={1.5} /> Analyze any page
           </Link>
         </div>
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center">
           <p className="text-[#6B7280] mb-2">No site connected yet.</p>
           <p className="text-sm text-[#9CA3AF]">
             <Link href="/onboarding" className="text-[#3B82F6] hover:text-[#2563EB] font-medium">

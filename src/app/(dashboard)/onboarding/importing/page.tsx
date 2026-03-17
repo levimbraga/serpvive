@@ -81,7 +81,7 @@ export default function ImportingPage() {
             </p>
             <button
               onClick={() => router.push("/onboarding")}
-              className="h-12 px-8 rounded-xl bg-[#3B82F6] text-white text-[15px] font-semibold hover:bg-[#2563EB] transition-colors"
+              className="h-12 px-8 rounded-lg bg-[#3B82F6] text-white text-[15px] font-semibold hover:bg-[#2563EB] transition-colors"
             >
               Try again
             </button>

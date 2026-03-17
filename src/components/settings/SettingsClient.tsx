@@ -38,7 +38,7 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> 
 
 const PLAN_DISPLAY: Record<PlanName, { label: string; monthlyPrice: string; annualPrice: string; color: string }> = {
   free:    { label: "Free", monthlyPrice: "Free", annualPrice: "Free", color: "#6B7280" },
-  starter: { label: "Starter", monthlyPrice: "$29/mo", annualPrice: "$24/mo", color: "#0D9488" },
+  starter: { label: "Starter", monthlyPrice: "$29/mo", annualPrice: "$24/mo", color: "#3B82F6" },
   pro:     { label: "Pro", monthlyPrice: "$69/mo", annualPrice: "$58/mo", color: "#2563EB" },
   agency:  { label: "Agency", monthlyPrice: "$129/mo", annualPrice: "$108/mo", color: "#7C3AED" },
 };
@@ -370,21 +370,21 @@ export default function SettingsClient({
 
       {/* Banners */}
       {(checkoutStatus === "success" || upgradeStatus === "success") && (
-        <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
           <CheckCircle2 size={20} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
           <p className="text-sm text-[#16A34A] font-medium">Plan updated successfully! Changes are now active.</p>
         </div>
       )}
 
       {upgradeStatus === "canceled" && (
-        <div className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-4">
           <AlertTriangle size={20} strokeWidth={1.5} className="text-[#6B7280] flex-shrink-0" />
           <p className="text-sm text-[#6B7280] font-medium">Plan change was canceled. No changes were made.</p>
         </div>
       )}
 
       {plan === "free" && (
-        <div className="flex items-center gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-4">
           <Zap size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-[#92400E]">
@@ -400,7 +400,7 @@ export default function SettingsClient({
       )}
 
       {planStatus === "past_due" && (
-        <div className="flex items-center gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-4">
           <AlertTriangle size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-[#D97706]">Payment past due</p>
@@ -410,7 +410,7 @@ export default function SettingsClient({
       )}
 
       {pendingPlan && planChangesAt && (
-        <div className="flex items-center gap-3 bg-[#FEF3C7] border border-[#FDE68A] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#FEF3C7] border border-[#FDE68A] rounded-lg p-4">
           <Clock size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-[#92400E]">
@@ -428,18 +428,18 @@ export default function SettingsClient({
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">{error}</div>
       )}
 
       {success && (
-        <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4">
+        <div className="flex items-center gap-3 bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
           <CheckCircle2 size={16} strokeWidth={1.5} className="text-[#16A34A] flex-shrink-0" />
           <p className="text-sm text-[#16A34A] font-medium">{success}</p>
         </div>
       )}
 
       {/* ── Connected Sites ── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-[#111827]">Connected Sites</h2>
           <span className="text-xs text-[#9CA3AF] tabular-nums">{sites.length} / {sitesLimit}</span>
@@ -451,7 +451,7 @@ export default function SettingsClient({
             <p className="text-sm text-[#6B7280] mb-3">No sites connected yet.</p>
             <button
               onClick={handleAddSite}
-              className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
             >
               <Plus size={14} strokeWidth={1.5} />
               Connect Google Search Console
@@ -491,7 +491,7 @@ export default function SettingsClient({
               {canAddSite ? (
                 <button
                   onClick={handleAddSite}
-                  className="flex items-center gap-2 h-9 px-4 rounded-lg border border-dashed border-[#D1D5DB] text-sm text-[#6B7280] hover:border-[#0D9488] hover:text-[#0D9488] transition-colors"
+                  className="flex items-center gap-2 h-9 px-4 rounded-lg border border-dashed border-[#D1D5DB] text-sm text-[#6B7280] hover:border-[#3B82F6] hover:text-[#3B82F6] transition-colors"
                 >
                   <Plus size={14} strokeWidth={1.5} />
                   Add site
@@ -502,7 +502,7 @@ export default function SettingsClient({
                   {upgradePlans.length > 0 && (
                     <button
                       onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
-                      className="text-[#0D9488] hover:underline inline-flex items-center gap-0.5"
+                      className="text-[#3B82F6] hover:underline inline-flex items-center gap-0.5"
                     >
                       Upgrade to add more
                       <ArrowUpRight size={10} strokeWidth={1.5} />
@@ -545,7 +545,7 @@ export default function SettingsClient({
       </Dialog>
 
       {/* ── Account ── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <h2 className="text-sm font-semibold text-[#111827] mb-4">Account</h2>
         <div className="divide-y divide-[#F3F4F6]">
           {/* Email (read-only) */}
@@ -693,7 +693,7 @@ export default function SettingsClient({
       </div>
 
       {/* ── Plan & Usage ── */}
-      <div className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+      <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-[#111827]">Plan & Usage</h2>
           <div className="flex items-center gap-2">
@@ -777,7 +777,7 @@ export default function SettingsClient({
             ) : (
               <button
                 onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
-                className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+                className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
               >
                 <Zap size={14} strokeWidth={1.5} />
                 Reactivate — Choose a Plan
@@ -790,7 +790,7 @@ export default function SettingsClient({
           <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
             <button
               onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
             >
               <Zap size={14} strokeWidth={1.5} />
               Choose a Plan
@@ -801,7 +801,7 @@ export default function SettingsClient({
 
       {/* ── Upgrade ── */}
       {upgradePlans.length > 0 && (
-        <div id="upgrade-section" className="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        <div id="upgrade-section" className="bg-white rounded-lg border border-[#E5E7EB] p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#111827]">
               {plan === "free" ? "Choose a plan" : "Upgrade"}
@@ -811,7 +811,7 @@ export default function SettingsClient({
               <button
                 onClick={() => setIsAnnual(!isAnnual)}
                 className="relative w-10 h-5 rounded-full transition-colors flex-shrink-0"
-                style={{ background: isAnnual ? "#0D9488" : "#D1D5DB" }}
+                style={{ background: isAnnual ? "#3B82F6" : "#D1D5DB" }}
                 aria-label="Toggle annual billing"
               >
                 <span
@@ -821,7 +821,7 @@ export default function SettingsClient({
               </button>
               <span className={`text-xs font-medium ${isAnnual ? "text-[#111827]" : "text-[#9CA3AF]"}`}>Annual</span>
               {isAnnual && (
-                <span className="text-[10px] font-bold text-white bg-[#0D9488] px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold text-white bg-[#3B82F6] px-2 py-0.5 rounded-full">
                   Save 17%
                 </span>
               )}
@@ -833,7 +833,7 @@ export default function SettingsClient({
               const savings = (p.monthly * 12) - p.annualTotal;
 
               return (
-                <div key={p.key} className="border border-[#E5E7EB] rounded-xl p-4 flex flex-col">
+                <div key={p.key} className="border border-[#E5E7EB] rounded-lg p-4 flex flex-col">
                   <p className="font-semibold text-[#111827]">{p.label}</p>
                   <div className="mt-1">
                     {isAnnual && (
@@ -843,7 +843,7 @@ export default function SettingsClient({
                     <span className="text-sm font-normal text-[#6B7280]">/mo</span>
                   </div>
                   {isAnnual && (
-                    <p className="text-[11px] text-[#0D9488] font-medium mt-0.5">
+                    <p className="text-[11px] text-[#3B82F6] font-medium mt-0.5">
                       Billed as ${p.annualTotal}/yr — save ${savings}/yr
                     </p>
                   )}
@@ -858,7 +858,7 @@ export default function SettingsClient({
                   <button
                     onClick={() => handleUpgrade(p.key)}
                     disabled={loadingPlan !== null}
-                    className="mt-4 w-full h-9 rounded-lg bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="mt-4 w-full h-9 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loadingPlan === p.key ? (
                       <Loader2 size={14} strokeWidth={1.5} className="animate-spin" />
@@ -876,7 +876,7 @@ export default function SettingsClient({
       )}
 
       {/* ── Danger Zone: Delete Account ── */}
-      <div className="bg-white rounded-xl border border-[#FECACA] p-6 mt-2">
+      <div className="bg-white rounded-lg border border-[#FECACA] p-6 mt-2">
         <h2 className="text-sm font-semibold text-[#DC2626] mb-2">Danger Zone</h2>
         <p className="text-xs text-[#6B7280] mb-4">
           Permanently delete your account and all associated data. This cannot be undone.

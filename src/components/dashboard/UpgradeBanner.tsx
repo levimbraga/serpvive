@@ -15,7 +15,7 @@ export default function UpgradeBanner({ totalContentPages, monitoredPages, plan,
   if (totalContentPages <= pageLimit) return null;
 
   return (
-    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-5 py-4 flex items-center justify-between gap-4">
       <div>
         <p className="text-sm font-medium text-[#92400E]">
           Your site has {totalContentPages.toLocaleString()} content pages but your{" "}
