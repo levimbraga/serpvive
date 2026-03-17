@@ -35,7 +35,7 @@ export default function OnboardingDay2({
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Text style={logo}>SerpVive</Text>
+            <Text style={logo}>Serp<span style={{ color: "#3B82F6" }}>Vive</span></Text>
           </Section>
 
           <Section style={content}>

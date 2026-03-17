@@ -127,7 +127,7 @@ export default function HeroSection() {
               <div className="relative w-[120px] h-[120px] mb-3">
                 <svg viewBox="0 0 100 100" className="-rotate-90 w-full h-full">
                   <circle cx="50" cy="50" r="44" fill="none" stroke="#1E293B" strokeWidth="6" />
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="#3B82F6" strokeWidth="6" strokeLinecap="round"
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#D97706" strokeWidth="6" strokeLinecap="round"
                     strokeDasharray="276" strokeDashoffset="77"
                   />
                 </svg>
