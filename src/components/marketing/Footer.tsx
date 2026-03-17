@@ -1,27 +1,64 @@
+import Link from "next/link";
+
+const LINKS = {
+  Product: [
+    { label: "Features", href: "#features" },
+    { label: "Pricing", href: "#pricing" },
+  ],
+  Company: [
+    { label: "Contact", href: "mailto:serpvive@gmail.com" },
+  ],
+  Legal: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ],
+};
+
 export default function Footer() {
   return (
-    <footer className="sv-footer">
-      <div className="fi">
-        <div className="fb">
-          <a href="/" className="logo">Serp<span>Vive</span></a>
-          <p>Revive your rankings.</p>
-          <p style={{ marginTop: 16 }}>&copy; 2026 SerpVive. All rights reserved.</p>
+    <footer className="py-14 sm:py-16 px-5 sm:px-12 border-t border-[#1E293B]" style={{ background: "#050710" }}>
+      <div className="max-w-[1080px] mx-auto">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 md:gap-16">
+          {/* Logo + tagline */}
+          <div className="flex-shrink-0">
+            <Link
+              href="/"
+              className="text-[24px] font-extrabold tracking-tight text-white no-underline"
+              style={{ letterSpacing: "-0.5px" }}
+            >
+              Serp<span className="text-[#3B82F6]">Vive</span>
+            </Link>
+            <p className="text-[14px] text-[#64748B] mt-2">
+              Revive your rankings.
+            </p>
+          </div>
+
+          {/* Link columns */}
+          <div className="flex flex-wrap gap-12 sm:gap-16">
+            {Object.entries(LINKS).map(([title, links]) => (
+              <div key={title} className="flex flex-col gap-3">
+                <h4 className="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1">
+                  {title}
+                </h4>
+                {links.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-[14px] text-[#64748B] hover:text-[#F1F5F9] transition-colors no-underline"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="fl">
-          <div className="fc">
-            <h4>Product</h4>
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-          </div>
-          <div className="fc">
-            <h4>Company</h4>
-            <a href="mailto:serpvive@gmail.com">Contact</a>
-          </div>
-          <div className="fc">
-            <h4>Legal</h4>
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms of Service</a>
-          </div>
+
+        {/* Copyright */}
+        <div className="mt-12 pt-6 border-t border-[#1E293B]">
+          <p className="text-[13px] text-[#475569]">
+            &copy; 2026 SerpVive. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

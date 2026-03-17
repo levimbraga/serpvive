@@ -16,8 +16,14 @@ export async function getSupabaseServer() {
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+          try {
+            for (const { name, value, options } of cookiesToSet) {
+              cookieStore.set(name, value, options);
+            }
+          } catch {
+            // Called from a Server Component — cookies are read-only here.
+            // The Supabase client attempts to refresh the session token,
+            // which is handled by the middleware instead.
           }
         },
       },

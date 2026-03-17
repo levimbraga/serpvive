@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Navbar from "@/components/marketing/Navbar";
 import HeroSection from "@/components/marketing/HeroSection";
 import SocialProof from "@/components/marketing/SocialProof";
-import ProductShowcase from "@/components/marketing/ProductShowcase";
 import ProblemSection from "@/components/marketing/ProblemSection";
+import ComparisonSection from "@/components/marketing/ComparisonSection";
 import StepsSection from "@/components/marketing/StepsSection";
 import ExampleSection from "@/components/marketing/ExampleSection";
+import FeaturesGrid from "@/components/marketing/FeaturesGrid";
 import PricingSection from "@/components/marketing/PricingSection";
 import FinalCTA from "@/components/marketing/FinalCTA";
 import Footer from "@/components/marketing/Footer";
@@ -38,10 +39,11 @@ export default function MarketingPage() {
       <Navbar />
       <HeroSection />
       <SocialProof />
-      <ProductShowcase />
       <ProblemSection />
+      <ComparisonSection />
       <StepsSection />
       <ExampleSection />
+      <FeaturesGrid />
       <PricingSection />
       <FinalCTA />
       <Footer />
