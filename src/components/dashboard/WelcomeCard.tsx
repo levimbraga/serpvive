@@ -115,6 +115,31 @@ export default function WelcomeCard({
     }
   }
 
+  async function handleRetryDiagnosis() {
+    setUserTriggeredDiag(true);
+    setError("");
+
+    try {
+      const diagRes = await fetch("/api/diagnose/auto", { method: "POST" });
+      const diagJson = (await diagRes.json()) as { data?: { status: string; pageId?: string } };
+
+      if (diagJson.data?.status === "already_done") {
+        setUserTriggeredDiag(false);
+        router.refresh();
+        return;
+      }
+
+      if (diagJson.data?.pageId) {
+        setDiagPageIdOverride(diagJson.data.pageId);
+      }
+
+      startPolling(10_000);
+    } catch {
+      setError("Diagnosis failed. Please try again.");
+      setUserTriggeredDiag(false);
+    }
+  }
+
   function handleDismiss() {
     setDismissed(true);
     stopPolling();
@@ -230,6 +255,22 @@ export default function WelcomeCard({
         <div className="flex items-center gap-3 text-sm text-[#7C3AED]">
           <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
           Generating diagnosis... this takes 2–3 minutes
+        </div>
+      )}
+
+      {/* Engine done but diagnosis hasn't started or failed — show retry */}
+      {diagStep === "pending" && engineStep === "done" && (
+        <div>
+          <button
+            onClick={handleRetryDiagnosis}
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+          >
+            <Gift size={16} strokeWidth={1.5} />
+            Get Free Diagnosis
+          </button>
+          <p className="text-xs text-[#9CA3AF] mt-3">
+            AI will analyze your most important page and explain what to improve.
+          </p>
         </div>
       )}
 

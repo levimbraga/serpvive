@@ -391,12 +391,7 @@ async function runImport(
       }
     } catch (err) {
       console.error("[gsc/import] Auto-diagnosis failed:", err);
-      // Mark as done to prevent infinite retry loop from the UI
-      await admin
-        .from("sites")
-        .update({ has_free_diagnosis: true })
-        .eq("id", siteId);
-      console.log("[gsc/import] Marked has_free_diagnosis=true after failure");
+      // Do NOT mark has_free_diagnosis — let user retry via WelcomeCard
     }
 
     // ── Send onboarding day 0 email ──

@@ -134,11 +134,7 @@ export async function POST() {
       console.log(`[diagnose/auto] Free diagnosis complete for site ${site.id}`);
     } catch (err) {
       console.error(`[diagnose/auto] Failed for site ${site.id}:`, err);
-      await admin
-        .from("sites")
-        .update({ has_free_diagnosis: true })
-        .eq("id", site.id);
-      console.log(`[diagnose/auto] Marked has_free_diagnosis=true after failure for site ${site.id}`);
+      // Do NOT mark has_free_diagnosis — let user retry via WelcomeCard
     }
   });
 
