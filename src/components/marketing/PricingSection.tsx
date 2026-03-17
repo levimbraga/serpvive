@@ -282,7 +282,7 @@ export default function PricingSection() {
               {/* Spacer to push CTA to bottom */}
               <div className="flex-1" />
               <a
-                href="mailto:hello@serpvive.com"
+                href="mailto:serpvive@gmail.com"
                 onClick={() =>
                   posthog.capture("cta_clicked", {
                     location: "pricing",
