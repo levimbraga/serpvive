@@ -9,8 +9,13 @@ export const metadata: Metadata = {
     "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
   metadataBase: new URL("https://serpvive.com"),
   icons: {
-    icon: "/favicon.ico",
-    apple: "/og-icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/og-icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/og-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   openGraph: {
     title: "SerpVive — Revive Your Rankings",
