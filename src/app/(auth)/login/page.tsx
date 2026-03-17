@@ -54,9 +54,9 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-[480px]">
       <div className="text-center mb-10">
-        <h1 className="text-[32px] font-extrabold tracking-tight text-white">
+        <Link href="/" className="inline-block text-[32px] font-extrabold tracking-tight text-white no-underline hover:opacity-90 transition-opacity">
           Serp<span className="text-[#3B82F6]">Vive</span>
-        </h1>
+        </Link>
         <p className="text-[#94A3B8] text-base mt-3">Sign in to your account</p>
       </div>
 
