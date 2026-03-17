@@ -135,10 +135,10 @@ const SEVERITY_CONFIG: Record<string, { color: string; border: string }> = {
   low:    { color: "#16A34A", border: "border-l-[#16A34A]" },
 };
 
-const PRIORITY_CONFIG: Record<string, { dot: string; label: string }> = {
-  urgent:      { dot: "bg-[#DC2626]", label: "Urgent" },
-  important:   { dot: "bg-[#D97706]", label: "Important" },
-  nice_to_have: { dot: "bg-[#16A34A]", label: "Nice to have" },
+const PRIORITY_CONFIG: Record<string, { textColor: string; bg: string; label: string }> = {
+  urgent:      { textColor: "text-[#EF4444]", bg: "bg-[rgba(239,68,68,0.1)]", label: "Urgent" },
+  important:   { textColor: "text-[#F59E0B]", bg: "bg-[rgba(245,158,11,0.1)]", label: "Important" },
+  nice_to_have: { textColor: "text-[#22C55E]", bg: "bg-[rgba(34,197,94,0.1)]", label: "Nice to have" },
 };
 
 const RESULT_CONFIG: Record<string, { color: string; bg: string; icon: typeof TrendingUp; label: string }> = {
@@ -1015,7 +1015,9 @@ export default function PageDetailClient({
                           onClick={() => toggleAction(i)}
                           className="flex-1 flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
                         >
-                          <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
+                          <span className={`text-[11px] font-medium ${pri.textColor} ${pri.bg} px-2 py-0.5 rounded-full flex-shrink-0`}>
+                            {pri.label}
+                          </span>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-[#111827]">{action.title}</p>
                             <p className="text-xs text-[#9CA3AF] mt-0.5">
@@ -1250,7 +1252,9 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
                 }}
                 className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
               >
-                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${pri.dot}`} />
+                <span className={`text-[11px] font-medium ${pri.textColor} ${pri.bg} px-2 py-0.5 rounded-full flex-shrink-0`}>
+                  {pri.label}
+                </span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[#111827]">{action.title}</p>
                   <p className="text-xs text-[#9CA3AF] mt-0.5">

@@ -307,18 +307,75 @@ export default function PricingSection() {
 
         {/* FAQ */}
         <Reveal>
-          <div className="mt-10 text-left max-w-[520px] mx-auto rounded-xl border border-[#1E293B] p-6 sm:p-7" style={{ background: "#0F1219" }}>
-            <p className="text-[15px] font-semibold text-[#E2E8F0] mb-2">
-              What happens if I cancel?
-            </p>
-            <p className="text-[14px] text-[#94A3B8] leading-[1.7]">
-              You keep access to your dashboard with weekly data syncs. Your data
-              is preserved. Upgrade again anytime to resume daily monitoring and
-              AI diagnoses.
-            </p>
+          <div className="mt-16 text-left max-w-[680px] mx-auto">
+            <h3
+              className="text-[24px] sm:text-[32px] font-extrabold text-center mb-8"
+              style={{ letterSpacing: "-0.03em" }}
+            >
+              Frequently asked questions
+            </h3>
+            <FaqAccordion />
           </div>
         </Reveal>
       </div>
     </section>
+  );
+}
+
+const FAQ_ITEMS = [
+  {
+    q: "What happens if I cancel?",
+    a: "You keep access to your dashboard with weekly data syncs. Your data is preserved. Upgrade again anytime to resume daily monitoring and AI diagnoses.",
+  },
+  {
+    q: "My site is new. Can I still use SerpVive?",
+    a: "Yes! Decay monitoring needs a few months of traffic history, but you can run AI analysis on any page from day one. The diagnosis compares your content against current SERP competitors regardless of your traffic history.",
+  },
+  {
+    q: "How is this different from Surfer SEO or Ahrefs?",
+    a: "Surfer helps you create content. Ahrefs tracks rankings. SerpVive protects what you already have \u2014 we diagnose WHY posts are declining and tell you exactly WHAT to fix, with evidence from your real competitors.",
+  },
+  {
+    q: "What does the AI diagnosis include?",
+    a: "Specific causes of decline with evidence from your real SERP competitors, topic coverage score, ready-to-copy title suggestions, corrected data (outdated prices, stats), missing topics with competitor references, and time estimates for each fix.",
+  },
+  {
+    q: "Can I analyze pages that aren\u2019t mine?",
+    a: "Yes. Paste any URL + keyword and get a full AI diagnosis. Great for analyzing competitor content or auditing a prospect\u2019s blog before closing a deal.",
+  },
+  {
+    q: "How long until I see results?",
+    a: "You can run a new diagnosis immediately after making changes to see your updated competitive position. Automatic before/after measurement happens after 28 days.",
+  },
+];
+
+function FaqAccordion() {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  return (
+    <div className="rounded-xl border border-[#1E293B] overflow-hidden" style={{ background: "#0F1219" }}>
+      {FAQ_ITEMS.map((item, i) => {
+        const isOpen = openIdx === i;
+        const isLast = i === FAQ_ITEMS.length - 1;
+        return (
+          <div key={i} className={!isLast ? "border-b border-[#1E293B]" : ""}>
+            <button
+              onClick={() => setOpenIdx(isOpen ? null : i)}
+              className="w-full flex items-center justify-between gap-4 px-6 sm:px-7 py-5 text-left hover:bg-[#1E293B]/30 transition-colors"
+            >
+              <span className="text-[15px] font-medium text-[#F1F5F9]">{item.q}</span>
+              <span className="text-[20px] leading-none text-[#64748B] flex-shrink-0 select-none">
+                {isOpen ? "\u2212" : "+"}
+              </span>
+            </button>
+            {isOpen && (
+              <div className="px-6 sm:px-7 pb-5 -mt-1">
+                <p className="text-[14px] text-[#94A3B8] leading-[1.7]">{item.a}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }

@@ -40,11 +40,11 @@ export default function PersonasSection() {
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           {PERSONAS.map((persona) => {
             const Icon = persona.icon;
             return (
-              <Reveal key={persona.title}>
+              <Reveal key={persona.title} className="h-full">
                 <div className="rounded-xl border border-[#E2E8F0] bg-white p-7 sm:p-9 transition-all duration-300 hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] h-full flex flex-col">
                   <div className="w-10 h-10 rounded-lg bg-[#EFF6FF] flex items-center justify-center mb-5">
                     <Icon className="w-5 h-5 text-[#3B82F6]" strokeWidth={1.5} />
@@ -55,7 +55,7 @@ export default function PersonasSection() {
                   <p className="text-[15px] text-[#334155] leading-relaxed flex-1">
                     {persona.body}
                   </p>
-                  <div className="mt-5 pt-4 border-t border-[#F1F5F9]">
+                  <div className="mt-auto pt-4 border-t border-[#F1F5F9]">
                     <span className="text-[12px] font-bold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-3 py-1.5 rounded-full">
                       {persona.plan}
                     </span>

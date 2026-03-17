@@ -80,18 +80,28 @@ export default function ExampleSection() {
                 </div>
                 <div className="px-5 py-4 flex flex-col gap-2.5">
                   {[
-                    { priority: "high", dot: "bg-[#DC2626]", text: 'Update title \u2192 "Best PM Tools in 2026 (Compared)"' },
-                    { priority: "high", dot: "bg-[#DC2626]", text: "Add ~400 word section about AI features in PM tools" },
-                    { priority: "high", dot: "bg-[#DC2626]", text: "Fix Monday.com pricing: $8 \u2192 $12/seat" },
-                    { priority: "med", dot: "bg-[#D97706]", text: "Add comparison table (12 tools \u00D7 6 columns)" },
-                    { priority: "med", dot: "bg-[#D97706]", text: "Fix 2 broken external links" },
-                    { priority: "low", dot: "bg-[#16A34A]", text: "Update meta description with 2026 keywords" },
-                  ].map((action) => (
-                    <div key={action.text} className="flex items-center gap-2.5">
-                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${action.dot}`} />
-                      <span className="text-[13px] sm:text-[14px] text-[#475569] leading-relaxed">{action.text}</span>
-                    </div>
-                  ))}
+                    { priority: "high" as const, text: 'Update title \u2192 "Best PM Tools in 2026 (Compared)"' },
+                    { priority: "high" as const, text: "Add ~400 word section about AI features in PM tools" },
+                    { priority: "high" as const, text: "Fix Monday.com pricing: $8 \u2192 $12/seat" },
+                    { priority: "med" as const, text: "Add comparison table (12 tools \u00D7 6 columns)" },
+                    { priority: "med" as const, text: "Fix 2 broken external links" },
+                    { priority: "low" as const, text: "Update meta description with 2026 keywords" },
+                  ].map((action) => {
+                    const pill =
+                      action.priority === "high"
+                        ? { label: "Urgent", textColor: "text-[#EF4444]", bg: "bg-[rgba(239,68,68,0.1)]" }
+                        : action.priority === "med"
+                        ? { label: "Important", textColor: "text-[#F59E0B]", bg: "bg-[rgba(245,158,11,0.1)]" }
+                        : { label: "Nice to have", textColor: "text-[#22C55E]", bg: "bg-[rgba(34,197,94,0.1)]" };
+                    return (
+                      <div key={action.text} className="flex items-center gap-2.5">
+                        <span className={`text-[11px] font-medium ${pill.textColor} ${pill.bg} px-2 py-0.5 rounded-full flex-shrink-0`}>
+                          {pill.label}
+                        </span>
+                        <span className="text-[13px] sm:text-[14px] text-[#475569] leading-relaxed">{action.text}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
