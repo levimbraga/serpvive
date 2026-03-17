@@ -56,6 +56,7 @@ export default function ForgotPasswordPage() {
             <p className="text-[#64748B] text-sm mt-4">
               Click the link in the email to set a new password.
             </p>
+            <p className="text-[#9CA3AF] text-[13px] mt-2">Can&apos;t find it? Check your spam or junk folder.</p>
           </div>
         ) : (
           <>

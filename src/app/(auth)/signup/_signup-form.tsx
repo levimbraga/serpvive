@@ -160,6 +160,7 @@ export default function SignupForm() {
               <span className="text-white font-medium">{email}</span>
             </p>
             <p className="text-[#64748B] text-sm mt-4">Click the link to activate your account and get started.</p>
+            <p className="text-[#9CA3AF] text-[13px] mt-2">Can&apos;t find it? Check your spam or junk folder.</p>
           </div>
         ) : (<>
         <button

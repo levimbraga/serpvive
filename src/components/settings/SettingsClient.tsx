@@ -592,6 +592,7 @@ export default function SettingsClient({
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                 <p className="text-xs text-[#1E40AF]">
                   Confirmation sent to <strong>{newEmail}</strong>. Click the link to complete the change.
+                  <span className="text-[#6B7280]"> Can&apos;t find it? Check your spam or junk folder.</span>
                 </p>
               </div>
             )}
