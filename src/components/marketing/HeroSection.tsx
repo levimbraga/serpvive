@@ -5,53 +5,76 @@ import posthog from "posthog-js";
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-12 pt-[140px] sm:pt-[160px] pb-16 text-center overflow-hidden">
-      {/* ── Decorative arcs ── */}
-      <div className="absolute top-[-350px] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full border border-[rgba(59,130,246,0.05)] pointer-events-none" />
-      <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[rgba(59,130,246,0.04)] pointer-events-none" />
-      <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full border border-[rgba(59,130,246,0.03)] pointer-events-none" />
-
-      {/* ── Glow effects ── */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.05) 0%, transparent 70%)" }}
+      {/* ── 1. Background grid pattern ── */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(59,130,246,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.4) 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+        }}
       />
-      <div className="absolute top-[50%] left-1/2 -translate-x-1/2 w-[400px] h-[300px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.03) 0%, transparent 70%)" }}
+      {/* Fade grid out at edges */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 30%, #07090F 75%)",
+        }}
+      />
+
+      {/* ── Decorative arcs (Surfer-style) ── */}
+      <div className="absolute top-[-350px] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full border border-[rgba(59,130,246,0.06)] pointer-events-none" />
+      <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[rgba(59,130,246,0.05)] pointer-events-none" />
+      <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full border border-[rgba(59,130,246,0.04)] pointer-events-none" />
+
+      {/* ── Radial glow behind headline ── */}
+      <div
+        className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[900px] h-[700px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, transparent 65%)" }}
+      />
+      <div
+        className="absolute top-[45%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.04) 0%, transparent 65%)" }}
       />
 
       {/* ── Tag pill ── */}
       <div
-        className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
+        className="relative inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
         style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.2)" }}
       >
         <span className="text-[14px]">&#x2726;</span>
         AI Content Decay Monitor
       </div>
 
-      {/* ── Headline ── */}
+      {/* ── Headline with gradient text ── */}
       <h1
-        className="text-[40px] sm:text-[64px] lg:text-[84px] font-extrabold leading-[1.05] max-w-[1000px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
+        className="relative text-[40px] sm:text-[64px] lg:text-[84px] font-extrabold leading-[1.05] max-w-[1000px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
         style={{ letterSpacing: "-0.05em" }}
       >
         Your posts are losing traffic.
         <br />
-        <span className="text-[#3B82F6]">We tell you why — and how to fix them.</span>
+        <span
+          className="bg-clip-text text-transparent"
+          style={{ backgroundImage: "linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)" }}
+        >
+          We tell you why — and how to fix them.
+        </span>
       </h1>
 
       {/* ── Subtitle ── */}
-      <p className="text-[16px] sm:text-[20px] leading-[1.7] text-[#94A3B8] max-w-[660px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]">
+      <p className="relative text-[16px] sm:text-[20px] leading-[1.7] text-[#94A3B8] max-w-[660px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]">
         SerpVive monitors every page on your blog. When traffic drops, our AI reads your competitors, compares with your content, and delivers a{" "}
         <strong className="text-[#F1F5F9] font-semibold">specific action plan</strong> — not generic advice.
       </p>
 
-      {/* ── Dual CTAs ── */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
+      {/* ── 4. Dual CTAs (Supademo hierarchy) ── */}
+      <div className="relative flex flex-col sm:flex-row items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
         <a
           href="/signup"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "primary" })}
-          className="inline-flex items-center gap-2.5 h-[60px] px-12 rounded-xl bg-[#3B82F6] text-white text-[18px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+          className="inline-flex items-center gap-2.5 h-[60px] px-12 rounded-xl bg-[#3B82F6] text-white text-[18px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
         >
           Get Started Free
-          <span className="text-[20px] transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+          <span className="text-[20px]">&rarr;</span>
         </a>
         <a
           href="#features"
@@ -64,7 +87,7 @@ export default function HeroSection() {
       </div>
 
       {/* ── Trust signals ── */}
-      <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]">
+      <div className="relative flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]">
         {["No credit card required", "1 free AI diagnosis included", "Setup in under 5 minutes"].map((text) => (
           <span key={text} className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
             <span className="text-[#3B82F6] font-bold text-[12px]">&#x2713;</span>
@@ -73,19 +96,24 @@ export default function HeroSection() {
         ))}
       </div>
 
-      {/* ── Product screenshot with glow ── */}
+      {/* ── 2. Product screenshot with strong blue glow ── */}
       <div className="relative mt-16 w-full max-w-[1000px] mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]">
-        {/* Blue glow behind */}
+        {/* Blue glow — stronger, visible */}
         <div
-          className="absolute -inset-4 rounded-2xl pointer-events-none"
+          className="absolute -inset-6 rounded-3xl pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%)",
-            filter: "blur(40px)",
+            boxShadow: "0 0 80px rgba(59,130,246,0.2), 0 0 160px rgba(59,130,246,0.08)",
           }}
         />
 
         {/* Browser mockup */}
-        <div className="relative rounded-2xl overflow-hidden border border-[#1E293B] shadow-[0_40px_120px_rgba(0,0,0,0.5)]" style={{ background: "#0F1219" }}>
+        <div
+          className="relative rounded-2xl overflow-hidden border border-[rgba(59,130,246,0.15)]"
+          style={{
+            background: "#0F1219",
+            boxShadow: "0 0 60px rgba(59,130,246,0.12), 0 40px 120px rgba(0,0,0,0.5)",
+          }}
+        >
           {/* Title bar */}
           <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1E293B]" style={{ background: "rgba(7,9,15,0.5)" }}>
             <div className="w-[9px] h-[9px] rounded-full bg-[#EF4444] opacity-50" />
@@ -96,7 +124,7 @@ export default function HeroSection() {
             </span>
           </div>
 
-          {/* Dashboard content — simplified mockup */}
+          {/* Dashboard content */}
           <div className="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-[240px_1fr] gap-6">
             {/* Left: Health Score */}
             <div className="flex flex-col items-center p-6 rounded-xl" style={{ background: "rgba(7,9,15,0.4)", border: "1px solid rgba(30,41,59,0.4)" }}>
@@ -168,6 +196,16 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── 3. Social proof mini-bar ── */}
+      <div className="relative flex flex-wrap justify-center gap-x-2 mt-12 animate-[fadeInUp_0.6s_ease_0.6s_both]">
+        {["Built for SEO professionals", "Powered by Claude AI", "Free plan available"].map((text, i) => (
+          <span key={text} className="flex items-center gap-2 text-[12px] text-[#475569] font-medium uppercase tracking-wider">
+            {text}
+            {i < 2 && <span className="text-[#1E293B]">&#x2022;</span>}
+          </span>
+        ))}
       </div>
     </section>
   );
