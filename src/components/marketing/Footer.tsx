@@ -4,7 +4,7 @@ const LINKS = {
   Product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Changelog", href: "#" },
+    { label: "Changelog", href: "/changelog" },
   ],
   Resources: [
     { label: "Blog", href: "#" },
@@ -12,18 +12,18 @@ const LINKS = {
     { label: "API Docs", href: "#" },
   ],
   Company: [
-    { label: "About", href: "#" },
-    { label: "Contact", href: "mailto:serpvive@gmail.com" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "mailto:hello@serpvive.com" },
     { label: "Feedback", href: "/feedback" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
-    { label: "Cookie Policy", href: "#" },
+    { label: "Cookie Policy", href: "/cookies" },
   ],
   Connect: [
     { label: "Twitter/X", href: "https://x.com/serpvive" },
-    { label: "Email", href: "mailto:serpvive@gmail.com" },
+    { label: "Email", href: "mailto:hello@serpvive.com" },
   ],
 };
 
