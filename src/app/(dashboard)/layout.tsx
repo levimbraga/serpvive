@@ -47,6 +47,7 @@ export default async function DashboardLayout({
       <Sidebar
         diagnosesUsed={diagnosesUsed}
         diagnosesLimit={diagnosesLimit}
+        plan={plan}
         sites={sites}
         activeSiteId={activeSiteId}
         userEmail={user.email ?? ""}
