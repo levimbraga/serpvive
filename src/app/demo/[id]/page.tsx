@@ -52,9 +52,9 @@ export default async function DemoPage({ params }: Props) {
     return (
       <div className="min-h-screen bg-[#F5F7FA]">
         <header className="border-b border-[#1E293B] bg-[#0F172A]">
-          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
             <Link href="/">
-              <span className="text-lg font-extrabold text-white tracking-tight">
+              <span className="text-2xl font-extrabold text-white tracking-tight">
                 Serp<span className="text-[#3B82F6]">Vive</span>
               </span>
             </Link>
@@ -89,13 +89,13 @@ export default async function DemoPage({ params }: Props) {
     <div className="min-h-screen bg-[#F5F7FA]">
       {/* Header */}
       <header className="border-b border-[#1E293B] bg-[#0F172A]">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <Link href="/">
-            <span className="text-lg font-extrabold text-white tracking-tight">
+            <span className="text-2xl font-extrabold text-white tracking-tight">
               Serp<span className="text-[#3B82F6]">Vive</span>
             </span>
           </Link>
-          <span className="text-xs text-[#94A3B8] bg-[#1E293B] px-3 py-1 rounded-full font-medium">
+          <span className="text-[13px] text-[#94A3B8] bg-[#1E293B] px-4 py-1.5 rounded-full font-medium">
             Free Content Analysis
           </span>
         </div>
