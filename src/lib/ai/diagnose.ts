@@ -3,7 +3,7 @@ import { z } from "zod";
 import { extractJson } from "./json-extract";
 import { sanitizeAiOutput } from "./sanitize";
 
-const anthropic = new Anthropic({ maxRetries: 1 });
+const anthropic = new Anthropic({ maxRetries: 0 });
 
 // ── Zod Schemas ──
 
