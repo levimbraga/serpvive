@@ -131,16 +131,14 @@ export default function WelcomeCard({
 
   return (
     <div className="relative bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
-      {/* Dismiss button */}
-      {allDone && (
-        <button
-          onClick={handleDismiss}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
-          aria-label="Dismiss"
-        >
-          <X size={16} strokeWidth={1.5} />
-        </button>
-      )}
+      {/* Dismiss button — always visible */}
+      <button
+        onClick={handleDismiss}
+        className="absolute top-4 right-4 p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+        aria-label="Dismiss"
+      >
+        <X size={16} strokeWidth={1.5} />
+      </button>
 
       <h2 className="text-lg font-semibold text-[#111827] mb-1">
         Site connected! Here&apos;s what happens next

@@ -161,20 +161,31 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
         </div>
 
         {/* Usage */}
-        <div className="flex items-center gap-2 mb-2">
-          <Zap size={13} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
-          <span className={`text-[13px] font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
-            {diagnosesUsed}/{diagnosesLimit} diagnoses
-          </span>
-        </div>
-        <div className="h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              usagePercent >= 90 ? "bg-[#EF4444]" : usagePercent >= 80 ? "bg-[#F59E0B]" : "bg-[#3B82F6]"
-            }`}
-            style={{ width: `${usagePercent}%` }}
-          />
-        </div>
+        {diagnosesLimit > 0 ? (
+          <>
+            <div className="flex items-center gap-2 mb-2">
+              <Zap size={13} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
+              <span className={`text-[13px] font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
+                {diagnosesUsed}/{diagnosesLimit} diagnoses
+              </span>
+            </div>
+            <div className="h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  usagePercent >= 90 ? "bg-[#EF4444]" : usagePercent >= 80 ? "bg-[#F59E0B]" : "bg-[#3B82F6]"
+                }`}
+                style={{ width: `${usagePercent}%` }}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
+            <Link href="/settings" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">
+              Upgrade for AI diagnoses
+            </Link>
+          </div>
+        )}
       </div>
     </aside>
   );

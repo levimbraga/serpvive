@@ -76,29 +76,48 @@ export async function POST(request: Request) {
     );
   }
 
-  // Block free plan users — they get 1 auto-diagnosis only
+  // Free plan: allow 1 manual diagnosis if user has GSC connected
   if (plan === "free") {
-    return NextResponse.json(
-      { error: "Upgrade to a paid plan to run AI diagnoses." },
-      { status: 403 },
-    );
+    const { data: hasSite } = await admin
+      .from("sites")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (!hasSite) {
+      return NextResponse.json(
+        { error: "Connect Google Search Console to unlock your free AI diagnosis." },
+        { status: 403 },
+      );
+    }
+
+    // Free plan with GSC: allow 1 diagnosis total
+    if (profile.diagnoses_used_this_month >= 1) {
+      return NextResponse.json(
+        { error: "You've used your free diagnosis. Upgrade for more." },
+        { status: 403 },
+      );
+    }
   }
 
-  // Block if subscription canceled
-  if (profile.plan_status === "canceled") {
+  // Block if subscription canceled (paid plans only)
+  if (plan !== "free" && profile.plan_status === "canceled") {
     return NextResponse.json(
       { error: "Subscription canceled. Resubscribe to use AI diagnoses." },
       { status: 403 },
     );
   }
 
-  const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-
-  if (profile.diagnoses_used_this_month >= limit) {
-    return NextResponse.json(
-      { error: `Diagnosis limit reached (${limit}/${limit}). Upgrade your plan for more.` },
-      { status: 429 },
-    );
+  // Check monthly limit (paid plans)
+  if (plan !== "free") {
+    const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+    if (profile.diagnoses_used_this_month >= limit) {
+      return NextResponse.json(
+        { error: `Diagnosis limit reached (${limit}/${limit}). Upgrade your plan for more.` },
+        { status: 429 },
+      );
+    }
   }
 
   // Check for concurrent diagnosis — prevent user from running 2 at once
