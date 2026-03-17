@@ -5,35 +5,31 @@ import posthog from "posthog-js";
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-12 pt-[140px] sm:pt-[160px] pb-16 text-center overflow-hidden">
-      {/* ── 1. Background grid pattern ── */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(59,130,246,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.4) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
-      {/* Fade grid out at edges */}
+      {/* ── 1. Dot grid pattern — subtle depth ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 30%, #07090F 75%)",
+          backgroundImage: "radial-gradient(rgba(59,130,246,0.15) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          maskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)",
         }}
       />
 
-      {/* ── Decorative arcs (Surfer-style) ── */}
-      <div className="absolute top-[-350px] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full border border-[rgba(59,130,246,0.06)] pointer-events-none" />
-      <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[rgba(59,130,246,0.05)] pointer-events-none" />
-      <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full border border-[rgba(59,130,246,0.04)] pointer-events-none" />
+      {/* ── Decorative arcs (Surfer-style concentric rings) ── */}
+      <div className="absolute top-[-350px] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full border border-[#1E293B]/40 pointer-events-none" />
+      <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[#1E293B]/30 pointer-events-none" />
+      <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full border border-[#1E293B]/20 pointer-events-none" />
+      <div className="absolute top-[200px] left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full border border-[rgba(59,130,246,0.08)] pointer-events-none" />
 
-      {/* ── Radial glow behind headline ── */}
+      {/* ── Radial glow behind headline — stronger ── */}
       <div
-        className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[900px] h-[700px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, transparent 65%)" }}
+        className="absolute top-[12%] left-1/2 -translate-x-1/2 w-[1000px] h-[800px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 60%)" }}
       />
       <div
-        className="absolute top-[45%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.04) 0%, transparent 65%)" }}
+        className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[600px] h-[500px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, transparent 60%)" }}
       />
 
       {/* ── Tag pill ── */}
