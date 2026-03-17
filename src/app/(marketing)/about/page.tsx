@@ -91,8 +91,8 @@ export default function AboutPage() {
             </Link>
             <p className="text-[14px] text-[#6B7280] mt-4">
               Questions? Reach me at{" "}
-              <a href="mailto:hello@serpvive.com" className="text-[#3B82F6] hover:underline">
-                hello@serpvive.com
+              <a href="mailto:serpvive@gmail.com" className="text-[#3B82F6] hover:underline">
+                serpvive@gmail.com
               </a>
             </p>
           </div>

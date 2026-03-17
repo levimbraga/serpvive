@@ -13,7 +13,7 @@ const LINKS = {
   ],
   Company: [
     { label: "About", href: "/about" },
-    { label: "Contact", href: "mailto:hello@serpvive.com" },
+    { label: "Contact", href: "mailto:serpvive@gmail.com" },
     { label: "Feedback", href: "/feedback" },
   ],
   Legal: [
@@ -23,7 +23,7 @@ const LINKS = {
   ],
   Connect: [
     { label: "Twitter/X", href: "https://x.com/serpvive" },
-    { label: "Email", href: "mailto:hello@serpvive.com" },
+    { label: "Email", href: "mailto:serpvive@gmail.com" },
   ],
 };
 

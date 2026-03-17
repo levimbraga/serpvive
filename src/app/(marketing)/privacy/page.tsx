@@ -113,13 +113,13 @@ export default function PrivacyPage() {
       </UL>
       <P>
         You can delete your account directly from Settings &gt; Danger Zone. For data export or other requests,
-        email us at <A href="mailto:hello@serpvive.com">hello@serpvive.com</A>.
+        email us at <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>.
       </P>
 
       <H2 id="contact">Contact</H2>
       <P>
         For any privacy-related questions or requests, contact us at:<br />
-        <A href="mailto:hello@serpvive.com">hello@serpvive.com</A>
+        <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>
       </P>
       <P>
         Levi Braga<br />
