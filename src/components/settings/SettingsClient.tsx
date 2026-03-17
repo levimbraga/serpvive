@@ -165,6 +165,12 @@ export default function SettingsClient({
   const [currentDigestDay, setCurrentDigestDay] = useState(digestDay);
   const [emailOff, setEmailOff] = useState(emailUnsubscribed);
 
+  // Change email state
+  const [showEmailChange, setShowEmailChange] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [emailChangeSuccess, setEmailChangeSuccess] = useState(false);
+
   // Delete account state
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -261,6 +267,23 @@ export default function SettingsClient({
 
     if (err) setError("Failed to update digest day");
     else flash("Digest day updated");
+  }
+
+  async function handleChangeEmail() {
+    if (!newEmail.trim() || newEmail.trim() === email) return;
+    setSavingEmail(true);
+    setError("");
+
+    const { error: err } = await supabase.auth.updateUser({ email: newEmail.trim() });
+
+    setSavingEmail(false);
+
+    if (err) {
+      setError(err.message);
+      return;
+    }
+
+    setEmailChangeSuccess(true);
   }
 
   async function handleEmailToggle() {
@@ -548,10 +571,54 @@ export default function SettingsClient({
       <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <h2 className="text-sm font-semibold text-[#111827] mb-4">Account</h2>
         <div className="divide-y divide-[#F3F4F6]">
-          {/* Email (read-only) */}
-          <div className="flex items-center justify-between py-3 first:pt-0">
-            <span className="text-sm text-[#6B7280]">Email</span>
-            <span className="text-sm text-[#111827]">{email}</span>
+          {/* Email (with change option) */}
+          <div className="py-3 first:pt-0">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6B7280]">Email</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-[#111827]">{email}</span>
+                {isPasswordAuth && !showEmailChange && !emailChangeSuccess && (
+                  <button
+                    onClick={() => setShowEmailChange(true)}
+                    className="text-xs font-medium text-[#3B82F6] hover:text-[#2563EB] transition-colors"
+                  >
+                    Change
+                  </button>
+                )}
+              </div>
+            </div>
+            {emailChangeSuccess && (
+              <div className="mt-2 flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg px-3 py-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <p className="text-xs text-[#1E40AF]">
+                  Confirmation sent to <strong>{newEmail}</strong>. Click the link to complete the change.
+                </p>
+              </div>
+            )}
+            {showEmailChange && !emailChangeSuccess && (
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="New email address"
+                  className="h-8 flex-1 px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
+                />
+                <button
+                  onClick={handleChangeEmail}
+                  disabled={savingEmail || !newEmail.trim() || newEmail.trim() === email}
+                  className="h-8 px-3 rounded-lg bg-[#3B82F6] text-white text-xs font-medium hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                >
+                  {savingEmail ? <Loader2 size={12} className="animate-spin" /> : "Send confirmation"}
+                </button>
+                <button
+                  onClick={() => { setShowEmailChange(false); setNewEmail(""); }}
+                  className="h-8 px-2 text-xs text-[#6B7280] hover:text-[#111827] transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Name (editable) */}
