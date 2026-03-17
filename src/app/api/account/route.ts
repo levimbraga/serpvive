@@ -64,13 +64,15 @@ export async function DELETE() {
       }
     }
 
-    // Delete refreshes and diagnoses by user_id (they have user_id FK)
-    const [refreshErr, diagErr] = await Promise.allSettled([
+    // Delete refreshes, diagnoses, and external analyses by user_id
+    const [refreshErr, diagErr, extErr] = await Promise.allSettled([
       admin.from("refreshes").delete().eq("user_id", user.id),
       admin.from("diagnoses").delete().eq("user_id", user.id),
+      admin.from("external_analyses").delete().eq("user_id", user.id),
     ]);
     if (refreshErr.status === "rejected") console.error("[account/delete] Refreshes error:", refreshErr.reason);
     if (diagErr.status === "rejected") console.error("[account/delete] Diagnoses error:", diagErr.reason);
+    if (extErr.status === "rejected") console.error("[account/delete] External analyses error:", extErr.reason);
 
     // Delete pages
     if (pageIds.length > 0) {
@@ -86,7 +88,10 @@ export async function DELETE() {
     if (sitesErr) console.error("[account/delete] Sites delete error:", sitesErr);
   }
 
-  // Delete profile
+  // Unlink demo analyses (public, keep but remove creator reference)
+  await admin.from("demo_analyses").update({ created_by: null }).eq("created_by", user.id);
+
+  // Delete profile (cascades to any remaining FKs)
   const { error: profileErr } = await admin.from("profiles").delete().eq("id", user.id);
   if (profileErr) console.error("[account/delete] Profile delete error:", profileErr);
 

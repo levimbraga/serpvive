@@ -121,20 +121,27 @@ export async function POST() {
     return NextResponse.json({ data: { status: "no_candidate" } });
   }
 
+  // Optimistic lock: mark as done BEFORE pipeline starts to prevent duplicate runs.
+  // The WelcomeCard polls every 10s — without this, it re-triggers the pipeline.
+  await admin
+    .from("sites")
+    .update({ has_free_diagnosis: true })
+    .eq("id", site.id);
+
   // Run diagnosis after response is sent — `after()` keeps the serverless
   // function alive on Vercel so the pipeline actually completes.
   after(async () => {
     try {
       console.log(`[diagnose/auto] Starting pipeline for site ${site.id}, page ${bestPage!.id}`);
       await runDiagnosisPipeline(admin, bestPage!.id, user!.id, "auto");
-      await admin
-        .from("sites")
-        .update({ has_free_diagnosis: true })
-        .eq("id", site.id);
       console.log(`[diagnose/auto] Free diagnosis complete for site ${site.id}`);
     } catch (err) {
       console.error(`[diagnose/auto] Failed for site ${site.id}:`, err);
-      // Do NOT mark has_free_diagnosis — let user retry via WelcomeCard
+      // Reset flag so user can retry via WelcomeCard
+      await admin
+        .from("sites")
+        .update({ has_free_diagnosis: false })
+        .eq("id", site.id);
     }
   });
 
