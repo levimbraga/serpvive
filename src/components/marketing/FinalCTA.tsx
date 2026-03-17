@@ -27,14 +27,8 @@ export default function FinalCTA() {
         </Reveal>
 
         <Reveal>
-          <p className="text-[16px] sm:text-[20px] text-[#94A3B8] leading-[1.7] max-w-[520px] mx-auto mb-10">
-            Your content is decaying right now. Do you know which posts?
-          </p>
-        </Reveal>
-
-        <Reveal>
-          <p className="text-[14px] sm:text-[16px] text-[#64748B] leading-relaxed max-w-[480px] mx-auto mb-10">
-            Stop guessing. Get AI-powered diagnosis with evidence from your actual SERP competitors.
+          <p className="text-[16px] sm:text-[20px] text-[#94A3B8] leading-[1.7] max-w-[560px] mx-auto mb-10">
+            Your content is decaying right now. SerpVive detects it, explains why, and tells you exactly what to fix.
           </p>
         </Reveal>
 
@@ -50,7 +44,13 @@ export default function FinalCTA() {
         </Reveal>
 
         <Reveal>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-7">
+          <p className="text-[14px] sm:text-[16px] text-[#64748B] leading-relaxed mt-6 mb-7">
+            Analyze any page for free — no Google Search Console required.
+          </p>
+        </Reveal>
+
+        <Reveal>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             {["No credit card required", "Cancel anytime", "First AI diagnosis included"].map((text) => (
               <span key={text} className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
                 <span className="text-[#3B82F6] font-bold text-[12px]">&#x2713;</span>

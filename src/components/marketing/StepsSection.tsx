@@ -3,9 +3,9 @@ import { Reveal } from "@/hooks/useReveal";
 const STEPS = [
   {
     num: 1,
-    title: "DETECT",
-    desc: "Monitor every page daily. Know the moment traffic drops.",
-    tag: "FREE · AUTOMATIC",
+    title: "CONNECT",
+    desc: "Link your Google Search Console. 2 clicks. Read-only access.",
+    tag: "FREE \u00B7 2 CLICKS",
     tagColor: "text-[#22C55E]",
     tagBg: "rgba(34,197,94,0.1)",
     tagBorder: "rgba(34,197,94,0.2)",
@@ -13,8 +13,18 @@ const STEPS = [
   },
   {
     num: 2,
+    title: "MONITOR",
+    desc: "We track every page, every day. You get a Health Score.",
+    tag: "AUTOMATIC",
+    tagColor: "text-[#3B82F6]",
+    tagBg: "rgba(59,130,246,0.1)",
+    tagBorder: "rgba(59,130,246,0.2)",
+    accent: false,
+  },
+  {
+    num: 3,
     title: "DIAGNOSE",
-    desc: "AI analyzes SERP, competitors & your content. Explains WHY.",
+    desc: "Click \u2018Diagnose\u2019 on any declining post. AI reads your competitors and explains WHY.",
     tag: "CLAUDE OPUS 4.6",
     tagColor: "text-[#7C3AED]",
     tagBg: "rgba(124,58,237,0.1)",
@@ -22,24 +32,14 @@ const STEPS = [
     accent: true,
   },
   {
-    num: 3,
-    title: "RECOMMEND",
-    desc: "\u201CChange title to X, add section about Y, fix price Z.\u201D",
+    num: 4,
+    title: "FIX",
+    desc: "Follow the action plan with ready-to-use suggestions. Mark as updated.",
     tag: "MICRO-DRAFTS",
     tagColor: "text-[#F97316]",
     tagBg: "rgba(249,115,22,0.1)",
     tagBorder: "rgba(249,115,22,0.2)",
     accent: true,
-  },
-  {
-    num: 4,
-    title: "TRACK",
-    desc: "Mark your post as updated. We snapshot the metrics.",
-    tag: "ONE CLICK",
-    tagColor: "text-[#3B82F6]",
-    tagBg: "rgba(59,130,246,0.1)",
-    tagBorder: "rgba(59,130,246,0.2)",
-    accent: false,
   },
   {
     num: 5,
@@ -62,12 +62,12 @@ export default function StepsSection() {
             className="text-[32px] sm:text-[44px] lg:text-[52px] font-extrabold leading-[1.1] mb-5"
             style={{ letterSpacing: "-0.04em" }}
           >
-            The complete content rescue system.
+            Five steps. Two minutes to set up.
           </h2>
         </Reveal>
         <Reveal>
-          <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[500px] mx-auto mb-14">
-            No other tool does all 5 steps.
+          <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[560px] mx-auto mb-14">
+            From &ldquo;my traffic is dropping&rdquo; to &ldquo;here&apos;s exactly what to fix&rdquo; — in one click.
           </p>
         </Reveal>
 

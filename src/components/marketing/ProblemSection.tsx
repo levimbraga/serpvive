@@ -29,12 +29,12 @@ export default function ProblemSection() {
           <h2 className="text-[32px] sm:text-[44px] lg:text-[52px] font-extrabold leading-[1.1] mb-5" style={{ letterSpacing: "-0.04em" }}>
             Your blog is losing traffic right now.
             <br />
-            <span className="text-[#475569]">You just don&apos;t know it yet.</span>
+            <span className="text-[#475569]">And AI Search is making it worse.</span>
           </h2>
         </Reveal>
         <Reveal>
           <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[600px] mx-auto mb-14">
-            The numbers don&apos;t lie — and they&apos;re getting worse with AI Search.
+            Content decay is the #1 silent threat to organic traffic. Here&apos;s the data:
           </p>
         </Reveal>
 

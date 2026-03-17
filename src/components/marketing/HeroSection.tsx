@@ -23,24 +23,24 @@ export default function HeroSection() {
         className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
         style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.2)" }}
       >
-        <span className="text-[14px]">✦</span>
-        AI-Powered Content Decay Monitor
+        <span className="text-[14px]">&#x2726;</span>
+        AI Content Decay Monitor
       </div>
 
       {/* ── Headline ── */}
       <h1
-        className="text-[48px] sm:text-[72px] lg:text-[96px] font-extrabold leading-[1.02] max-w-[1000px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
+        className="text-[40px] sm:text-[64px] lg:text-[84px] font-extrabold leading-[1.05] max-w-[1000px] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
         style={{ letterSpacing: "-0.05em" }}
       >
-        Revive your{" "}
-        <span className="text-[#3B82F6]">rankings.</span>
+        Your posts are losing traffic.
+        <br />
+        <span className="text-[#3B82F6]">We tell you why — and how to fix them.</span>
       </h1>
 
       {/* ── Subtitle ── */}
-      <p className="text-[16px] sm:text-[20px] leading-[1.7] text-[#94A3B8] max-w-[620px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]">
-        Your content is dying. We detect it, explain{" "}
-        <strong className="text-[#F1F5F9] font-semibold">WHY</strong> with AI, and tell you exactly{" "}
-        <strong className="text-[#F1F5F9] font-semibold">WHAT to fix</strong> — with evidence from your actual SERP competitors.
+      <p className="text-[16px] sm:text-[20px] leading-[1.7] text-[#94A3B8] max-w-[660px] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]">
+        SerpVive monitors every page on your blog. When traffic drops, our AI reads your competitors, compares with your content, and delivers a{" "}
+        <strong className="text-[#F1F5F9] font-semibold">specific action plan</strong> — not generic advice.
       </p>
 
       {/* ── Dual CTAs ── */}
@@ -51,7 +51,7 @@ export default function HeroSection() {
           className="inline-flex items-center gap-2.5 h-[60px] px-12 rounded-xl bg-[#3B82F6] text-white text-[18px] font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
         >
           Get Started Free
-          <span className="text-[20px] transition-transform duration-200 group-hover:translate-x-1">→</span>
+          <span className="text-[20px] transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
         </a>
         <a
           href="#features"
@@ -67,7 +67,7 @@ export default function HeroSection() {
       <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]">
         {["No credit card required", "1 free AI diagnosis included", "Setup in under 5 minutes"].map((text) => (
           <span key={text} className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
-            <span className="text-[#3B82F6] font-bold text-[12px]">✓</span>
+            <span className="text-[#3B82F6] font-bold text-[12px]">&#x2713;</span>
             {text}
           </span>
         ))}

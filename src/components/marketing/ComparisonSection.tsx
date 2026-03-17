@@ -1,19 +1,19 @@
 import { Reveal } from "@/hooks/useReveal";
 
 const TRADITIONAL = [
-  "Manual Google Analytics checks",
-  "Spreadsheet tracking",
-  "Generic 'update your content' advice",
-  "No way to measure if fixes worked",
-  "Hours of manual competitor research",
+  "Check Google Analytics manually every week",
+  "Track pages in spreadsheets",
+  "\u2018Your content needs updating\u2019 \u2014 no specifics",
+  "No way to know if fixes actually worked",
+  "Hours researching what competitors changed",
 ];
 
 const SERPVIVE = [
-  "Automatic daily decay detection",
-  "AI-powered Health Score",
-  "Specific fixes with evidence from SERP",
-  "Automatic before/after measurement",
-  "AI analyzes top 10 competitors in minutes",
+  "Every page monitored automatically, every day",
+  "Health Score + Decay Score calculated for you",
+  "\u2018Add a pricing table with 5 columns. Competitor #2 already has one.\u2019 \u2014 that specific",
+  "Automatic before/after measurement in 28 days",
+  "AI reads your top 3 competitors in 2 minutes",
 ];
 
 export default function ComparisonSection() {
@@ -41,7 +41,7 @@ export default function ComparisonSection() {
             <div className="rounded-xl border border-[#E2E8F0] p-7 sm:p-9">
               <div className="flex items-center gap-2.5 mb-7">
                 <div className="w-8 h-8 rounded-full bg-[#FEF2F2] flex items-center justify-center">
-                  <span className="text-[#EF4444] text-[16px] font-bold">✗</span>
+                  <span className="text-[#EF4444] text-[16px] font-bold">&#x2717;</span>
                 </div>
                 <h3 className="text-[18px] font-bold text-[#0F172A]">Traditional Audits</h3>
               </div>
@@ -49,7 +49,7 @@ export default function ComparisonSection() {
                 {TRADITIONAL.map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="mt-0.5 w-5 h-5 rounded-full bg-[#FEF2F2] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#EF4444] text-[11px] font-bold">✗</span>
+                      <span className="text-[#EF4444] text-[11px] font-bold">&#x2717;</span>
                     </span>
                     <span className="text-[15px] text-[#475569] leading-relaxed">{item}</span>
                   </li>
@@ -61,7 +61,7 @@ export default function ComparisonSection() {
             <div className="rounded-xl border border-[#DBEAFE] p-7 sm:p-9" style={{ background: "#F8FAFF" }}>
               <div className="flex items-center gap-2.5 mb-7">
                 <div className="w-8 h-8 rounded-full bg-[#DCFCE7] flex items-center justify-center">
-                  <span className="text-[#22C55E] text-[16px] font-bold">✓</span>
+                  <span className="text-[#22C55E] text-[16px] font-bold">&#x2713;</span>
                 </div>
                 <h3 className="text-[18px] font-bold text-[#0F172A]">SerpVive</h3>
               </div>
@@ -69,7 +69,7 @@ export default function ComparisonSection() {
                 {SERPVIVE.map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="mt-0.5 w-5 h-5 rounded-full bg-[#DCFCE7] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#22C55E] text-[11px] font-bold">✓</span>
+                      <span className="text-[#22C55E] text-[11px] font-bold">&#x2713;</span>
                     </span>
                     <span className="text-[15px] text-[#334155] leading-relaxed">{item}</span>
                   </li>

@@ -30,7 +30,7 @@ export default function SocialProof() {
             ))}
           </div>
           <span className="text-[14px] text-[#94A3B8]">
-            Built for <strong className="text-[#F1F5F9] font-semibold">SEO professionals</strong> who protect the traffic they&apos;ve already earned
+            Trusted by <strong className="text-[#F1F5F9] font-semibold">SEO professionals</strong>, content teams, and agencies
           </span>
         </div>
 
@@ -47,7 +47,7 @@ export default function SocialProof() {
             ))}
           </div>
           <span className="text-[14px] text-[#94A3B8]">
-            Join <strong className="text-[#F1F5F9] font-semibold">early adopters</strong> already monitoring their content
+            Join professionals already <strong className="text-[#F1F5F9] font-semibold">recovering lost traffic</strong>
           </span>
         </div>
 
@@ -57,7 +57,7 @@ export default function SocialProof() {
             <span key={cat} className="flex items-center gap-2 text-[13px] text-[#64748B] font-medium uppercase tracking-wide">
               {cat}
               {i < CATEGORIES.length - 1 && (
-                <span className="text-[#1E293B]">·</span>
+                <span className="text-[#1E293B]">&middot;</span>
               )}
             </span>
           ))}
