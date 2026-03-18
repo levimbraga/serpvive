@@ -8,12 +8,14 @@ import {
   Sparkles, Database, Gift,
 } from "lucide-react";
 
+type AutoDiagStatus = "pending" | "engine_running" | "diagnosing" | "completed" | "failed";
+
 type WelcomeCardProps = {
   siteId: string;
   domain: string;
   pagesCount: number;
   hasEngineRun: boolean;
-  hasDiagnosis: boolean;
+  autoDiagStatus: AutoDiagStatus;
   freeDiagPageId: string | null;
   freeDiagPagePath: string | null;
   dismissed: boolean;
@@ -26,9 +28,8 @@ export default function WelcomeCard({
   domain,
   pagesCount,
   hasEngineRun,
-  hasDiagnosis,
+  autoDiagStatus,
   freeDiagPageId,
-  freeDiagPagePath,
   dismissed: initialDismissed,
 }: WelcomeCardProps) {
   const router = useRouter();
@@ -36,25 +37,22 @@ export default function WelcomeCard({
 
   const [dismissed, setDismissed] = useState(() => {
     if (initialDismissed) return true;
-    // Returning user: engine already ran + has diagnosis = not a first visit
-    if (hasEngineRun && hasDiagnosis && freeDiagPageId) return true;
+    if (autoDiagStatus === "completed" && freeDiagPageId) return true;
     return false;
   });
 
-  // Client actions: track whether user has triggered engine/diagnosis
-  const [importStep] = useState<Step>("done");
+  // Local state only for engine run (which completes in-page)
   const [userTriggeredEngine, setUserTriggeredEngine] = useState(false);
-  const [userTriggeredDiag, setUserTriggeredDiag] = useState(false);
   const [enginePagesOverride, setEnginePagesOverride] = useState<number | null>(null);
-  const [diagPageIdOverride, setDiagPageIdOverride] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  // Derive steps: server props take priority, then local trigger state
+  // Steps derived from DB-persisted state (server props)
   const engineStep: Step = hasEngineRun ? "done" : userTriggeredEngine ? "running" : "pending";
-  const diagStep: Step = hasDiagnosis ? "done" : userTriggeredDiag ? "running" : "pending";
+  const diagStep: Step =
+    autoDiagStatus === "completed" ? "done" :
+    autoDiagStatus === "diagnosing" ? "running" :
+    "pending";
   const enginePages = enginePagesOverride ?? pagesCount;
-  const diagPageId = freeDiagPageId ?? diagPageIdOverride;
-  const diagPagePath = freeDiagPagePath;
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -67,18 +65,15 @@ export default function WelcomeCard({
     return () => stopPolling();
   }, [stopPolling]);
 
-  // Stop polling once diagnosis arrives from server refresh
+  // Auto-poll when diagnosing (status comes from DB via server refresh)
   useEffect(() => {
-    if (hasDiagnosis && freeDiagPageId) stopPolling();
-  }, [hasDiagnosis, freeDiagPageId, stopPolling]);
-
-  // Poll by refreshing the server component data
-  function startPolling(intervalMs: number) {
-    stopPolling();
-    pollRef.current = setInterval(() => {
-      router.refresh();
-    }, intervalMs);
-  }
+    if (autoDiagStatus === "diagnosing") {
+      stopPolling();
+      pollRef.current = setInterval(() => router.refresh(), 5_000);
+    } else {
+      stopPolling();
+    }
+  }, [autoDiagStatus, router, stopPolling]);
 
   async function handleRunEngine() {
     setUserTriggeredEngine(true);
@@ -95,25 +90,12 @@ export default function WelcomeCard({
       }
 
       setEnginePagesOverride(json.data?.pagesProcessed ?? pagesCount);
-      router.refresh();
 
       // Auto-trigger free diagnosis
-      setUserTriggeredDiag(true);
-      const diagRes = await fetch("/api/diagnose/auto", { method: "POST" });
-      const diagJson = (await diagRes.json()) as { data?: { status: string; pageId?: string } };
+      await fetch("/api/diagnose/auto", { method: "POST" });
 
-      if (diagJson.data?.status === "already_done") {
-        setUserTriggeredDiag(false);
-        router.refresh();
-        return;
-      }
-
-      if (diagJson.data?.pageId) {
-        setDiagPageIdOverride(diagJson.data.pageId);
-      }
-
-      // Poll for diagnosis completion (every 10s)
-      startPolling(10_000);
+      // Refresh to pick up new status from DB
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
       setUserTriggeredEngine(false);
@@ -121,27 +103,20 @@ export default function WelcomeCard({
   }
 
   async function handleRetryDiagnosis() {
-    setUserTriggeredDiag(true);
     setError("");
 
     try {
-      const diagRes = await fetch("/api/diagnose/auto", { method: "POST" });
-      const diagJson = (await diagRes.json()) as { data?: { status: string; pageId?: string } };
+      const res = await fetch("/api/diagnose/auto", { method: "POST" });
+      const json = (await res.json()) as { data?: { status: string } };
 
-      if (diagJson.data?.status === "already_done") {
-        setUserTriggeredDiag(false);
-        router.refresh();
-        return;
+      if (json.data?.status === "failed") {
+        setError("Auto-diagnosis failed. You can pick any page to analyze manually.");
       }
 
-      if (diagJson.data?.pageId) {
-        setDiagPageIdOverride(diagJson.data.pageId);
-      }
-
-      startPolling(10_000);
+      // Refresh to pick up new status from DB
+      router.refresh();
     } catch {
-      setError("Diagnosis failed. Please try again.");
-      setUserTriggeredDiag(false);
+      setError("Network error. Please try again.");
     }
   }
 
@@ -157,11 +132,11 @@ export default function WelcomeCard({
 
   if (dismissed) return null;
 
-  const allDone = engineStep === "done" && diagStep === "done" && diagPageId;
+  const allDone = engineStep === "done" && diagStep === "done" && freeDiagPageId;
 
   return (
     <div className="relative bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
-      {/* Dismiss button — always visible */}
+      {/* Dismiss button */}
       <button
         onClick={handleDismiss}
         className="absolute top-4 right-4 p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
@@ -173,64 +148,43 @@ export default function WelcomeCard({
       <h2 className="text-lg font-semibold text-[#111827] mb-1">
         Site connected! Here&apos;s what happens next
       </h2>
-      <p className="text-sm text-[#6B7280] mb-5">
-        {domain}
-      </p>
+      <p className="text-sm text-[#6B7280] mb-5">{domain}</p>
 
       {/* Steps */}
       <div className="space-y-4 mb-6">
-        {/* Step 1: Import */}
         <StepRow
-          step={importStep}
+          step="done"
           icon={<Database size={16} strokeWidth={1.5} />}
           label="Import data from Google Search Console"
           detail="done"
         />
-
-        {/* Step 2: Engine */}
         <StepRow
           step={engineStep}
           icon={<Sparkles size={16} strokeWidth={1.5} />}
           label="Run the Decay Engine to analyze your pages"
           detail={
-            engineStep === "done"
-              ? `${enginePages} pages analyzed`
-              : engineStep === "running"
-              ? "Analyzing your pages..."
-              : undefined
+            engineStep === "done" ? `${enginePages} pages analyzed`
+            : engineStep === "running" ? "Analyzing your pages..."
+            : undefined
           }
         />
-
-        {/* Step 3: Diagnosis */}
         <StepRow
           step={diagStep}
           icon={<Gift size={16} strokeWidth={1.5} />}
           label="Get your first AI diagnosis — free, on us"
           detail={
-            diagStep === "done" && diagPagePath
-              ? "Your first diagnosis is ready!"
-              : diagStep === "running"
-              ? "Generating your free diagnosis..."
-              : undefined
+            diagStep === "done" ? "Your first diagnosis is ready!"
+            : diagStep === "running" ? "Generating your free diagnosis..."
+            : autoDiagStatus === "failed" ? "Pick any page to analyze manually"
+            : undefined
           }
         />
       </div>
 
-      {/* Description */}
-      {engineStep === "pending" && (
-        <p className="text-sm text-[#6B7280] mb-5 leading-relaxed">
-          The Decay Engine scans your imported data, calculates your Health Score, and identifies
-          which pages need attention. After it runs, we&apos;ll automatically generate a free AI
-          diagnosis for your most critical page. This usually takes about 1–2 minutes.
-        </p>
-      )}
-
       {/* Error */}
-      {error && (
-        <p className="text-sm text-[#DC2626] mb-4">{error}</p>
-      )}
+      {error && <p className="text-sm text-[#DC2626] mb-4">{error}</p>}
 
-      {/* Actions */}
+      {/* Actions based on state */}
       {engineStep === "pending" && (
         <div>
           <button
@@ -247,10 +201,7 @@ export default function WelcomeCard({
       )}
 
       {engineStep === "running" && (
-        <button
-          disabled
-          className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold opacity-70 cursor-not-allowed"
-        >
+        <button disabled className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] text-white text-sm font-semibold opacity-70 cursor-not-allowed">
           <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
           Running...
         </button>
@@ -263,43 +214,51 @@ export default function WelcomeCard({
         </div>
       )}
 
-      {/* Engine done but diagnosis hasn't started or failed — show retry + manual option */}
+      {/* Engine done + diagnosis pending or failed — show action */}
       {diagStep === "pending" && engineStep === "done" && (
         <div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={handleRetryDiagnosis}
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
-            >
-              <Gift size={16} strokeWidth={1.5} />
-              Get Free Diagnosis
-            </button>
-            <Link
-              href="/pages"
-              className="text-sm text-[#7C3AED] hover:text-[#6D28D9] font-medium transition-colors"
-            >
-              or pick a page
-            </Link>
+            {autoDiagStatus === "failed" ? (
+              <Link
+                href="/pages"
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+              >
+                <Gift size={16} strokeWidth={1.5} />
+                Pick a page to analyze
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={handleRetryDiagnosis}
+                  className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+                >
+                  <Gift size={16} strokeWidth={1.5} />
+                  Get Free Diagnosis
+                </button>
+                <Link href="/pages" className="text-sm text-[#7C3AED] hover:text-[#6D28D9] font-medium transition-colors">
+                  or pick a page
+                </Link>
+              </>
+            )}
           </div>
           <p className="text-xs text-[#9CA3AF] mt-3">
-            AI will analyze your most important page and explain what to improve.
+            {autoDiagStatus === "failed"
+              ? "Your free diagnosis is ready — choose any page."
+              : "AI will analyze your most important page and explain what to improve."}
           </p>
         </div>
       )}
 
-      {allDone && diagPageId && (
+      {allDone && freeDiagPageId && (
         <div className="flex items-center gap-3">
           <Link
-            href={`/pages/${diagPageId}`}
+            href={`/pages/${freeDiagPageId}`}
             className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
           >
             View diagnosis
             <ArrowRight size={16} strokeWidth={1.5} />
           </Link>
-          <button
-            onClick={handleDismiss}
-            className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
-          >
+          <button onClick={handleDismiss} className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
             Dismiss
           </button>
         </div>
@@ -308,17 +267,7 @@ export default function WelcomeCard({
   );
 }
 
-function StepRow({
-  step,
-  icon,
-  label,
-  detail,
-}: {
-  step: Step;
-  icon: React.ReactNode;
-  label: string;
-  detail?: string;
-}) {
+function StepRow({ step, icon, label, detail }: { step: Step; icon: React.ReactNode; label: string; detail?: string }) {
   return (
     <div className="flex items-start gap-3">
       <div className="mt-0.5 flex-shrink-0">
@@ -332,10 +281,10 @@ function StepRow({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className={`${step === "done" ? "text-[#16A34A]" : step === "running" ? "text-[#3B82F6]" : "text-[#9CA3AF]"}`}>
+          <span className={step === "done" ? "text-[#16A34A]" : step === "running" ? "text-[#3B82F6]" : "text-[#9CA3AF]"}>
             {icon}
           </span>
-          <span className={`text-sm font-medium ${step === "done" ? "text-[#111827]" : step === "running" ? "text-[#111827]" : "text-[#6B7280]"}`}>
+          <span className={`text-sm font-medium ${step === "done" || step === "running" ? "text-[#111827]" : "text-[#6B7280]"}`}>
             {label}
           </span>
         </div>

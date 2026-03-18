@@ -48,7 +48,7 @@ export default async function DashboardPage() {
     activeSiteId
       ? supabase
           .from("sites")
-          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, status, created_at, token_error, welcome_dismissed, free_diag_dismissed")
+          .select("id, domain, health_score, health_score_prev, pages_count, total_content_pages, pages_healthy, pages_warning, pages_critical, pages_dead, last_engine_run_at, last_sync_at, has_free_diagnosis, auto_diagnosis_status, status, created_at, token_error, welcome_dismissed, free_diag_dismissed")
           .eq("id", activeSiteId)
           .single()
       : Promise.resolve({ data: null }),
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
   // Free diagnosis: find the auto-diagnosed page
   let freeDiagPageId: string | null = null;
   let freeDiagPagePath: string | null = null;
-  const isAutoProcessing = site.status === "active" && !site.has_free_diagnosis && hasEngineRun;
+  const isAutoProcessing = site.auto_diagnosis_status === "diagnosing";
 
   if (site.has_free_diagnosis) {
     const { data: autoDiag } = await supabase
@@ -228,7 +228,7 @@ export default async function DashboardPage() {
           domain={site.domain}
           pagesCount={site.pages_count ?? 0}
           hasEngineRun={hasEngineRun}
-          hasDiagnosis={!!site.has_free_diagnosis}
+          autoDiagStatus={(site.auto_diagnosis_status ?? "pending") as "pending" | "engine_running" | "diagnosing" | "completed" | "failed"}
           freeDiagPageId={freeDiagPageId}
           freeDiagPagePath={freeDiagPagePath}
           dismissed={site.welcome_dismissed ?? false}

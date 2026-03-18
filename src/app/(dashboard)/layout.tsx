@@ -26,7 +26,7 @@ export default async function DashboardLayout({
       .single(),
     supabase
       .from("sites")
-      .select("id, domain, status, health_score, has_free_diagnosis")
+      .select("id, domain, status, health_score, has_free_diagnosis, auto_diagnosis_status")
       .eq("user_id", user.id)
       .order("created_at", { ascending: true }),
   ]);
