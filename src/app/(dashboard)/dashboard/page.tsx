@@ -162,6 +162,10 @@ export default async function DashboardPage() {
   const totalContentPages = site.total_content_pages ?? site.pages_count ?? 0;
   const pageLimit = PLAN_LIMITS[plan]?.pages ?? 100;
 
+  // WelcomeCard is visible when not dismissed AND not auto-completed
+  const welcomeCardVisible = site.status === "active" &&
+    !(site.welcome_dismissed ?? false);
+
   // Free diagnosis: find the auto-diagnosed page
   let freeDiagPageId: string | null = null;
   let freeDiagPagePath: string | null = null;
@@ -278,6 +282,12 @@ export default async function DashboardPage() {
                   </p>
                 </div>
               )}
+            </div>
+          ) : welcomeCardVisible ? (
+            <div className="text-center py-8">
+              <p className="text-[#9CA3AF] text-sm">
+                Health score will appear after the engine runs.
+              </p>
             </div>
           ) : (
             <div className="text-center py-8">
