@@ -572,55 +572,12 @@ export default function SettingsClient({
       <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
         <h2 className="text-sm font-semibold text-[#111827] mb-4">Account</h2>
         <div className="divide-y divide-[#F3F4F6]">
-          {/* Email (with change option) */}
+          {/* Email (read-only — change email disabled for now, re-enable by setting ENABLE_CHANGE_EMAIL to true) */}
           <div className="py-3 first:pt-0">
             <div className="flex items-center justify-between">
               <span className="text-sm text-[#6B7280]">Email</span>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[#111827]">{email}</span>
-                {isPasswordAuth && !showEmailChange && !emailChangeSuccess && (
-                  <button
-                    onClick={() => setShowEmailChange(true)}
-                    className="text-xs font-medium text-[#3B82F6] hover:text-[#2563EB] transition-colors"
-                  >
-                    Change
-                  </button>
-                )}
-              </div>
+              <span className="text-sm text-[#111827]">{email}</span>
             </div>
-            {emailChangeSuccess && (
-              <div className="mt-2 flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg px-3 py-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                <p className="text-xs text-[#1E40AF]">
-                  Confirmation sent to <strong>{newEmail}</strong>. Click the link to complete the change.
-                  <span className="text-[#6B7280]"> Can&apos;t find it? Check your spam or junk folder.</span>
-                </p>
-              </div>
-            )}
-            {showEmailChange && !emailChangeSuccess && (
-              <div className="mt-3 flex items-center gap-2">
-                <input
-                  type="email"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="New email address"
-                  className="h-8 flex-1 px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
-                />
-                <button
-                  onClick={handleChangeEmail}
-                  disabled={savingEmail || !newEmail.trim() || newEmail.trim() === email}
-                  className="h-8 px-3 rounded-lg bg-[#3B82F6] text-white text-xs font-medium hover:bg-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
-                >
-                  {savingEmail ? <Loader2 size={12} className="animate-spin" /> : "Send confirmation"}
-                </button>
-                <button
-                  onClick={() => { setShowEmailChange(false); setNewEmail(""); }}
-                  className="h-8 px-2 text-xs text-[#6B7280] hover:text-[#111827] transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Name (editable) */}
