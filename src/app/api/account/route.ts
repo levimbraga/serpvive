@@ -20,14 +20,27 @@ export async function DELETE() {
     .eq("id", user.id)
     .single();
 
-  // Cancel Stripe subscription if active
-  if (profile?.stripe_subscription_id) {
+  // Cancel Stripe subscription + scrub PII from customer (keep customer for tax/dispute compliance)
+  if (profile?.stripe_customer_id) {
     try {
       const stripe = getStripe();
-      await stripe.subscriptions.cancel(profile.stripe_subscription_id);
-      console.log(`[account/delete] Canceled subscription ${profile.stripe_subscription_id}`);
+
+      if (profile.stripe_subscription_id) {
+        await stripe.subscriptions.cancel(profile.stripe_subscription_id);
+        console.log(`[account/delete] Canceled subscription ${profile.stripe_subscription_id}`);
+      }
+
+      // Clear PII but preserve the customer object for invoice/tax records
+      await stripe.customers.update(profile.stripe_customer_id, {
+        name: "",
+        email: "",
+        phone: "",
+        description: "[deleted user]",
+        metadata: { deleted: "true", deleted_at: new Date().toISOString() },
+      });
+      console.log(`[account/delete] Scrubbed PII from Stripe customer ${profile.stripe_customer_id}`);
     } catch (err) {
-      console.error("[account/delete] Stripe cancel error:", err);
+      console.error("[account/delete] Stripe cleanup error:", err);
     }
   }
 
