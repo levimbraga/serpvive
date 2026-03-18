@@ -67,6 +67,11 @@ export default function WelcomeCard({
     return () => stopPolling();
   }, [stopPolling]);
 
+  // Stop polling once diagnosis arrives from server refresh
+  useEffect(() => {
+    if (hasDiagnosis && freeDiagPageId) stopPolling();
+  }, [hasDiagnosis, freeDiagPageId, stopPolling]);
+
   // Poll by refreshing the server component data
   function startPolling(intervalMs: number) {
     stopPolling();

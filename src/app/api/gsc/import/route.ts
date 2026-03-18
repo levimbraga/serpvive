@@ -13,7 +13,6 @@ import {
 import { isContentUrl } from "@/lib/engine/url-filter";
 import { getPostHogServer } from "@/lib/posthog/server";
 import { runEngine } from "@/lib/engine/run-engine";
-import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
 import { sendOnboardingDay0 } from "@/lib/email/send";
 
@@ -344,55 +343,8 @@ async function runImport(
       console.error("[gsc/import] Engine failed:", err);
     }
 
-    // ── Auto-generate free first diagnosis ──
-    try {
-      const { data: siteCheck } = await admin
-        .from("sites")
-        .select("has_free_diagnosis")
-        .eq("id", siteId)
-        .single();
-
-      if (!siteCheck?.has_free_diagnosis) {
-        // Pick the best page: highest decay_score, or highest clicks if all "new"
-        const { data: candidates } = await admin
-          .from("pages")
-          .select("id, status, decay_score, current_clicks_28d, current_impressions_28d, primary_keyword")
-          .eq("site_id", siteId)
-          .order("decay_score", { ascending: false })
-          .limit(50);
-
-        if (candidates && candidates.length > 0) {
-          const allNew = candidates.every((p) => p.status === "new" || p.status === "unknown");
-
-          let bestPage: typeof candidates[0] | null = null;
-
-          if (allNew) {
-            // New site: pick page with most clicks (most value to protect)
-            bestPage = [...candidates].sort((a, b) =>
-              (b.current_clicks_28d ?? 0) - (a.current_clicks_28d ?? 0),
-            )[0] ?? null;
-          } else {
-            // Existing site: pick most critical with keyword
-            bestPage = candidates.find((p) => p.primary_keyword) ?? candidates[0] ?? null;
-          }
-
-          if (bestPage) {
-            console.log(`[gsc/import] Auto-diagnosing page ${bestPage.id} (decay: ${bestPage.decay_score}, clicks: ${bestPage.current_clicks_28d})`);
-            await runDiagnosisPipeline(admin, bestPage.id, userId, "auto");
-
-            await admin
-              .from("sites")
-              .update({ has_free_diagnosis: true })
-              .eq("id", siteId);
-
-            console.log("[gsc/import] Free diagnosis complete!");
-          }
-        }
-      }
-    } catch (err) {
-      console.error("[gsc/import] Auto-diagnosis failed:", err);
-      // Do NOT mark has_free_diagnosis — let user retry via WelcomeCard
-    }
+    // Auto-diagnosis is handled by /api/diagnose/auto (triggered by WelcomeCard).
+    // Removed from import to prevent duplicate runs — single code path only.
 
     // ── Send onboarding day 0 email ──
     try {
