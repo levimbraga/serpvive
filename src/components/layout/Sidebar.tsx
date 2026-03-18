@@ -52,9 +52,10 @@ type SidebarProps = {
   userEmail?: string;
   hasFreeDiagnosis?: boolean;
   hasGsc?: boolean;
+  autoDiagStatus?: string;
 };
 
-export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, userEmail, hasFreeDiagnosis, hasGsc }: SidebarProps) {
+export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, userEmail, hasFreeDiagnosis, hasGsc, autoDiagStatus }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
@@ -180,14 +181,14 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
               />
             </div>
           </>
-        ) : hasGsc && !hasFreeDiagnosis ? (
+        ) : autoDiagStatus === "failed" && hasGsc && !hasFreeDiagnosis ? (
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#0D9488]" />
             <Link href="/pages" className="text-[12px] text-[#0D9488] hover:text-[#14B8A6] transition-colors no-underline font-medium">
               1 free diagnosis available
             </Link>
           </div>
-        ) : hasGsc ? (
+        ) : autoDiagStatus === "completed" || (hasGsc && hasFreeDiagnosis) ? (
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
             <Link href="/settings" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">

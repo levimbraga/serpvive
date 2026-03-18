@@ -160,6 +160,7 @@ export default function PageDetailClient({
   timeZone,
   userEmail,
   hasFreeDiagnosis = true,
+  autoDiagStatus = "pending",
 }: {
   page: PageData;
   siteDomain: string;
@@ -172,6 +173,7 @@ export default function PageDetailClient({
   timeZone: string;
   userEmail: string;
   hasFreeDiagnosis?: boolean;
+  autoDiagStatus?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -194,7 +196,8 @@ export default function PageDetailClient({
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const isFree = plan === "free";
-  const atLimit = (isFree && hasFreeDiagnosis) || (!isFree && diagnosesUsed >= diagnosesLimit);
+  const engineNotReady = isFree && (autoDiagStatus === "pending" || autoDiagStatus === "engine_running" || autoDiagStatus === "diagnosing");
+  const atLimit = engineNotReady || (isFree && hasFreeDiagnosis) || (!isFree && diagnosesUsed >= diagnosesLimit);
   const isAdmin = userEmail === "levimaiabraga@gmail.com";
 
   function handleExport(format: "md" | "json") {
@@ -1244,9 +1247,11 @@ export default function PageDetailClient({
           </p>
           <p className="text-xs text-[#9CA3AF] mt-2">
             {isFree
-              ? hasFreeDiagnosis
-                ? "Upgrade to a paid plan to run more AI diagnoses."
-                : "This will use your 1 free diagnosis."
+              ? engineNotReady
+                ? "Run the Decay Engine first to unlock AI diagnosis."
+                : hasFreeDiagnosis
+                  ? "Upgrade to a paid plan to run more AI diagnoses."
+                  : "This will use your 1 free diagnosis."
               : `Uses 1 of your ${diagnosesLimit} monthly diagnoses (${diagnosesUsed} used)`
             }
           </p>

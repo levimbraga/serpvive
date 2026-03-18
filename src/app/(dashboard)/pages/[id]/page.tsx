@@ -30,7 +30,7 @@ export default async function PageDetailPage({
   // Verify ownership
   const { data: site } = await supabase
     .from("sites")
-    .select("user_id, domain, has_free_diagnosis")
+    .select("user_id, domain, has_free_diagnosis, auto_diagnosis_status")
     .eq("id", page.site_id)
     .single();
 
@@ -77,6 +77,7 @@ export default async function PageDetailPage({
       timeZone={profileRes.data?.timezone ?? "UTC"}
       userEmail={user.email ?? ""}
       hasFreeDiagnosis={!!(site as { has_free_diagnosis?: boolean }).has_free_diagnosis}
+      autoDiagStatus={(site as { auto_diagnosis_status?: string }).auto_diagnosis_status ?? "pending"}
     />
   );
 }

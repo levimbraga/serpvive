@@ -53,6 +53,7 @@ export default async function DashboardLayout({
         userEmail={user.email ?? ""}
         hasFreeDiagnosis={hasFreeDiagnosis}
         hasGsc={hasGsc}
+        autoDiagStatus={(activeSite as { auto_diagnosis_status?: string } | undefined)?.auto_diagnosis_status ?? "pending"}
       />
       <div className="sm:ml-[200px]">
         <DashboardHeader
