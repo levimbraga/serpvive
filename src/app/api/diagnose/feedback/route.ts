@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
     await resend.emails.send({
       from: "SerpVive Feedback <noreply@mail.serpvive.com>",
-      to: "levimaiabraga@gmail.com",
+      to: process.env.ADMIN_EMAIL ?? "",
       replyTo: profile?.email ?? user.email ?? undefined,
       subject: `[SerpVive Feedback] ${feedback === "helpful" ? "helpful" : "not_helpful"} — ${page?.url ?? "unknown page"}`,
       text: [

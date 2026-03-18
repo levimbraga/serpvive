@@ -41,25 +41,22 @@ const PLAN_LABELS: Record<string, string> = {
   agency: "AGENCY",
 };
 
-const ADMIN_EMAIL = "levimaiabraga@gmail.com";
-
 type SidebarProps = {
   diagnosesUsed: number;
   diagnosesLimit: number;
   plan?: string;
   sites: SiteItem[];
   activeSiteId: string | null;
-  userEmail?: string;
+  isAdmin?: boolean;
   hasFreeDiagnosis?: boolean;
   hasGsc?: boolean;
   autoDiagStatus?: string;
 };
 
-export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, userEmail, hasFreeDiagnosis, hasGsc, autoDiagStatus }: SidebarProps) {
+export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, isAdmin, hasFreeDiagnosis, hasGsc, autoDiagStatus }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
-  const isAdmin = userEmail === ADMIN_EMAIL;
 
   const activeSite = sites.find((s) => s.id === activeSiteId) ?? sites[0] ?? null;
   const hasMultipleSites = sites.length > 1;

@@ -158,7 +158,7 @@ export default function PageDetailClient({
   diagnosesUsed,
   diagnosesLimit,
   timeZone,
-  userEmail,
+  isAdmin = false,
   hasFreeDiagnosis = true,
   autoDiagStatus = "pending",
 }: {
@@ -171,7 +171,7 @@ export default function PageDetailClient({
   diagnosesUsed: number;
   diagnosesLimit: number;
   timeZone: string;
-  userEmail: string;
+  isAdmin?: boolean;
   hasFreeDiagnosis?: boolean;
   autoDiagStatus?: string;
 }) {
@@ -198,7 +198,6 @@ export default function PageDetailClient({
   const isFree = plan === "free";
   const engineNotReady = isFree && (autoDiagStatus === "pending" || autoDiagStatus === "engine_running" || autoDiagStatus === "diagnosing");
   const atLimit = engineNotReady || (isFree && hasFreeDiagnosis) || (!isFree && diagnosesUsed >= diagnosesLimit);
-  const isAdmin = userEmail === "levimaiabraga@gmail.com";
 
   function handleExport(format: "md" | "json") {
     if (!diagnosis) return;

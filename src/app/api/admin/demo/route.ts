@@ -8,7 +8,7 @@ import { nanoid } from "nanoid";
 
 export const maxDuration = 300; // 5 minutes
 
-const ADMIN_EMAIL = "levimaiabraga@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
 
 const CreateDemoSchema = z.object({
   url: z.string().url().startsWith("https://"),

@@ -15,6 +15,13 @@ export const RATE_LIMITS_PER_HOUR: Record<PlanName, number> = {
   agency: 20,
 };
 
+/** Server-only: reads ADMIN_EMAIL from env. Never expose on the client. */
+export function getAdminEmail(): string {
+  const email = process.env.ADMIN_EMAIL;
+  if (!email) throw new Error("Missing ADMIN_EMAIL env var");
+  return email;
+}
+
 export const DECAY_THRESHOLDS = {
   healthy_max: 15,
   warning_max: 30,
