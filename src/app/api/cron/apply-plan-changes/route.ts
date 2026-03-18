@@ -47,6 +47,7 @@ export async function GET(request: Request) {
     if (isCancellation) {
       updateData.free_since = new Date().toISOString();
       updateData.stripe_subscription_id = null;
+      updateData.billing_interval = "monthly";
     }
 
     const { error: updateError } = await admin

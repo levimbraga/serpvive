@@ -16,7 +16,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day, email_unsubscribed, pending_plan, plan_changes_at")
+    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day, email_unsubscribed, pending_plan, plan_changes_at, billing_interval")
     .eq("id", user.id)
     .single();
 
@@ -51,7 +51,7 @@ export default async function SettingsPage() {
       emailUnsubscribed={profile.email_unsubscribed ?? false}
       pendingPlan={profile.pending_plan ?? null}
       planChangesAt={profile.plan_changes_at ?? null}
-      billingInterval="monthly"
+      billingInterval={profile.billing_interval === "annual" ? "annual" : "monthly"}
       authProvider={authProvider}
     />
   );

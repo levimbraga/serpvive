@@ -141,7 +141,7 @@ export default function SettingsClient({
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
-  const [isAnnual, setIsAnnual] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(billingInterval === "annual");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -182,12 +182,13 @@ export default function SettingsClient({
   const isPasswordAuth = authProvider === "email";
 
   // Plans available for upgrade
-  // Monthly: only show plans ABOVE current
-  // Annual: show plans >= current (same plan on annual = valid switch)
+  // Annual toggle + currently monthly: show plans >= current (same plan = monthly→annual switch)
+  // Annual toggle + already annual: show only plans ABOVE current (no same-plan switch)
+  // Monthly toggle: show only plans ABOVE current
   const currentPlanIndex = PLAN_ORDER.indexOf(plan);
   const upgradePlans = PLANS_FOR_UPGRADE.filter((p) => {
     const targetIndex = PLAN_ORDER.indexOf(p.key);
-    if (isAnnual) {
+    if (isAnnual && billingInterval === "monthly") {
       return targetIndex >= currentPlanIndex && p.key !== "free";
     }
     return targetIndex > currentPlanIndex;

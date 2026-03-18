@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getStripe, resolvePlanFromPriceId } from "@/lib/stripe";
+import { getStripe, resolvePlanFromPriceId, resolveIntervalFromPriceId } from "@/lib/stripe";
 
 export async function POST() {
   const supabase = await getSupabaseServer();
@@ -30,8 +30,10 @@ export async function POST() {
 
     // ALWAYS resolve from price_id first (metadata may be stale from original checkout)
     let plan: string | undefined;
+    let billingInterval: "monthly" | "annual" = "monthly";
     if (priceId) {
       plan = await resolvePlanFromPriceId(priceId);
+      billingInterval = await resolveIntervalFromPriceId(priceId);
     }
     if (!plan) {
       plan = subscription.metadata?.plan;
@@ -52,14 +54,15 @@ export async function POST() {
       .update({
         plan,
         plan_status: planStatus,
+        billing_interval: billingInterval,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
 
-    console.log(`[stripe/sync-plan] Synced: user=${user.id}, plan=${plan}, status=${planStatus}`);
+    console.log(`[stripe/sync-plan] Synced: user=${user.id}, plan=${plan} (${billingInterval}), status=${planStatus}`);
 
     return NextResponse.json({
-      data: { plan, planStatus, synced: true },
+      data: { plan, planStatus, billingInterval, synced: true },
     });
   } catch (err) {
     // Subscription deleted or not found — downgrade to free
@@ -70,6 +73,7 @@ export async function POST() {
       .update({
         plan: "free",
         plan_status: "active",
+        billing_interval: "monthly",
         free_since: new Date().toISOString(),
         stripe_subscription_id: null,
         updated_at: new Date().toISOString(),

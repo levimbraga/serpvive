@@ -68,6 +68,45 @@ const KNOWN_PRICE_IDS: Record<string, string> = {
   "price_1T97lKLxIzb11hGRFU6644Ux": "agency",   // legacy monthly $99
 };
 
+/** Known annual price IDs — used to resolve billing interval without Stripe API call */
+const KNOWN_ANNUAL_PRICE_IDS = new Set([
+  // Starter annual $290
+  "price_1TABV3LxIzb11hGRQ8bbW8xK",
+  // Pro annual $690
+  "price_1TABV4LxIzb11hGRlFGdOl27",
+  // Agency annual $1290
+  "price_1TABV4LxIzb11hGRW10lkSuU",
+]);
+
+/**
+ * Resolve Stripe price_id → billing interval ("monthly" | "annual").
+ * Checks: 1) env vars, 2) hardcoded set, 3) Stripe API fallback.
+ */
+export async function resolveIntervalFromPriceId(priceId: string): Promise<"monthly" | "annual"> {
+  // 1. Check env var match (annualPriceId fields)
+  for (const config of Object.values(STRIPE_PLANS)) {
+    if (config.annualPriceId === priceId) return "annual";
+    if (config.priceId === priceId) return "monthly";
+  }
+
+  // 2. Check hardcoded annual set
+  if (KNOWN_ANNUAL_PRICE_IDS.has(priceId)) return "annual";
+
+  // 3. If in KNOWN_PRICE_IDS but not annual → monthly
+  if (KNOWN_PRICE_IDS[priceId]) return "monthly";
+
+  // 4. Fallback: ask Stripe API
+  try {
+    const stripe = getStripe();
+    const price = await stripe.prices.retrieve(priceId);
+    if (price.recurring?.interval === "year") return "annual";
+  } catch (err) {
+    console.error(`[stripe] Failed to resolve interval for price_id=${priceId}:`, err);
+  }
+
+  return "monthly";
+}
+
 /** Product name → plan key mapping for Stripe API fallback */
 const PRODUCT_NAME_TO_PLAN: Record<string, string> = {
   starter: "starter",

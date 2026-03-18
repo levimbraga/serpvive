@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripe, resolvePlanFromPriceId } from "@/lib/stripe";
+import { getStripe, resolvePlanFromPriceId, resolveIntervalFromPriceId } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPostHogServer } from "@/lib/posthog/server";
@@ -108,10 +108,12 @@ export async function POST(request: Request) {
         break;
       }
 
-      // Resolve plan: ALWAYS use price_id (metadata may be stale from original checkout)
+      // Resolve plan + interval: ALWAYS use price_id (metadata may be stale from original checkout)
       let plan: string | undefined;
+      let billingInterval: "monthly" | "annual" = "monthly";
       if (priceId) {
         plan = await resolvePlanFromPriceId(priceId);
+        billingInterval = await resolveIntervalFromPriceId(priceId);
       }
       if (!plan) {
         plan = subscription.metadata?.plan;
@@ -156,6 +158,7 @@ export async function POST(request: Request) {
             pending_plan: plan,
             plan_changes_at: periodEnd,
             plan_status: planStatus,
+            billing_interval: billingInterval,
             stripe_subscription_id: subscription.id,
             updated_at: new Date().toISOString(),
           })
@@ -164,17 +167,18 @@ export async function POST(request: Request) {
         if (updateError) {
           console.error(`[stripe/webhook] CRITICAL: Failed to set pending downgrade:`, updateError);
         } else {
-          console.log(`[stripe/webhook] SUCCESS: user=${userId} pending downgrade to ${plan} at ${periodEnd}`);
+          console.log(`[stripe/webhook] SUCCESS: user=${userId} pending downgrade to ${plan} (${billingInterval}) at ${periodEnd}`);
         }
       } else {
         // UPGRADE or same-tier change: apply immediately
-        console.log(`[stripe/webhook] Updating profile: user=${userId}, plan=${plan}, status=${planStatus}`);
+        console.log(`[stripe/webhook] Updating profile: user=${userId}, plan=${plan} (${billingInterval}), status=${planStatus}`);
 
         const { error: updateError } = await admin
           .from("profiles")
           .update({
             plan,
             plan_status: planStatus,
+            billing_interval: billingInterval,
             pending_plan: null,
             plan_changes_at: null,
             stripe_subscription_id: subscription.id,
@@ -185,7 +189,7 @@ export async function POST(request: Request) {
         if (updateError) {
           console.error(`[stripe/webhook] CRITICAL: Failed to update profile:`, updateError);
         } else {
-          console.log(`[stripe/webhook] SUCCESS: user=${userId} updated to plan=${plan}, status=${planStatus}`);
+          console.log(`[stripe/webhook] SUCCESS: user=${userId} updated to plan=${plan} (${billingInterval}), status=${planStatus}`);
         }
 
         // Handle excess sites after upgrade (shouldn't happen, but defensive)
@@ -212,7 +216,7 @@ export async function POST(request: Request) {
         }
       }
 
-      getPostHogServer().capture({ distinctId: userId, event: "plan_changed", properties: { plan, planStatus, isDowngrade } });
+      getPostHogServer().capture({ distinctId: userId, event: "plan_changed", properties: { plan, planStatus, billingInterval, isDowngrade } });
       break;
     }
 
@@ -319,21 +323,25 @@ async function processCheckout(
 
   // ALWAYS resolve from price_id first (metadata may be stale)
   let plan: string | undefined;
-  if (subscription?.items?.data?.[0]?.price?.id) {
-    plan = await resolvePlanFromPriceId(subscription.items.data[0].price.id);
+  let billingInterval: "monthly" | "annual" = "monthly";
+  const checkoutPriceId = subscription?.items?.data?.[0]?.price?.id;
+  if (checkoutPriceId) {
+    plan = await resolvePlanFromPriceId(checkoutPriceId);
+    billingInterval = await resolveIntervalFromPriceId(checkoutPriceId);
   }
   if (!plan) {
     plan = subscription?.metadata?.plan;
   }
   plan = plan || "starter";
 
-  console.log(`[stripe/webhook] processCheckout: user=${userId}, plan=${plan}`);
+  console.log(`[stripe/webhook] processCheckout: user=${userId}, plan=${plan} (${billingInterval})`);
 
   const { error: updateError } = await admin
     .from("profiles")
     .update({
       plan,
       plan_status: "active",
+      billing_interval: billingInterval,
       free_since: null,
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
@@ -354,5 +362,5 @@ async function processCheckout(
     .eq("user_id", userId)
     .eq("status", "paused");
 
-  getPostHogServer().capture({ distinctId: userId, event: "plan_upgraded", properties: { plan } });
+  getPostHogServer().capture({ distinctId: userId, event: "plan_upgraded", properties: { plan, billingInterval } });
 }
