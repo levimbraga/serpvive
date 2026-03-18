@@ -289,10 +289,19 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
 
       {/* URL + keyword header */}
       <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
             Page Analysis
           </span>
+          {analysisId && (
+            <Link
+              href={`/pages/analyze/${analysisId}`}
+              className="text-xs text-[#6B7280] hover:text-[#3B82F6] transition-colors flex items-center gap-1"
+            >
+              Saved — view permalink
+              <ArrowLeft size={10} strokeWidth={1.5} className="rotate-180" />
+            </Link>
+          )}
         </div>
         <p className="text-sm font-medium text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>
           {url}
