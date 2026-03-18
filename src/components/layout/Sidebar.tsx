@@ -50,9 +50,11 @@ type SidebarProps = {
   sites: SiteItem[];
   activeSiteId: string | null;
   userEmail?: string;
+  hasFreeDiagnosis?: boolean;
+  hasGsc?: boolean;
 };
 
-export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, userEmail }: SidebarProps) {
+export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, userEmail, hasFreeDiagnosis, hasGsc }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
@@ -178,11 +180,25 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
               />
             </div>
           </>
-        ) : (
+        ) : hasGsc && !hasFreeDiagnosis ? (
+          <div className="flex items-center gap-2">
+            <Zap size={13} strokeWidth={1.5} className="text-[#0D9488]" />
+            <Link href="/pages" className="text-[12px] text-[#0D9488] hover:text-[#14B8A6] transition-colors no-underline font-medium">
+              1 free diagnosis available
+            </Link>
+          </div>
+        ) : hasGsc ? (
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
             <Link href="/settings" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">
               Upgrade for AI diagnoses
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
+            <Link href="/onboarding" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">
+              Connect GSC to get started
             </Link>
           </div>
         )}

@@ -131,13 +131,18 @@ export async function POST() {
   // Run diagnosis after response is sent — `after()` keeps the serverless
   // function alive on Vercel so the pipeline actually completes.
   after(async () => {
+    const TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
     try {
       console.log(`[diagnose/auto] Starting pipeline for site ${site.id}, page ${bestPage!.id}`);
-      await runDiagnosisPipeline(admin, bestPage!.id, user!.id, "auto");
+      const pipeline = runDiagnosisPipeline(admin, bestPage!.id, user!.id, "auto");
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Auto-diagnosis timed out after 3 minutes")), TIMEOUT_MS),
+      );
+      await Promise.race([pipeline, timeout]);
       console.log(`[diagnose/auto] Free diagnosis complete for site ${site.id}`);
     } catch (err) {
       console.error(`[diagnose/auto] Failed for site ${site.id}:`, err);
-      // Reset flag so user can retry via WelcomeCard
+      // Reset flag so user can retry via WelcomeCard or pick a page manually
       await admin
         .from("sites")
         .update({ has_free_diagnosis: false })

@@ -26,7 +26,7 @@ export default async function DashboardLayout({
       .single(),
     supabase
       .from("sites")
-      .select("id, domain, status, health_score")
+      .select("id, domain, status, health_score, has_free_diagnosis")
       .eq("user_id", user.id)
       .order("created_at", { ascending: true }),
   ]);
@@ -36,10 +36,10 @@ export default async function DashboardLayout({
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const sites = sitesRes.data ?? [];
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-
-  // Onboarding redirects are handled by middleware (middleware.ts)
-  // Layout only needs to provide activeSiteId for the sidebar/header
   const activeSiteId = await getActiveSiteId(supabase, user.id);
+  const activeSite = sites.find((s) => s.id === activeSiteId);
+  const hasFreeDiagnosis = !!(activeSite as { has_free_diagnosis?: boolean } | undefined)?.has_free_diagnosis;
+  const hasGsc = sites.length > 0;
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -51,6 +51,8 @@ export default async function DashboardLayout({
         sites={sites}
         activeSiteId={activeSiteId}
         userEmail={user.email ?? ""}
+        hasFreeDiagnosis={hasFreeDiagnosis}
+        hasGsc={hasGsc}
       />
       <div className="sm:ml-[200px]">
         <DashboardHeader

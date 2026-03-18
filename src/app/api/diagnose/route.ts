@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   const { data: site } = await admin
     .from("sites")
-    .select("user_id")
+    .select("user_id, has_free_diagnosis")
     .eq("id", page.site_id)
     .single();
 
@@ -66,6 +66,7 @@ export async function POST(request: Request) {
   }
 
   const plan = profile.plan as PlanName;
+  const isFreeDiagnosis = plan === "free" && !site.has_free_diagnosis;
 
   // Rate limit per plan
   const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
@@ -76,30 +77,31 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: manual diagnoses always blocked.
-  // The free auto-diagnosis goes through /api/diagnose/auto (separate route).
-  if (plan === "free") {
+  // Free plan: allow 1 manual diagnosis if has_free_diagnosis is false
+  if (plan === "free" && site.has_free_diagnosis) {
     return NextResponse.json(
-      { error: "Upgrade to a paid plan to run AI diagnoses." },
+      { error: "You've used your free diagnosis. Upgrade for unlimited AI diagnoses." },
       { status: 403 },
     );
   }
 
-  // Block if subscription canceled
-  if (profile.plan_status === "canceled") {
+  // Block if subscription canceled (paid plans only)
+  if (plan !== "free" && profile.plan_status === "canceled") {
     return NextResponse.json(
       { error: "Subscription canceled. Resubscribe to use AI diagnoses." },
       { status: 403 },
     );
   }
 
-  // Check monthly limit
-  const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-  if (profile.diagnoses_used_this_month >= limit) {
-    return NextResponse.json(
-      { error: `Diagnosis limit reached (${limit}/${limit}). Upgrade your plan for more.` },
-      { status: 429 },
-    );
+  // Check monthly limit (paid plans only — free uses has_free_diagnosis gate)
+  if (plan !== "free") {
+    const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+    if (profile.diagnoses_used_this_month >= limit) {
+      return NextResponse.json(
+        { error: `Diagnosis limit reached (${limit}/${limit}). Upgrade your plan for more.` },
+        { status: 429 },
+      );
+    }
   }
 
   // Check for concurrent diagnosis — prevent user from running 2 at once
@@ -123,17 +125,27 @@ export async function POST(request: Request) {
     }
   }
 
-  // Increment usage BEFORE running (prevents race condition)
-  await admin
-    .from("profiles")
-    .update({
-      diagnoses_used_this_month: profile.diagnoses_used_this_month + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+  // Increment usage BEFORE running (prevents race condition) — skip for free plan
+  if (!isFreeDiagnosis) {
+    await admin
+      .from("profiles")
+      .update({
+        diagnoses_used_this_month: profile.diagnoses_used_this_month + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+  }
 
   try {
     const result = await runDiagnosisPipeline(admin, pageId, user.id, "manual", parsed.data.keywordOverride);
+
+    // Mark free diagnosis as used on success
+    if (isFreeDiagnosis) {
+      await admin
+        .from("sites")
+        .update({ has_free_diagnosis: true })
+        .eq("id", page.site_id);
+    }
 
     return NextResponse.json({
       data: {
@@ -146,12 +158,14 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     // Rollback usage on failure — user shouldn't lose a diagnosis credit
-    await admin
-      .from("profiles")
-      .update({
-        diagnoses_used_this_month: profile.diagnoses_used_this_month,
-      })
-      .eq("id", user.id);
+    if (!isFreeDiagnosis) {
+      await admin
+        .from("profiles")
+        .update({
+          diagnoses_used_this_month: profile.diagnoses_used_this_month,
+        })
+        .eq("id", user.id);
+    }
 
     const message = err instanceof Error ? err.message : String(err);
     console.error("[api/diagnose] Pipeline error:", message);

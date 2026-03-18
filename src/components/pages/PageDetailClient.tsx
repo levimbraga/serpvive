@@ -159,6 +159,7 @@ export default function PageDetailClient({
   diagnosesLimit,
   timeZone,
   userEmail,
+  hasFreeDiagnosis = true,
 }: {
   page: PageData;
   siteDomain: string;
@@ -170,6 +171,7 @@ export default function PageDetailClient({
   diagnosesLimit: number;
   timeZone: string;
   userEmail: string;
+  hasFreeDiagnosis?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -192,7 +194,7 @@ export default function PageDetailClient({
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const isFree = plan === "free";
-  const atLimit = isFree || diagnosesUsed >= diagnosesLimit;
+  const atLimit = (isFree && hasFreeDiagnosis) || (!isFree && diagnosesUsed >= diagnosesLimit);
   const isAdmin = userEmail === "levimaiabraga@gmail.com";
 
   function handleExport(format: "md" | "json") {
@@ -1242,7 +1244,9 @@ export default function PageDetailClient({
           </p>
           <p className="text-xs text-[#9CA3AF] mt-2">
             {isFree
-              ? "Upgrade to a paid plan to run AI diagnoses."
+              ? hasFreeDiagnosis
+                ? "Upgrade to a paid plan to run more AI diagnoses."
+                : "This will use your 1 free diagnosis."
               : `Uses 1 of your ${diagnosesLimit} monthly diagnoses (${diagnosesUsed} used)`
             }
           </p>

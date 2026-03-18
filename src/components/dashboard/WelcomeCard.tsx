@@ -258,16 +258,24 @@ export default function WelcomeCard({
         </div>
       )}
 
-      {/* Engine done but diagnosis hasn't started or failed — show retry */}
+      {/* Engine done but diagnosis hasn't started or failed — show retry + manual option */}
       {diagStep === "pending" && engineStep === "done" && (
         <div>
-          <button
-            onClick={handleRetryDiagnosis}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
-          >
-            <Gift size={16} strokeWidth={1.5} />
-            Get Free Diagnosis
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRetryDiagnosis}
+              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+            >
+              <Gift size={16} strokeWidth={1.5} />
+              Get Free Diagnosis
+            </button>
+            <Link
+              href="/pages"
+              className="text-sm text-[#7C3AED] hover:text-[#6D28D9] font-medium transition-colors"
+            >
+              or pick a page
+            </Link>
+          </div>
           <p className="text-xs text-[#9CA3AF] mt-3">
             AI will analyze your most important page and explain what to improve.
           </p>
