@@ -207,6 +207,10 @@ export default function PageDetailClient({
   const [expandedPrevEvidence, setExpandedPrevEvidence] = useState<Set<string>>(new Set());
 
   // Merge state
+  const [mergedDismissed, setMergedDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try { return localStorage.getItem(`merge_dismissed_${page.id}`) === "1"; } catch { return false; }
+  });
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeSearch, setMergeSearch] = useState("");
   const [selectedMergePage, setSelectedMergePage] = useState<{ id: string; path: string; url: string } | null>(null);
@@ -581,14 +585,23 @@ export default function PageDetailClient({
           </div>
         </div>
 
-        {/* Merged-from banner */}
-        {mergedFrom && (
-          <div className="mt-3 flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg px-3 py-2">
-            <GitMerge size={14} strokeWidth={1.5} className="text-[#2563EB] flex-shrink-0" />
-            <p className="text-xs text-[#1E40AF]">
-              Includes history merged from <span className="font-medium" style={{ fontFamily: "var(--font-mono, monospace)" }}>{mergedFrom.path}</span> on{" "}
-              {new Date(mergedFrom.mergedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })}.
-            </p>
+        {/* Merged-from note */}
+        {mergedFrom && !mergedDismissed && (
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-[#9CA3AF]">
+            <Info size={11} strokeWidth={1.5} className="flex-shrink-0" />
+            <span>
+              Merged from{" "}
+              <span style={{ fontFamily: "var(--font-mono, monospace)" }}>{mergedFrom.path}</span>
+              {" "}&middot;{" "}
+              {new Date(mergedFrom.mergedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })}
+            </span>
+            <button
+              onClick={() => { setMergedDismissed(true); try { localStorage.setItem(`merge_dismissed_${page.id}`, "1"); } catch {} }}
+              className="ml-1 text-[#D1D5DB] hover:text-[#9CA3AF] transition-colors"
+              aria-label="Dismiss"
+            >
+              &times;
+            </button>
           </div>
         )}
 
