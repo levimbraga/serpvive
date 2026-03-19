@@ -502,8 +502,9 @@ export default function PageDetailClient({
               <span className="text-xs text-[#9CA3AF]">{siteDomain}</span>
             </div>
             <h1
-              className="text-xl font-semibold text-[#111827] truncate break-all"
+              className="text-xl font-semibold text-[#111827] truncate max-w-full"
               style={{ fontFamily: "var(--font-mono, monospace)" }}
+              title={page.url}
             >
               {page.path}
             </h1>
@@ -1376,7 +1377,7 @@ export default function PageDetailClient({
                     key={p.id}
                     onClick={() => setSelectedMergePage(p)}
                     className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors ${
-                      selectedMergePage?.id === p.id ? "bg-[#FFFBEB] border-l-2 border-l-[#D97706]" : ""
+                      selectedMergePage?.id === p.id ? "bg-[#EFF6FF] border-l-2 border-l-[#3B82F6]" : ""
                     }`}
                   >
                     <span className="font-medium text-[#111827] truncate block" style={{ fontFamily: "var(--font-mono, monospace)" }}>
@@ -1388,14 +1389,14 @@ export default function PageDetailClient({
             </div>
 
             {selectedMergePage && (
-              <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-3 space-y-2">
-                <p className="text-xs font-medium text-[#92400E]">Preview</p>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-[#6B7280] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>{selectedMergePage.path}</span>
-                  <ArrowLeft size={12} strokeWidth={1.5} className="text-[#D97706] rotate-180 flex-shrink-0" />
-                  <span className="text-[#111827] font-medium truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>{page.path}</span>
+              <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-3 space-y-2">
+                <p className="text-xs font-medium text-[#1E40AF]">Preview</p>
+                <div className="flex items-center gap-2 text-xs min-w-0">
+                  <span className="text-[#6B7280] truncate min-w-0" style={{ fontFamily: "var(--font-mono, monospace)" }} title={selectedMergePage.url}>{selectedMergePage.path}</span>
+                  <ArrowLeft size={12} strokeWidth={1.5} className="text-[#3B82F6] rotate-180 flex-shrink-0" />
+                  <span className="text-[#111827] font-medium truncate min-w-0" style={{ fontFamily: "var(--font-mono, monospace)" }} title={page.url}>{page.path}</span>
                 </div>
-                <p className="text-[11px] text-[#B45309]">
+                <p className="text-[11px] text-[#1E40AF]">
                   Diagnoses and refresh history from the old page will be moved here. The old page will be archived. This cannot be easily undone.
                 </p>
               </div>
@@ -1417,7 +1418,7 @@ export default function PageDetailClient({
             <button
               onClick={handleMerge}
               disabled={mergeLoading || !selectedMergePage}
-              className="h-9 px-4 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {mergeLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <GitMerge size={14} strokeWidth={1.5} />}
               Merge Pages
