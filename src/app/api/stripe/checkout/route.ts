@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       if (subscription.status === "active" || subscription.status === "trialing") {
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: profile.stripe_customer_id,
-          return_url: `${appUrl}/settings?upgrade=success`,
+          return_url: `${appUrl}/settings`,
           flow_data: {
             type: "subscription_update",
             subscription_update: {

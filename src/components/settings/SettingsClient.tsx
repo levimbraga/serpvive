@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
@@ -144,6 +144,16 @@ export default function SettingsClient({
   const [isAnnual, setIsAnnual] = useState(billingInterval === "annual");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Clean upgrade/checkout query params after showing the banner once
+  useEffect(() => {
+    if (upgradeStatus || checkoutStatus) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("upgrade");
+      url.searchParams.delete("checkout");
+      window.history.replaceState({}, "", url.pathname);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Disconnect site state
   const [disconnectSite, setDisconnectSite] = useState<SiteInfo | null>(null);
