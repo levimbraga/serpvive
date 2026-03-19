@@ -129,6 +129,61 @@ export async function POST(request: Request) {
       };
       const planStatus = statusMap[subscription.status] ?? "active";
 
+      // Handle cancellation scheduled via Stripe Portal (cancel_at_period_end)
+      // This fires as subscription.updated with status still "active" — the plan/price don't change,
+      // only the cancel_at_period_end flag is set. We must detect this separately.
+      if (subscription.cancel_at_period_end) {
+        const itemPeriodEnd = subscription.items?.data?.[0]?.current_period_end;
+        const periodEnd = itemPeriodEnd
+          ? new Date(itemPeriodEnd * 1000).toISOString()
+          : new Date().toISOString();
+
+        console.log(`[stripe/webhook] CANCELLATION scheduled: user=${userId}, plan=${plan}, active until ${periodEnd}`);
+
+        const { error: cancelError } = await admin
+          .from("profiles")
+          .update({
+            pending_plan: "free",
+            plan_changes_at: periodEnd,
+            plan_status: "canceled",
+            stripe_subscription_id: subscription.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (cancelError) {
+          console.error(`[stripe/webhook] CRITICAL: Failed to set pending cancellation:`, cancelError);
+        } else {
+          console.log(`[stripe/webhook] SUCCESS: user=${userId} cancellation deferred to ${periodEnd}`);
+        }
+
+        getPostHogServer().capture({ distinctId: userId, event: "plan_cancel_scheduled", properties: { plan, effectiveAt: periodEnd } });
+        break;
+      }
+
+      // If user re-activated (cancel_at_period_end went from true → false), clear pending cancellation
+      if (!subscription.cancel_at_period_end) {
+        const { data: checkProfile } = await admin
+          .from("profiles")
+          .select("pending_plan")
+          .eq("id", userId)
+          .single();
+
+        if (checkProfile?.pending_plan === "free") {
+          await admin
+            .from("profiles")
+            .update({
+              pending_plan: null,
+              plan_changes_at: null,
+              plan_status: "active",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", userId);
+
+          console.log(`[stripe/webhook] Cancellation reversed for user=${userId}`);
+        }
+      }
+
       // Determine if this is a downgrade by comparing plan tiers
       const planLimits = await import("@/lib/constants").then((m) => m.PLAN_LIMITS);
       const PLAN_TIER: Record<string, number> = { free: 0, starter: 1, pro: 2, agency: 3 };
