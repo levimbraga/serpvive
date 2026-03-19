@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { getStripe, resolveIntervalFromPriceId } from "@/lib/stripe";
 
 /**
  * Cron: Apply deferred plan changes (downgrades/cancellations).
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
 
   const { data: profiles, error } = await admin
     .from("profiles")
-    .select("id, plan, pending_plan, plan_changes_at")
+    .select("id, plan, pending_plan, plan_changes_at, stripe_subscription_id")
     .not("pending_plan", "is", null)
     .lte("plan_changes_at", new Date().toISOString());
 
@@ -48,6 +49,18 @@ export async function GET(request: Request) {
       updateData.free_since = new Date().toISOString();
       updateData.stripe_subscription_id = null;
       updateData.billing_interval = "monthly";
+    } else if (profile.stripe_subscription_id) {
+      // Resolve billing interval from the current Stripe subscription
+      try {
+        const stripe = getStripe();
+        const sub = await stripe.subscriptions.retrieve(profile.stripe_subscription_id);
+        const priceId = sub.items?.data?.[0]?.price?.id;
+        if (priceId) {
+          updateData.billing_interval = await resolveIntervalFromPriceId(priceId);
+        }
+      } catch (err) {
+        console.error(`[cron/apply-plan-changes] Failed to resolve interval for user=${profile.id}:`, err);
+      }
     }
 
     const { error: updateError } = await admin

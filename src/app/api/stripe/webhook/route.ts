@@ -152,13 +152,15 @@ export async function POST(request: Request) {
 
         console.log(`[stripe/webhook] DOWNGRADE detected: user=${userId}, ${currentProfile?.plan} → ${plan}, deferred until ${periodEnd}`);
 
+        // Note: billing_interval is NOT updated here — it stays at the current value
+        // until the plan change is applied by the cron. This ensures Settings shows
+        // the correct current billing state during the transition period.
         const { error: updateError } = await admin
           .from("profiles")
           .update({
             pending_plan: plan,
             plan_changes_at: periodEnd,
             plan_status: planStatus,
-            billing_interval: billingInterval,
             stripe_subscription_id: subscription.id,
             updated_at: new Date().toISOString(),
           })
