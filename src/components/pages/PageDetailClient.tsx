@@ -1348,56 +1348,90 @@ export default function PageDetailClient({
 
       {/* Merge modal */}
       <Dialog open={showMergeModal} onOpenChange={(open) => { if (!open) { setShowMergeModal(false); setSelectedMergePage(null); setMergeSearch(""); setMergeError(""); } }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-[640px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <GitMerge size={18} strokeWidth={1.5} className="text-[#D97706]" />
+              <GitMerge size={18} strokeWidth={1.5} className="text-[#3B82F6]" />
               Merge Page History
             </DialogTitle>
             <DialogDescription>
-              Transfer all diagnoses and refreshes from an old URL into this page. The old page will be marked as redirected.
+              Select the old page (previous URL) to merge into this one. Diagnoses and refresh history will be transferred here. The old page will be archived.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 overflow-hidden">
-            <input
-              type="text"
-              value={mergeSearch}
-              onChange={(e) => setMergeSearch(e.target.value)}
-              placeholder="Search pages by path or URL..."
-              className="h-9 w-full px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
-            />
-
-            <div className="max-h-48 overflow-hidden overflow-y-auto border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
-              {filteredMergePages.length === 0 ? (
-                <p className="text-sm text-[#9CA3AF] text-center py-4">No matching pages</p>
-              ) : (
-                filteredMergePages.slice(0, 20).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setSelectedMergePage(p)}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors overflow-hidden ${
-                      selectedMergePage?.id === p.id ? "bg-[#EFF6FF] border-l-2 border-l-[#3B82F6]" : ""
-                    }`}
-                  >
-                    <span className="font-medium text-[#111827] block truncate max-w-full" style={{ fontFamily: "var(--font-mono, monospace)" }} title={p.path}>
-                      {p.path}
-                    </span>
-                  </button>
-                ))
-              )}
+          <div className="space-y-4 overflow-hidden">
+            {/* Current page (new URL) */}
+            <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg px-3 py-2.5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#16A34A] bg-[#16A34A]/10 px-2 py-0.5 rounded">New</span>
+                <span className="text-xs text-[#6B7280]">This page (will receive history)</span>
+              </div>
+              <p className="text-sm font-medium text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }} title={page.url}>
+                {page.path}
+              </p>
             </div>
 
+            {/* Select old page */}
+            <div>
+              <p className="text-xs font-medium text-[#6B7280] mb-2">Select the old page:</p>
+              <input
+                type="text"
+                value={mergeSearch}
+                onChange={(e) => setMergeSearch(e.target.value)}
+                placeholder="Search pages by path or URL..."
+                className="h-9 w-full px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent mb-2"
+              />
+              <div className="max-h-48 overflow-hidden overflow-y-auto border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
+                {filteredMergePages.length === 0 ? (
+                  <p className="text-sm text-[#9CA3AF] text-center py-4">No matching pages</p>
+                ) : (
+                  filteredMergePages.slice(0, 20).map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelectedMergePage(p)}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors overflow-hidden ${
+                        selectedMergePage?.id === p.id ? "bg-[#EFF6FF] border-l-2 border-l-[#3B82F6]" : ""
+                      }`}
+                    >
+                      <span className="font-medium text-[#111827] block truncate max-w-full" style={{ fontFamily: "var(--font-mono, monospace)" }} title={p.path}>
+                        {p.path}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Merge preview */}
             {selectedMergePage && (
-              <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg p-3 space-y-2">
-                <p className="text-xs font-medium text-[#1E40AF]">Preview</p>
-                <div className="flex items-center gap-2 text-xs min-w-0">
-                  <span className="text-[#6B7280] truncate min-w-0" style={{ fontFamily: "var(--font-mono, monospace)" }} title={selectedMergePage.url}>{selectedMergePage.path}</span>
-                  <ArrowLeft size={12} strokeWidth={1.5} className="text-[#3B82F6] rotate-180 flex-shrink-0" />
-                  <span className="text-[#111827] font-medium truncate min-w-0" style={{ fontFamily: "var(--font-mono, monospace)" }} title={page.url}>{page.path}</span>
+              <div className="border border-[#E5E7EB] rounded-lg p-3 space-y-3 overflow-hidden">
+                <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded">Old</span>
+                    <span className="text-[10px] text-[#9CA3AF]">Will be archived</span>
+                  </div>
+                  <p className="text-sm text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }} title={selectedMergePage.url}>
+                    {selectedMergePage.path}
+                  </p>
                 </div>
-                <p className="text-[11px] text-[#1E40AF]">
-                  Diagnoses and refresh history from the old page will be moved here. The old page will be archived. This cannot be easily undone.
+                <div className="flex justify-center">
+                  <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
+                    <span>↓</span>
+                    <span>merge into</span>
+                    <span>↓</span>
+                  </div>
+                </div>
+                <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#16A34A] bg-[#16A34A]/10 px-2 py-0.5 rounded">New</span>
+                    <span className="text-[10px] text-[#9CA3AF]">Will receive history</span>
+                  </div>
+                  <p className="text-sm font-medium text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }} title={page.url}>
+                    {page.path}
+                  </p>
+                </div>
+                <p className="text-[11px] text-[#9CA3AF] text-center">
+                  This cannot be easily undone.
                 </p>
               </div>
             )}
