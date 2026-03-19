@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import DemoResultClient from "./DemoResultClient";
+import DemoFeedback from "./DemoFeedback";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -88,35 +89,38 @@ export default async function DemoPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       {/* Header */}
-      <header className="border-b border-[#1E293B] bg-[#0F172A]">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/">
-            <span className="text-2xl font-extrabold text-white tracking-tight">
-              Serp<span className="text-[#3B82F6]">Vive</span>
+      <header className="bg-[#0F172A] border-b border-[#1E293B]">
+        <div className="max-w-4xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/">
+              <span className="text-2xl font-extrabold text-white tracking-tight">
+                Serp<span className="text-[#3B82F6]">Vive</span>
+              </span>
+            </Link>
+            <span className="text-[13px] text-[#3B82F6] bg-[#3B82F6]/10 border border-[#3B82F6]/20 px-4 py-1.5 rounded-full font-semibold">
+              Free Content Analysis
             </span>
-          </Link>
-          <span className="text-[13px] text-[#94A3B8] bg-[#1E293B] px-4 py-1.5 rounded-full font-medium">
-            Free Content Analysis
-          </span>
+          </div>
+          <div className="space-y-1">
+            <p
+              className="text-sm text-white font-medium truncate"
+              style={{ fontFamily: "var(--font-mono, monospace)" }}
+            >
+              {demo.url}
+            </p>
+            <p className="text-xs text-[#64748B]">
+              Keyword: <span className="text-[#94A3B8]">{demo.keyword}</span>
+              {" "}&middot;{" "}
+              {new Date(demo.created_at).toLocaleDateString("en-US", {
+                month: "long", day: "numeric", year: "numeric",
+              })}
+            </p>
+          </div>
         </div>
       </header>
 
-      {/* Subtitle */}
-      <div className="max-w-4xl mx-auto px-6 pt-8 pb-2">
-        <p className="text-xs text-[#9CA3AF]">
-          Analysis of{" "}
-          <span className="text-[#6B7280]" style={{ fontFamily: "var(--font-mono, monospace)" }}>
-            {demo.url}
-          </span>{" "}
-          &middot;{" "}
-          {new Date(demo.created_at).toLocaleDateString("en-US", {
-            month: "long", day: "numeric", year: "numeric",
-          })}
-        </p>
-      </div>
-
       {/* Analysis content */}
-      <main className="max-w-4xl mx-auto px-6 pb-8">
+      <main className="max-w-4xl mx-auto px-6 py-8">
         <DemoResultClient
           url={demo.url}
           keyword={demo.keyword}
@@ -126,10 +130,19 @@ export default async function DemoPage({ params }: Props) {
         />
       </main>
 
+      {/* Feedback Section */}
+      <section className="max-w-xl mx-auto px-6 pb-8">
+        <DemoFeedback
+          demoAnalysisId={id}
+          pageUrl={demo.url}
+          keyword={demo.keyword}
+        />
+      </section>
+
       {/* CTA Section */}
       <section className="border-t border-[#E5E7EB]" style={{ background: "linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)" }}>
         <div className="max-w-2xl mx-auto px-6 py-16 text-center">
-          <div className="border border-[#BFDBFE] rounded-xl p-8">
+          <div className="border border-[#BFDBFE] rounded-xl p-8 bg-white/50">
             <h2 className="text-2xl font-semibold text-[#111827] mb-3">
               Want this for your entire blog?
             </h2>
@@ -153,7 +166,7 @@ export default async function DemoPage({ params }: Props) {
               ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
               <Link
                 href="/signup"
                 className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
@@ -167,15 +180,20 @@ export default async function DemoPage({ params }: Props) {
                 See Pricing
               </Link>
             </div>
+            <p className="text-xs text-[#9CA3AF]">No credit card required &middot; Free plan available</p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-[#E5E7EB] bg-[#F9FAFB]">
-        <div className="max-w-4xl mx-auto px-6 py-4 text-center">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <Link href="/" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827] transition-colors no-underline">
+            Serp<span className="text-[#3B82F6]">Vive</span>
+            <span className="font-normal text-xs text-[#9CA3AF] ml-2">Revive your rankings.</span>
+          </Link>
           <p className="text-xs text-[#9CA3AF]">
-            &copy; {new Date().getFullYear()} SerpVive. AI-powered content decay monitoring.
+            &copy; {new Date().getFullYear()} SerpVive
           </p>
         </div>
       </footer>
