@@ -9,7 +9,7 @@ type PageRow = {
   id: string;
   path: string;
   url: string;
-  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown";
+  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected";
   currentClicks28d: number;
   decayScore: number;
   velocity7d: number;
@@ -26,7 +26,8 @@ const STATUS_CONFIG = {
   critical: { color: "#DC2626", bg: "#FEF2F2", label: "Critical" },
   dead:     { color: "#6B7280", bg: "#F9FAFB", label: "Dead" },
   new:      { color: "#2563EB", bg: "#EFF6FF", label: "New" },
-  unknown:  { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
+  unknown:    { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
+  redirected: { color: "#9CA3AF", bg: "#F9FAFB", label: "Redirected" },
 } as const;
 
 export default function DecayList({ pages, isNewSite }: DecayListProps) {

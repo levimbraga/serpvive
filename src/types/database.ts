@@ -57,10 +57,14 @@ export type Page = {
   decay_velocity_7d: number;
   decay_velocity_28d: number;
   is_seasonal: boolean;
-  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown";
+  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected";
   primary_keyword: string | null;
   primary_position: number | null;
   keyword_source: "clicks" | "impressions" | "title" | "url" | null;
+  redirect_to: string | null;
+  redirect_url: string | null;
+  merged_from: string | null;
+  merged_at: string | null;
   last_diagnosis_at: string | null;
   last_refresh_at: string | null;
   created_at: string;

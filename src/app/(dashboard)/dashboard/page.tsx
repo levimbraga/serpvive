@@ -129,6 +129,7 @@ export default async function DashboardPage() {
       .from("pages")
       .select("id, path, url, status, current_clicks_28d, decay_score, decay_velocity_7d")
       .eq("site_id", site.id)
+      .neq("status", "redirected")
       .order("decay_score", { ascending: false }),
     supabase
       .from("refreshes")

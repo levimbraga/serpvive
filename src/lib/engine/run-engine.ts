@@ -69,7 +69,8 @@ export async function runEngine(
   const { data: pages } = await admin
     .from("pages")
     .select("id, title, path")
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .neq("status", "redirected");
 
   type KeywordInfo = { keyword: string; position: number | null; source: "clicks" | "impressions" | "title" | "url" };
   const primaryKeywords = new Map<string, KeywordInfo>();

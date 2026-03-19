@@ -64,6 +64,7 @@ export default async function PagesListPage() {
     .from("pages")
     .select("id, url, path, status, current_clicks_28d, peak_clicks_monthly, decay_score, decay_velocity_7d, decay_velocity_28d, primary_keyword, primary_position, last_diagnosis_at, updated_at")
     .eq("site_id", site.id)
+    .neq("status", "redirected")
     .order("decay_score", { ascending: false });
 
   return (

@@ -17,7 +17,8 @@ export async function detectCannibalization(
   const { data: pages } = await admin
     .from("pages")
     .select("id, url, primary_keyword")
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .neq("status", "redirected");
 
   if (!pages || pages.length === 0) return [];
 

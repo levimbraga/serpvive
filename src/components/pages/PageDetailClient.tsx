@@ -11,9 +11,17 @@ import {
   PartyPopper, Timer, TrendingUp, TrendingDown, Minus,
   BarChart3, Lightbulb, History, ThumbsUp, ThumbsDown,
   Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
-  Download, Pencil, CheckCircle2, Shield,
+  Download, Pencil, CheckCircle2, Shield, GitMerge,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import {
   DropdownMenu,
@@ -126,7 +134,8 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }
   critical: { color: "#DC2626", bg: "#FEF2F2", label: "Critical" },
   dead:     { color: "#6B7280", bg: "#F9FAFB", label: "Dead" },
   new:      { color: "#2563EB", bg: "#EFF6FF", label: "New" },
-  unknown:  { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
+  unknown:    { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
+  redirected: { color: "#9CA3AF", bg: "#F9FAFB", label: "Redirected" },
 };
 
 const SEVERITY_CONFIG: Record<string, { color: string; border: string }> = {
@@ -161,6 +170,8 @@ export default function PageDetailClient({
   isAdmin = false,
   hasFreeDiagnosis = true,
   autoDiagStatus = "pending",
+  mergedFrom = null,
+  sitePages = [],
 }: {
   page: PageData;
   siteDomain: string;
@@ -174,6 +185,8 @@ export default function PageDetailClient({
   isAdmin?: boolean;
   hasFreeDiagnosis?: boolean;
   autoDiagStatus?: string;
+  mergedFrom?: { id: string; url: string; path: string; mergedAt: string } | null;
+  sitePages?: { id: string; path: string; url: string }[];
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -192,6 +205,13 @@ export default function PageDetailClient({
   const [showKeywordOverride, setShowKeywordOverride] = useState(false);
   const [expandedEvidence, setExpandedEvidence] = useState<Set<number>>(new Set());
   const [expandedPrevEvidence, setExpandedPrevEvidence] = useState<Set<string>>(new Set());
+
+  // Merge state
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [mergeSearch, setMergeSearch] = useState("");
+  const [selectedMergePage, setSelectedMergePage] = useState<{ id: string; path: string; url: string } | null>(null);
+  const [mergeLoading, setMergeLoading] = useState(false);
+  const [mergeError, setMergeError] = useState("");
 
   const isNew = page.status === "new";
   const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
@@ -414,6 +434,42 @@ export default function PageDetailClient({
     });
   }
 
+  async function handleMerge() {
+    if (!selectedMergePage) return;
+    setMergeLoading(true);
+    setMergeError("");
+
+    try {
+      const res = await fetch("/api/pages/merge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldPageId: selectedMergePage.id, newPageId: page.id }),
+      });
+
+      const json = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        setMergeError(json.error ?? "Merge failed");
+        return;
+      }
+
+      posthog.capture("page_merged", { old_page_id: selectedMergePage.id, new_page_id: page.id });
+      setShowMergeModal(false);
+      setSelectedMergePage(null);
+      setMergeSearch("");
+      router.refresh();
+    } catch {
+      setMergeError("Network error");
+    } finally {
+      setMergeLoading(false);
+    }
+  }
+
+  const filteredMergePages = sitePages.filter((p) => {
+    const q = mergeSearch.toLowerCase();
+    return !q || p.path.toLowerCase().includes(q) || p.url.toLowerCase().includes(q);
+  });
+
   // Calculate days remaining for pending refresh
   const daysRemaining = refresh?.result_status === "pending"
     ? Math.max(0, 28 - Math.floor((Date.now() - new Date(refresh.refreshed_at).getTime()) / (1000 * 60 * 60 * 24)))
@@ -451,14 +507,25 @@ export default function PageDetailClient({
             >
               {page.path}
             </h1>
-            <a
-              href={page.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-sm text-[#3B82F6] hover:underline mt-1"
-            >
-              Visit page <ExternalLink size={12} strokeWidth={1.5} />
-            </a>
+            <div className="flex items-center gap-3 mt-1">
+              <a
+                href={page.url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-[#3B82F6] hover:underline"
+              >
+                Visit page <ExternalLink size={12} strokeWidth={1.5} />
+              </a>
+              {page.status !== "redirected" && sitePages.length > 0 && (
+                <button
+                  onClick={() => setShowMergeModal(true)}
+                  className="inline-flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#111827] transition-colors"
+                >
+                  <GitMerge size={12} strokeWidth={1.5} />
+                  Merge history
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Diagnose button + test button */}
@@ -512,6 +579,27 @@ export default function PageDetailClient({
             </p>
           </div>
         </div>
+
+        {/* Merged-from banner */}
+        {mergedFrom && (
+          <div className="mt-3 flex items-center gap-2 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg px-3 py-2">
+            <GitMerge size={14} strokeWidth={1.5} className="text-[#2563EB] flex-shrink-0" />
+            <p className="text-xs text-[#1E40AF]">
+              Includes history merged from <span className="font-medium" style={{ fontFamily: "var(--font-mono, monospace)" }}>{mergedFrom.path}</span> on{" "}
+              {new Date(mergedFrom.mergedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone })}.
+            </p>
+          </div>
+        )}
+
+        {/* Redirected banner */}
+        {page.status === "redirected" && (page as PageData & { redirect_to?: string }).redirect_to && (
+          <div className="mt-3 flex items-center gap-2 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-3 py-2">
+            <Info size={14} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
+            <p className="text-xs text-[#92400E]">
+              This page was merged into another URL. Its diagnoses and refresh history were transferred.
+            </p>
+          </div>
+        )}
 
         {/* GSC data lag disclaimer */}
         <p className="text-[10px] text-[#D1D5DB] mt-3 flex items-center gap-1">
@@ -1256,6 +1344,87 @@ export default function PageDetailClient({
           </p>
         </div>
       )}
+
+      {/* Merge modal */}
+      <Dialog open={showMergeModal} onOpenChange={(open) => { if (!open) { setShowMergeModal(false); setSelectedMergePage(null); setMergeSearch(""); setMergeError(""); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitMerge size={18} strokeWidth={1.5} className="text-[#D97706]" />
+              Merge Page History
+            </DialogTitle>
+            <DialogDescription>
+              Transfer all diagnoses and refreshes from an old URL into this page. The old page will be marked as redirected.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <input
+              type="text"
+              value={mergeSearch}
+              onChange={(e) => setMergeSearch(e.target.value)}
+              placeholder="Search pages by path or URL..."
+              className="h-9 w-full px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#D97706] focus:border-transparent"
+            />
+
+            <div className="max-h-48 overflow-y-auto border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
+              {filteredMergePages.length === 0 ? (
+                <p className="text-sm text-[#9CA3AF] text-center py-4">No matching pages</p>
+              ) : (
+                filteredMergePages.slice(0, 20).map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedMergePage(p)}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors ${
+                      selectedMergePage?.id === p.id ? "bg-[#FFFBEB] border-l-2 border-l-[#D97706]" : ""
+                    }`}
+                  >
+                    <span className="font-medium text-[#111827] truncate block" style={{ fontFamily: "var(--font-mono, monospace)" }}>
+                      {p.path}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+
+            {selectedMergePage && (
+              <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-3 space-y-2">
+                <p className="text-xs font-medium text-[#92400E]">Preview</p>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-[#6B7280] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>{selectedMergePage.path}</span>
+                  <ArrowLeft size={12} strokeWidth={1.5} className="text-[#D97706] rotate-180 flex-shrink-0" />
+                  <span className="text-[#111827] font-medium truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>{page.path}</span>
+                </div>
+                <p className="text-[11px] text-[#B45309]">
+                  Diagnoses and refresh history from the old page will be moved here. The old page will be archived. This cannot be easily undone.
+                </p>
+              </div>
+            )}
+
+            {mergeError && (
+              <p className="text-sm text-[#DC2626]">{mergeError}</p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <button
+              onClick={() => { setShowMergeModal(false); setSelectedMergePage(null); setMergeSearch(""); setMergeError(""); }}
+              disabled={mergeLoading}
+              className="h-9 px-4 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleMerge}
+              disabled={mergeLoading || !selectedMergePage}
+              className="h-9 px-4 rounded-lg bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {mergeLoading ? <Loader2 size={14} strokeWidth={1.5} className="animate-spin" /> : <GitMerge size={14} strokeWidth={1.5} />}
+              Merge Pages
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

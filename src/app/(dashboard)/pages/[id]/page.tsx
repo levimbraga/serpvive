@@ -37,8 +37,8 @@ export default async function PageDetailPage({
 
   if (!site || site.user_id !== user.id) notFound();
 
-  // Fetch all diagnoses (up to 11: 1 current + 10 history) + latest refresh + profile in parallel
-  const [diagnosisRes, refreshRes, profileRes] = await Promise.all([
+  // Fetch all diagnoses (up to 11: 1 current + 10 history) + latest refresh + profile + merge info in parallel
+  const [diagnosisRes, refreshRes, profileRes, mergedFromRes, sitePagesRes] = await Promise.all([
     supabase
       .from("diagnoses")
       .select("id, diagnosis, refresh_brief, cost_usd, processing_time_ms, created_at, keyword_used, keyword_source")
@@ -57,6 +57,15 @@ export default async function PageDetailPage({
       .select("plan, diagnoses_used_this_month, timezone")
       .eq("id", user.id)
       .single(),
+    page.merged_from
+      ? supabase.from("pages").select("id, url, path").eq("id", page.merged_from).single()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("pages")
+      .select("id, path, url, status")
+      .eq("site_id", page.site_id)
+      .neq("status", "redirected")
+      .neq("id", id),
   ]);
 
   const allDiagnoses = diagnosisRes.data ?? [];
@@ -79,6 +88,8 @@ export default async function PageDetailPage({
       isAdmin={user.email === getAdminEmail()}
       hasFreeDiagnosis={!!(site as { has_free_diagnosis?: boolean }).has_free_diagnosis}
       autoDiagStatus={(site as { auto_diagnosis_status?: string }).auto_diagnosis_status ?? "pending"}
+      mergedFrom={mergedFromRes.data ? { ...mergedFromRes.data, mergedAt: page.merged_at ?? "" } : null}
+      sitePages={(sitePagesRes.data ?? []).map((p) => ({ id: p.id, path: p.path, url: p.url }))}
     />
   );
 }

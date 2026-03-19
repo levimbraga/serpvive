@@ -27,7 +27,8 @@ export async function calculateDecayScores(
   const { data: pages, error: pagesErr } = await admin
     .from("pages")
     .select("id")
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .neq("status", "redirected");
 
   if (pagesErr || !pages) throw new Error(`Failed to fetch pages: ${pagesErr?.message}`);
 

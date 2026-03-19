@@ -32,7 +32,8 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; 
   warning:  { color: "#D97706", bg: "#FFFBEB", label: "Warning", order: 2 },
   new:      { color: "#2563EB", bg: "#EFF6FF", label: "New", order: 3 },
   healthy:  { color: "#16A34A", bg: "#F0FDF4", label: "Healthy", order: 4 },
-  unknown:  { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown", order: 5 },
+  unknown:    { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown", order: 5 },
+  redirected: { color: "#9CA3AF", bg: "#F9FAFB", label: "Redirected", order: 6 },
 };
 
 const SORT_PRESETS: { key: SortPreset; label: string }[] = [

@@ -120,7 +120,8 @@ export async function GET(request: Request) {
       const { data: existingPages } = await admin
         .from("pages")
         .select("url")
-        .eq("site_id", site.id);
+        .eq("site_id", site.id)
+        .neq("status", "redirected");
 
       const existingUrls = new Set((existingPages ?? []).map((p) => p.url));
       const currentPageCount = existingUrls.size;

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { DECAY_THRESHOLDS } from "@/lib/constants";
 
-type PageStatus = "healthy" | "warning" | "critical" | "dead" | "new" | "unknown";
+type PageStatus = "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected";
 
 type ClassifierResult = {
   pageId: string;
@@ -24,7 +24,8 @@ export async function classifyPages(
   const { data: pages } = await admin
     .from("pages")
     .select("id, created_at")
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .neq("status", "redirected");
 
   if (!pages) return [];
 

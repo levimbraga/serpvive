@@ -18,7 +18,8 @@ export async function detectSeasonal(
   const { data: pages } = await admin
     .from("pages")
     .select("id")
-    .eq("site_id", siteId);
+    .eq("site_id", siteId)
+    .neq("status", "redirected");
 
   if (!pages) return [];
 
