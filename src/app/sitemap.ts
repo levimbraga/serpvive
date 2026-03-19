@@ -9,13 +9,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: "https://serpvive.com/privacy",
+      url: "https://serpvive.com/privacy-policy",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
-      url: "https://serpvive.com/terms",
+      url: "https://serpvive.com/terms-of-service",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.3,
