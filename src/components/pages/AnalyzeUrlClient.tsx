@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Zap, Search, FileText, Brain, Sparkles, CheckCircle2, Loader2,
@@ -70,6 +71,7 @@ type AnalyzeUrlClientProps = {
 };
 
 export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }: AnalyzeUrlClientProps) {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
@@ -128,6 +130,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
       setBrief(json.data.brief);
       setAnalysisId(json.data.analysisId);
       setStatus("done");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setStatus("error");
