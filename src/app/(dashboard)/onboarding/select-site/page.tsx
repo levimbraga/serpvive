@@ -111,14 +111,18 @@ export default function SelectSitePage() {
           </div>
         ) : properties.length === 0 ? (
           <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 text-center">
-            <p className="text-[#4B5563] mb-2">No sites found in your Search Console.</p>
-            <p className="text-sm text-[#9CA3AF]">
-              Add a site at{" "}
-              <a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" className="text-[#3B82F6] hover:underline">
-                Google Search Console
-              </a>{" "}
-              first, then come back.
+            <p className="text-[#4B5563] mb-2">No verified sites found in your Search Console.</p>
+            <p className="text-sm text-[#9CA3AF] mb-3">
+              You need to verify your site in Google Search Console before connecting it to SerpVive.
             </p>
+            <a
+              href="https://support.google.com/webmasters/answer/9008080"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-[#3B82F6] hover:underline font-medium"
+            >
+              How to verify your site in GSC &rarr;
+            </a>
           </div>
         ) : (
           <>

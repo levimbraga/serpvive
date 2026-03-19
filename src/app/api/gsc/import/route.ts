@@ -46,6 +46,21 @@ export async function POST(request: Request) {
 
   const { siteUrl, domain } = parsed.data;
 
+  // Verify the site is actually verified in GSC (guard against bypassing UI filter)
+  try {
+    const { listProperties } = await import("@/lib/gsc/client");
+    const properties = await listProperties(accessToken);
+    const match = properties.find((p) => p.siteUrl === siteUrl);
+    if (!match) {
+      return NextResponse.json(
+        { error: "This site is not verified in your Google Search Console. Please verify it first." },
+        { status: 403 },
+      );
+    }
+  } catch {
+    // If property check fails, continue with import — GSC data fetch will fail naturally if unverified
+  }
+
   // Check plan site limit
   const admin = getSupabaseAdmin();
   const { data: profile } = await admin

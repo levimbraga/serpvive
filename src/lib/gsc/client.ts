@@ -114,12 +114,15 @@ export async function listProperties(accessToken: string): Promise<GscProperty[]
 
   const entries = z.array(SiteEntrySchema).parse(data.siteEntry ?? []);
 
-  return entries.map((entry) => ({
-    siteUrl: entry.siteUrl,
-    permissionLevel: entry.permissionLevel,
-    type: entry.siteUrl.startsWith("sc-domain:") ? "domain" : "url_prefix",
-    displayName: entry.siteUrl.replace("sc-domain:", "").replace(/\/$/, ""),
-  }));
+  // Filter out unverified sites — they return no data from Search Analytics
+  return entries
+    .filter((entry) => entry.permissionLevel !== "siteUnverifiedUser")
+    .map((entry) => ({
+      siteUrl: entry.siteUrl,
+      permissionLevel: entry.permissionLevel,
+      type: entry.siteUrl.startsWith("sc-domain:") ? "domain" : "url_prefix",
+      displayName: entry.siteUrl.replace("sc-domain:", "").replace(/\/$/, ""),
+    }));
 }
 
 // ── Search Analytics ──
