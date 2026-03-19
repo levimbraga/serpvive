@@ -1359,16 +1359,16 @@ export default function PageDetailClient({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-hidden">
             <input
               type="text"
               value={mergeSearch}
               onChange={(e) => setMergeSearch(e.target.value)}
               placeholder="Search pages by path or URL..."
-              className="h-9 w-full px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#D97706] focus:border-transparent"
+              className="h-9 w-full px-3 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent"
             />
 
-            <div className="max-h-48 overflow-y-auto border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
+            <div className="max-h-48 overflow-hidden overflow-y-auto border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
               {filteredMergePages.length === 0 ? (
                 <p className="text-sm text-[#9CA3AF] text-center py-4">No matching pages</p>
               ) : (
@@ -1376,11 +1376,11 @@ export default function PageDetailClient({
                   <button
                     key={p.id}
                     onClick={() => setSelectedMergePage(p)}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors ${
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F9FAFB] transition-colors overflow-hidden ${
                       selectedMergePage?.id === p.id ? "bg-[#EFF6FF] border-l-2 border-l-[#3B82F6]" : ""
                     }`}
                   >
-                    <span className="font-medium text-[#111827] truncate block" style={{ fontFamily: "var(--font-mono, monospace)" }}>
+                    <span className="font-medium text-[#111827] block truncate max-w-full" style={{ fontFamily: "var(--font-mono, monospace)" }} title={p.path}>
                       {p.path}
                     </span>
                   </button>
