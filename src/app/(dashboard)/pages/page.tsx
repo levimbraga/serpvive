@@ -60,6 +60,13 @@ export default async function PagesListPage() {
     );
   }
 
+  // Fetch site domain for the add-page dialog
+  const { data: siteData } = await supabase
+    .from("sites")
+    .select("domain")
+    .eq("id", site.id)
+    .single();
+
   const { data: pages } = await supabase
     .from("pages")
     .select("id, url, path, status, current_clicks_28d, peak_clicks_monthly, decay_score, decay_velocity_7d, decay_velocity_28d, primary_keyword, primary_position, last_diagnosis_at, updated_at")
@@ -78,7 +85,12 @@ export default async function PagesListPage() {
           <Zap size={14} strokeWidth={1.5} /> Analyze any page
         </Link>
       </div>
-      <PagesTable pages={pages ?? []} timeZone={timeZone} />
+      <PagesTable
+        pages={pages ?? []}
+        timeZone={timeZone}
+        siteId={site.id}
+        siteDomain={siteData?.domain}
+      />
       <ExternalAnalysesList userId={user.id} timeZone={timeZone} />
     </div>
   );

@@ -57,7 +57,7 @@ export type Page = {
   decay_velocity_7d: number;
   decay_velocity_28d: number;
   is_seasonal: boolean;
-  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected";
+  status: "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected" | "excluded";
   primary_keyword: string | null;
   primary_position: number | null;
   keyword_source: "clicks" | "impressions" | "title" | "url" | null;

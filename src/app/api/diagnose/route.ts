@@ -147,6 +147,20 @@ export async function POST(request: Request) {
         .eq("id", page.site_id);
     }
 
+    // If auto-diagnosis had failed, transition to completed on manual success
+    const { data: siteStatus } = await admin
+      .from("sites")
+      .select("auto_diagnosis_status")
+      .eq("id", page.site_id)
+      .single();
+
+    if (siteStatus?.auto_diagnosis_status === "failed") {
+      await admin
+        .from("sites")
+        .update({ auto_diagnosis_status: "completed" })
+        .eq("id", page.site_id);
+    }
+
     return NextResponse.json({
       data: {
         diagnosisId: result.diagnosisId,

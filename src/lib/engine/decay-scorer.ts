@@ -28,7 +28,8 @@ export async function calculateDecayScores(
     .from("pages")
     .select("id")
     .eq("site_id", siteId)
-    .neq("status", "redirected");
+    .neq("status", "redirected")
+    .neq("status", "excluded");
 
   if (pagesErr || !pages) throw new Error(`Failed to fetch pages: ${pagesErr?.message}`);
 

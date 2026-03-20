@@ -1,4 +1,4 @@
-type PageStatus = "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected";
+type PageStatus = "healthy" | "warning" | "critical" | "dead" | "new" | "unknown" | "redirected" | "excluded";
 
 const STATUS_WEIGHTS: Record<PageStatus, number | null> = {
   healthy: 100,
@@ -8,6 +8,7 @@ const STATUS_WEIGHTS: Record<PageStatus, number | null> = {
   new: null,        // excluded from calculation
   unknown: null,    // excluded from calculation
   redirected: null, // excluded from calculation
+  excluded: null,   // excluded from calculation
 };
 
 /**

@@ -25,7 +25,8 @@ export async function classifyPages(
     .from("pages")
     .select("id, created_at")
     .eq("site_id", siteId)
-    .neq("status", "redirected");
+    .neq("status", "redirected")
+    .neq("status", "excluded");
 
   if (!pages) return [];
 
