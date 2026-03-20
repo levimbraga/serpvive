@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, FileText, Settings, Zap, Globe,
-  ChevronDown, Check, MessageSquare, Share2, HelpCircle,
+  LayoutDashboard, FileText, Settings, Zap,
+  ChevronDown, Check, MessageSquare, Share2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,15 +55,16 @@ type SidebarProps = {
 
 export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", sites, activeSiteId, isAdmin, hasFreeDiagnosis, hasGsc, autoDiagStatus }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const usagePercent = diagnosesLimit > 0 ? Math.min((diagnosesUsed / diagnosesLimit) * 100, 100) : 0;
 
   const activeSite = sites.find((s) => s.id === activeSiteId) ?? sites[0] ?? null;
   const hasMultipleSites = sites.length > 1;
 
   function handleSiteChange(siteId: string) {
+    if (siteId === activeSiteId) return;
     document.cookie = `active_site_id=${siteId};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
-    router.refresh();
+    // Hard navigate to dashboard to ensure fresh data for the new site
+    window.location.assign("/dashboard");
   }
 
   return (

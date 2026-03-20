@@ -168,6 +168,17 @@ export default async function DashboardPage() {
   const welcomeCardVisible = site.status === "active" &&
     !(site.welcome_dismissed ?? false);
 
+  // Check if user has used free diagnosis on ANY site (it's a per-user benefit)
+  const { data: anySiteWithFreeDiag } = await supabase
+    .from("sites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("has_free_diagnosis", true)
+    .limit(1)
+    .maybeSingle();
+
+  const userHasUsedFreeDiagnosis = !!anySiteWithFreeDiag;
+
   // Free diagnosis: find the auto-diagnosed page
   let freeDiagPageId: string | null = null;
   let freeDiagPagePath: string | null = null;
@@ -238,6 +249,8 @@ export default async function DashboardPage() {
           freeDiagPageId={freeDiagPageId}
           freeDiagPagePath={freeDiagPagePath}
           dismissed={site.welcome_dismissed ?? false}
+          userHasUsedFreeDiagnosis={userHasUsedFreeDiagnosis}
+          plan={plan}
         />
       )}
 

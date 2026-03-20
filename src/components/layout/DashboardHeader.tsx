@@ -75,8 +75,10 @@ export default function DashboardHeader({
   }
 
   function handleSiteChange(siteId: string) {
+    if (siteId === activeSiteId) return;
     document.cookie = `active_site_id=${siteId};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
-    router.refresh();
+    // Hard navigate to dashboard to ensure fresh data for the new site
+    window.location.assign("/dashboard");
   }
 
   const initials = userEmail.charAt(0).toUpperCase();
@@ -182,37 +184,14 @@ export default function DashboardHeader({
         </Link>
       </div>
 
-      {/* Desktop: site selector on left */}
+      {/* Desktop: static domain display (site switching is in sidebar) */}
       <div className="hidden sm:flex items-center">
-        {activeSite && hasMultipleSites ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 text-[13px] text-[#6B7280] hover:text-[#111827] transition-colors duration-150 outline-none">
-              <Globe size={14} strokeWidth={1.5} className="flex-shrink-0" />
-              <span className="font-medium">{activeSite.domain}</span>
-              <ChevronDown size={12} strokeWidth={1.5} className="opacity-50" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              {sites.map((site) => (
-                <DropdownMenuItem
-                  key={site.id}
-                  onClick={() => handleSiteChange(site.id)}
-                  className="flex items-center gap-3 py-2 cursor-pointer"
-                >
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[site.status] ?? "bg-[#6B7280]"}`} />
-                  <span className="text-sm truncate flex-1">{site.domain}</span>
-                  {site.id === activeSite.id && (
-                    <Check size={14} strokeWidth={2} className="text-[#16A34A] flex-shrink-0" />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : activeSite ? (
+        {activeSite && (
           <div className="flex items-center gap-2 text-[13px] text-[#6B7280]">
             <Globe size={14} strokeWidth={1.5} />
             <span className="font-medium">{activeSite.domain}</span>
           </div>
-        ) : null}
+        )}
       </div>
 
       {/* Right: avatar + logout */}

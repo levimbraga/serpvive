@@ -19,6 +19,8 @@ type WelcomeCardProps = {
   freeDiagPageId: string | null;
   freeDiagPagePath: string | null;
   dismissed: boolean;
+  userHasUsedFreeDiagnosis?: boolean;
+  plan?: string;
 };
 
 type Step = "pending" | "running" | "done";
@@ -31,6 +33,8 @@ export default function WelcomeCard({
   autoDiagStatus,
   freeDiagPageId,
   dismissed: initialDismissed,
+  userHasUsedFreeDiagnosis = false,
+  plan = "free",
 }: WelcomeCardProps) {
   const router = useRouter();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -48,7 +52,10 @@ export default function WelcomeCard({
 
   // Steps derived from DB-persisted state (server props)
   const engineStep: Step = hasEngineRun ? "done" : userTriggeredEngine ? "running" : "pending";
+  // If user already used free diagnosis on another site, skip the diagnosis step
+  const isSubsequentSite = userHasUsedFreeDiagnosis && !freeDiagPageId;
   const diagStep: Step =
+    isSubsequentSite ? "done" :
     autoDiagStatus === "completed" ? "done" :
     autoDiagStatus === "diagnosing" ? "running" :
     "pending";
@@ -91,8 +98,10 @@ export default function WelcomeCard({
 
       setEnginePagesOverride(json.data?.pagesProcessed ?? pagesCount);
 
-      // Auto-trigger free diagnosis
-      await fetch("/api/diagnose/auto", { method: "POST" });
+      // Auto-trigger free diagnosis only if user hasn't used it on another site
+      if (!userHasUsedFreeDiagnosis) {
+        await fetch("/api/diagnose/auto", { method: "POST" });
+      }
 
       // Refresh to pick up new status from DB
       router.refresh();
@@ -171,9 +180,13 @@ export default function WelcomeCard({
         <StepRow
           step={diagStep}
           icon={<Gift size={16} strokeWidth={1.5} />}
-          label="Get your first AI diagnosis — free, on us"
+          label={isSubsequentSite
+            ? "Run AI diagnosis on your pages"
+            : "Get your first AI diagnosis — free, on us"
+          }
           detail={
-            diagStep === "done" ? "Your first diagnosis is ready!"
+            isSubsequentSite ? (plan === "free" ? "Upgrade for AI diagnoses" : "Pick a page to analyze")
+            : diagStep === "done" ? "Your first diagnosis is ready!"
             : diagStep === "running" ? "Generating your free diagnosis..."
             : autoDiagStatus === "failed" ? "Pick any page to analyze manually"
             : undefined
@@ -246,6 +259,32 @@ export default function WelcomeCard({
               ? "Your free diagnosis is ready — choose any page."
               : "AI will analyze your most important page and explain what to improve."}
           </p>
+        </div>
+      )}
+
+      {/* Subsequent site (free diagnosis already used): show plan-appropriate action */}
+      {isSubsequentSite && engineStep === "done" && (
+        <div className="flex items-center gap-3">
+          {plan === "free" ? (
+            <Link
+              href="/settings"
+              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
+            >
+              Upgrade for AI diagnoses
+              <ArrowRight size={16} strokeWidth={1.5} />
+            </Link>
+          ) : (
+            <Link
+              href="/pages"
+              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+            >
+              <Sparkles size={16} strokeWidth={1.5} />
+              Pick a page to analyze
+            </Link>
+          )}
+          <button onClick={handleDismiss} className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+            Dismiss
+          </button>
         </div>
       )}
 
