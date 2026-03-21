@@ -23,7 +23,7 @@ export const STRIPE_PLANS = {
     name: "Starter",
     price: 29,
     annualPrice: 24,
-    annualTotal: 290,
+    annualTotal: 288,
     priceId: process.env.STRIPE_PRICE_STARTER ?? "",
     annualPriceId: process.env.STRIPE_PRICE_STARTER_ANNUAL ?? "",
   },
@@ -31,7 +31,7 @@ export const STRIPE_PLANS = {
     name: "Pro",
     price: 69,
     annualPrice: 58,
-    annualTotal: 690,
+    annualTotal: 696,
     priceId: process.env.STRIPE_PRICE_PRO ?? "",
     annualPriceId: process.env.STRIPE_PRICE_PRO_ANNUAL ?? "",
   },
@@ -39,7 +39,7 @@ export const STRIPE_PLANS = {
     name: "Agency",
     price: 129,
     annualPrice: 108,
-    annualTotal: 1290,
+    annualTotal: 1296,
     priceId: process.env.STRIPE_PRICE_AGENCY ?? "",
     annualPriceId: process.env.STRIPE_PRICE_AGENCY_ANNUAL ?? "",
   },
@@ -53,16 +53,20 @@ export type StripePlanKey = keyof typeof STRIPE_PLANS;
  * Includes both current and legacy prices from the Stripe Dashboard.
  */
 const KNOWN_PRICE_IDS: Record<string, string> = {
-  // Starter
+  // ── Live ──
+  "price_1TDYIJLxIzb11hGR1wKDkbU2": "starter",  // monthly $29
+  "price_1TDYIKLxIzb11hGR1jxF4TgD": "starter",  // annual $288
+  "price_1TDYILLxIzb11hGRmiFtgvx7": "pro",      // monthly $69
+  "price_1TDYILLxIzb11hGReYalPvFE": "pro",      // annual $696
+  "price_1TDYIMLxIzb11hGRK1Rzg3jm": "agency",   // monthly $129
+  "price_1TDYINLxIzb11hGRSOq8BFsZ": "agency",   // annual $1,296
+
+  // ── Test (dev local) ──
   "price_1T97lJLxIzb11hGRTsBlc6sW": "starter",  // monthly $29
   "price_1TABV3LxIzb11hGRQ8bbW8xK": "starter",  // annual $290
-
-  // Pro
   "price_1T9BehLxIzb11hGRt4JMmdPd": "pro",      // monthly $69
   "price_1TABV4LxIzb11hGRlFGdOl27": "pro",      // annual $690
   "price_1T97lKLxIzb11hGRnhv01Z4E": "pro",      // legacy monthly $59
-
-  // Agency
   "price_1T9BeiLxIzb11hGRk7Whmltb": "agency",   // monthly $129
   "price_1TABV4LxIzb11hGRW10lkSuU": "agency",   // annual $1290
   "price_1T97lKLxIzb11hGRFU6644Ux": "agency",   // legacy monthly $99
@@ -70,12 +74,14 @@ const KNOWN_PRICE_IDS: Record<string, string> = {
 
 /** Known annual price IDs — used to resolve billing interval without Stripe API call */
 const KNOWN_ANNUAL_PRICE_IDS = new Set([
-  // Starter annual $290
-  "price_1TABV3LxIzb11hGRQ8bbW8xK",
-  // Pro annual $690
-  "price_1TABV4LxIzb11hGRlFGdOl27",
-  // Agency annual $1290
-  "price_1TABV4LxIzb11hGRW10lkSuU",
+  // Live
+  "price_1TDYIKLxIzb11hGR1jxF4TgD",  // Starter annual $288
+  "price_1TDYILLxIzb11hGReYalPvFE",  // Pro annual $696
+  "price_1TDYINLxIzb11hGRSOq8BFsZ",  // Agency annual $1,296
+  // Test (dev local)
+  "price_1TABV3LxIzb11hGRQ8bbW8xK",  // Starter annual $290
+  "price_1TABV4LxIzb11hGRlFGdOl27",  // Pro annual $690
+  "price_1TABV4LxIzb11hGRW10lkSuU",  // Agency annual $1290
 ]);
 
 /**

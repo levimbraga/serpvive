@@ -29,7 +29,7 @@ const PLANS = [
     name: "Starter",
     monthly: 29,
     annual: 24,
-    annualTotal: 290,
+    annualTotal: 288,
     period: "/month",
     features: [
       "1 site",
@@ -48,7 +48,7 @@ const PLANS = [
     name: "Pro",
     monthly: 69,
     annual: 58,
-    annualTotal: 690,
+    annualTotal: 696,
     period: "/month",
     features: [
       "3 sites",
@@ -67,7 +67,7 @@ const PLANS = [
     name: "Agency",
     monthly: 129,
     annual: 108,
-    annualTotal: 1290,
+    annualTotal: 1296,
     period: "/month",
     features: [
       "10 sites",

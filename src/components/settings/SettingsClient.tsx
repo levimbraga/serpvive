@@ -51,7 +51,7 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; monthly: number; annual
     label: "Starter",
     monthly: 29,
     annual: 24,
-    annualTotal: 290,
+    annualTotal: 288,
     features: ["1 site", "100 pages", "10 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
@@ -59,7 +59,7 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; monthly: number; annual
     label: "Pro",
     monthly: 69,
     annual: 58,
-    annualTotal: 690,
+    annualTotal: 696,
     features: ["3 sites", "1,000 pages", "40 diagnoses/mo", "Daily monitoring", "Weekly email digest"],
   },
   {
@@ -67,7 +67,7 @@ const PLANS_FOR_UPGRADE: { key: PlanName; label: string; monthly: number; annual
     label: "Agency",
     monthly: 129,
     annual: 108,
-    annualTotal: 1290,
+    annualTotal: 1296,
     features: ["10 sites", "5,000 pages", "120 diagnoses/mo", "Daily monitoring", "Priority support"],
   },
 ];
