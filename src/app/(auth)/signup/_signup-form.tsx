@@ -129,12 +129,16 @@ export default function SignupForm() {
 
   async function handleGoogle() {
     posthog.capture("user_signed_up", { method: "google" });
-    await supabase.auth.signInWithOAuth({
+    const { data } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/callback`,
+        skipBrowserRedirect: true,
       },
     });
+    if (data?.url) {
+      window.location.href = data.url;
+    }
   }
 
   return (
