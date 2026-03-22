@@ -13,6 +13,7 @@ import {
 import { isContentUrl } from "@/lib/engine/url-filter";
 import { getPostHogServer } from "@/lib/posthog/server";
 import { runEngine } from "@/lib/engine/run-engine";
+import { runServerAutoDiagnosis } from "@/lib/ai/auto-diagnosis";
 import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
 import { sendOnboardingDay0 } from "@/lib/email/send";
 
@@ -358,8 +359,15 @@ async function runImport(
       console.error("[gsc/import] Engine failed:", err);
     }
 
-    // Auto-diagnosis is handled by /api/diagnose/auto (triggered by WelcomeCard).
-    // Removed from import to prevent duplicate runs — single code path only.
+    // ── Trigger free auto-diagnosis (server-side, no user interaction needed) ──
+    // State machine in runServerAutoDiagnosis prevents duplicates.
+    console.log("[gsc/import] Triggering auto-diagnosis...");
+    try {
+      const diagResult = await runServerAutoDiagnosis(admin, siteId, userId);
+      console.log(`[gsc/import] Auto-diagnosis result: ${diagResult.status}`);
+    } catch (err) {
+      console.error("[gsc/import] Auto-diagnosis failed:", err);
+    }
 
     // ── Send onboarding day 0 email ──
     try {
