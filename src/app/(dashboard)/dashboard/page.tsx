@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { PLAN_LIMITS } from "@/lib/constants";
+import { PLAN_LIMITS, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { getActiveSiteId } from "@/lib/active-site";
 import HealthScoreRing from "@/components/dashboard/HealthScoreRing";
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
   const profile = profileRes.data;
   const site = siteRes.data;
 
-  const plan = (profile?.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
   const tz = profile?.timezone ?? "UTC";

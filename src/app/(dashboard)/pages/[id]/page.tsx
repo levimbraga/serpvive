@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import PageDetailClient from "@/components/pages/PageDetailClient";
-import { getAdminEmail } from "@/lib/constants";
+import { getAdminEmail, isAdmin } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Page Detail — SerpVive",
@@ -79,9 +79,10 @@ export default async function PageDetailPage({
       latestDiagnosis={latestDiagnosis}
       previousDiagnoses={previousDiagnoses}
       latestRefresh={refreshRes.data}
-      plan={(profileRes.data?.plan ?? "free") as string}
+      plan={isAdmin(user.email) ? "agency" : ((profileRes.data?.plan ?? "free") as string)}
       diagnosesUsed={profileRes.data?.diagnoses_used_this_month ?? 0}
       diagnosesLimit={
+        isAdmin(user.email) ? 120 :
         ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[profileRes.data?.plan ?? "free"] ?? 0
       }
       timeZone={profileRes.data?.timezone ?? "UTC"}

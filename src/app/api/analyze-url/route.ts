@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
-  const plan = profile.plan as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : profile.plan) as PlanName;
 
   // Rate limit per plan
   const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (profile.plan_status === "canceled") {
+  if (profile.plan_status === "canceled" && !isAdmin(user.email)) {
     return NextResponse.json(
       { error: "Subscription canceled. Resubscribe to use AI analyses." },
       { status: 403 },

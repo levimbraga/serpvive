@@ -4,7 +4,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
-  const plan = profile.plan as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : profile.plan) as PlanName;
   const isFreeDiagnosis = plan === "free" && !site.has_free_diagnosis;
 
   // Rate limit per plan
@@ -85,8 +85,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Block if subscription canceled (paid plans only)
-  if (plan !== "free" && profile.plan_status === "canceled") {
+  // Block if subscription canceled (paid plans only — admin bypasses)
+  if (plan !== "free" && profile.plan_status === "canceled" && !isAdmin(user.email)) {
     return NextResponse.json(
       { error: "Subscription canceled. Resubscribe to use AI diagnoses." },
       { status: 403 },

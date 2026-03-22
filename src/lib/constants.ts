@@ -22,6 +22,12 @@ export function getAdminEmail(): string {
   return email;
 }
 
+/** Check if a given email is the admin. Safe to call with undefined/null. */
+export function isAdmin(email: string | undefined | null): boolean {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  return !!adminEmail && !!email && email === adminEmail;
+}
+
 export const DECAY_THRESHOLDS = {
   healthy_max: 15,
   warning_max: 30,

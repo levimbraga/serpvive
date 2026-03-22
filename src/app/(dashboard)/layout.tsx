@@ -4,7 +4,7 @@ import { getActiveSiteId } from "@/lib/active-site";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
 import { PostHogIdentify } from "@/lib/posthog/identify";
-import { PLAN_LIMITS, type PlanName, getAdminEmail } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, getAdminEmail, isAdmin } from "@/lib/constants";
 
 export default async function DashboardLayout({
   children,
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
   ]);
 
   const profile = profileRes.data;
-  const plan = (profile?.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const sites = sitesRes.data ?? [];
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;

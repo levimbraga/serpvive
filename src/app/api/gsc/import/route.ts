@@ -13,7 +13,7 @@ import {
 import { isContentUrl } from "@/lib/engine/url-filter";
 import { getPostHogServer } from "@/lib/posthog/server";
 import { runEngine } from "@/lib/engine/run-engine";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
 import { sendOnboardingDay0 } from "@/lib/email/send";
 
 const ImportSchema = z.object({
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
-  const plan = (profile?.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
   const siteLimit = PLAN_LIMITS[plan].sites;
 
   const { count: currentSites } = await admin

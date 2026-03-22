@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
 import SettingsClient from "@/components/settings/SettingsClient";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default async function SettingsPage() {
 
   if (!profile) redirect("/login");
 
-  const plan = (profile.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile.plan ?? "free")) as PlanName;
   const limits = PLAN_LIMITS[plan];
 
   // Fetch user's sites

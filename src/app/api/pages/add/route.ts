@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS } from "@/lib/constants";
+import { PLAN_LIMITS, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 
 const AddPageSchema = z.object({
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
-  const plan = (profile?.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
   const pageLimit = PLAN_LIMITS[plan]?.pages ?? 100;
 
   const { count: currentCount } = await admin

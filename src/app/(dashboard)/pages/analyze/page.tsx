@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
-import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
 import AnalyzeUrlClient from "@/components/pages/AnalyzeUrlClient";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default async function AnalyzeUrlPage() {
     .eq("id", user.id)
     .single();
 
-  const plan = (profile?.plan ?? "free") as PlanName;
+  const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
   const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
 
