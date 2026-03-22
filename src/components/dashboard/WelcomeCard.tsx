@@ -53,11 +53,12 @@ export default function WelcomeCard({
   // Steps derived from DB-persisted state (server props)
   const engineStep: Step = hasEngineRun ? "done" : userTriggeredEngine ? "running" : "pending";
   // If user already used free diagnosis on another site, skip the diagnosis step
-  const isSubsequentSite = userHasUsedFreeDiagnosis && !freeDiagPageId;
+  // BUT not while a diagnosis is actively running on THIS site
+  const isSubsequentSite = userHasUsedFreeDiagnosis && !freeDiagPageId && autoDiagStatus !== "diagnosing";
   const diagStep: Step =
+    autoDiagStatus === "diagnosing" ? "running" :
     isSubsequentSite ? "done" :
     autoDiagStatus === "completed" ? "done" :
-    autoDiagStatus === "diagnosing" ? "running" :
     "pending";
   const enginePages = enginePagesOverride ?? pagesCount;
 

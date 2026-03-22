@@ -105,6 +105,7 @@ export default function SettingsClient({
   diagnosesUsed,
   diagnosesLimit,
   hasStripeCustomer,
+  hadPaidSubscription = false,
   sites,
   sitesLimit,
   timezone,
@@ -122,6 +123,7 @@ export default function SettingsClient({
   diagnosesUsed: number;
   diagnosesLimit: number;
   hasStripeCustomer: boolean;
+  hadPaidSubscription?: boolean;
   sites: SiteInfo[];
   sitesLimit: number;
   timezone: string;
@@ -422,10 +424,10 @@ export default function SettingsClient({
           <Zap size={20} strokeWidth={1.5} className="text-[#D97706] flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-[#92400E]">
-              {hasStripeCustomer ? "Your paid plan was canceled" : "You\u2019re on the free plan"}
+              {hadPaidSubscription ? "Your paid plan was canceled" : "You\u2019re on the free plan"}
             </p>
             <p className="text-xs text-[#B45309] mt-0.5">
-              {hasStripeCustomer
+              {hadPaidSubscription
                 ? "Your data syncs weekly. Choose a plan to resume daily monitoring and AI diagnoses."
                 : "Upgrade to unlock daily monitoring, AI diagnoses, and weekly email digests."}
             </p>

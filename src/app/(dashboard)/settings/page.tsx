@@ -16,7 +16,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, email, full_name, timezone, digest_day, email_unsubscribed, pending_plan, plan_changes_at, billing_interval")
+    .select("plan, plan_status, diagnoses_used_this_month, stripe_customer_id, stripe_subscription_id, email, full_name, timezone, digest_day, email_unsubscribed, pending_plan, plan_changes_at, billing_interval")
     .eq("id", user.id)
     .single();
 
@@ -44,6 +44,7 @@ export default async function SettingsPage() {
       diagnosesUsed={profile.diagnoses_used_this_month ?? 0}
       diagnosesLimit={limits.diagnoses_per_month}
       hasStripeCustomer={!!profile.stripe_customer_id}
+      hadPaidSubscription={!!profile.stripe_subscription_id}
       sites={sites ?? []}
       sitesLimit={limits.sites}
       timezone={profile.timezone ?? "UTC"}

@@ -262,8 +262,8 @@ export default async function DashboardPage() {
         pageLimit={pageLimit}
       />
 
-      {/* Free diagnosis banner */}
-      {(freeDiagPageId || isAutoProcessing) && (
+      {/* Free diagnosis banner — hide when WelcomeCard already shows the diagnosing state */}
+      {(freeDiagPageId || (isAutoProcessing && !welcomeCardVisible)) && (
         <FreeDiagnosisBanner
           siteId={site.id}
           pageId={freeDiagPageId}
