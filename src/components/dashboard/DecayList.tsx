@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 const PAGE_SIZE = 25;
 
@@ -20,15 +21,10 @@ type DecayListProps = {
   isNewSite?: boolean;
 };
 
-const STATUS_CONFIG = {
-  healthy:  { color: "#16A34A", bg: "#F0FDF4", label: "Healthy" },
-  warning:  { color: "#D97706", bg: "#FFFBEB", label: "Warning" },
-  critical: { color: "#DC2626", bg: "#FEF2F2", label: "Critical" },
-  dead:     { color: "#6B7280", bg: "#F9FAFB", label: "Dead" },
-  new:      { color: "#2563EB", bg: "#EFF6FF", label: "New" },
-  unknown:    { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
-  redirected: { color: "#9CA3AF", bg: "#F9FAFB", label: "Redirected" },
-} as const;
+const STATUS_COLORS: Record<string, string> = {
+  healthy: "#16A34A", warning: "#D97706", critical: "#DC2626",
+  dead: "#6B7280", new: "#2563EB", unknown: "#9CA3AF", redirected: "#9CA3AF",
+};
 
 export default function DecayList({ pages, isNewSite }: DecayListProps) {
   const [showAll, setShowAll] = useState(false);
@@ -76,7 +72,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
 
       {/* Rows */}
       {displayPages.map((page) => {
-        const cfg = STATUS_CONFIG[page.status];
+        const dotColor = STATUS_COLORS[page.status] ?? "#9CA3AF";
         return (
           <div key={page.id}>
           <Link
@@ -86,7 +82,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
             <div className="flex items-center gap-2.5 min-w-0">
               <div
                 className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: cfg.color }}
+                style={{ backgroundColor: dotColor }}
               />
               <span
                 className="text-sm text-[#111827] truncate"
@@ -128,12 +124,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
             )}
 
             <div className="flex justify-end">
-              <span
-                className="text-xs font-medium px-2.5 py-1 rounded-full"
-                style={{ color: cfg.color, backgroundColor: cfg.bg }}
-              >
-                {cfg.label}
-              </span>
+              <StatusBadge status={page.status} />
             </div>
           </Link>
 
@@ -144,7 +135,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
           >
             <div
               className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: cfg.color }}
+              style={{ backgroundColor: dotColor }}
             />
             <div className="flex-1 min-w-0">
               <span
@@ -166,12 +157,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
                 )}
               </div>
             </div>
-            <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0"
-              style={{ color: cfg.color, backgroundColor: cfg.bg }}
-            >
-              {cfg.label}
-            </span>
+            <StatusBadge status={page.status} />
           </Link>
           </div>
         );

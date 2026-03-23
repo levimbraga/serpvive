@@ -13,6 +13,7 @@ import {
   Search, FileText, Brain, Sparkles, Info, Copy, ClipboardCheck,
   Download, Pencil, CheckCircle2, Shield, GitMerge,
 } from "lucide-react";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -497,12 +498,7 @@ export default function PageDetailClient({
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="min-w-0 w-full sm:w-auto">
             <div className="flex items-center gap-3 mb-2">
-              <span
-                className="text-xs font-medium px-2.5 py-1 rounded-full"
-                style={{ color: statusCfg.color, backgroundColor: statusCfg.bg }}
-              >
-                {statusCfg.label}
-              </span>
+              <StatusBadge status={page.status} />
               <span className="text-xs text-[#9CA3AF]">{siteDomain}</span>
             </div>
             <h1

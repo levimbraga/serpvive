@@ -8,6 +8,7 @@ import {
   Search, ArrowUpDown, X, ChevronLeft, ChevronRight,
   MoreHorizontal, EyeOff, Eye, Sparkles, Plus,
 } from "lucide-react";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -453,12 +454,7 @@ export default function PagesTable({ pages, timeZone = "UTC", siteId, siteDomain
                       </Link>
                     </td>
                     <td className="px-3 py-3">
-                      <span
-                        className="text-xs font-medium px-2.5 py-1 rounded-full"
-                        style={{ color: cfg.color, backgroundColor: cfg.bg }}
-                      >
-                        {cfg.label}
-                      </span>
+                      <StatusBadge status={page.status} />
                     </td>
                     <td className="px-3 py-3 text-sm text-[#111827] text-right font-medium tabular-nums">
                       {page.current_clicks_28d.toLocaleString()}
