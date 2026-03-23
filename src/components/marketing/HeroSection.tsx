@@ -56,7 +56,7 @@ export default function HeroSection() {
         <a
           href="/signup"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "primary" })}
-          className="inline-flex items-center gap-2.5 rounded-xl bg-[#0D9488] text-white font-bold no-underline transition-all duration-200 hover:bg-[#0F766E] hover:shadow-[0_8px_50px_rgba(13,148,136,0.25)] hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-bold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5"
           style={{ fontSize: "clamp(1.05rem, 1.3vw, 1.25rem)", padding: "clamp(16px, 1.5vw, 22px) clamp(32px, 3.5vw, 56px)" }}
         >
           Get started free
