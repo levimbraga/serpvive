@@ -2,14 +2,19 @@ import Link from "next/link";
 
 const LINKS = {
   Product: [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "Features", href: "/#features" },
+    { label: "Pricing", href: "/#pricing" },
     { label: "Changelog", href: "/changelog" },
   ],
   Resources: [
-    { label: "Blog", href: "#" },
-    { label: "Help Center", href: "#" },
-    { label: "API Docs", href: "#" },
+    { label: "Blog", href: "/blog" },
+    { label: "Decay Calculator", href: "/tools/decay-calculator" },
+    { label: "Refresh Checklist", href: "/resources/content-decay-checklist" },
+  ],
+  Compare: [
+    { label: "vs Semrush", href: "/vs/semrush" },
+    { label: "vs Surfer SEO", href: "/vs/surfer-seo" },
+    { label: "vs Frase", href: "/vs/frase" },
   ],
   Company: [
     { label: "About", href: "/about" },

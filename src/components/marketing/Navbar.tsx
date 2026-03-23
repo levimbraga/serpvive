@@ -64,8 +64,9 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-9">
-          <a href="#features" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Features</a>
-          <a href="#pricing" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Pricing</a>
+          <a href="/#features" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Features</a>
+          <a href="/#pricing" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Pricing</a>
+          <Link href="/blog" className="font-medium text-[#94A3B8] hover:text-white transition-colors no-underline" style={{ fontSize: "clamp(14px, 1.1vw, 17px)" }}>Blog</Link>
         </div>
 
         <div className="flex items-center gap-4">
