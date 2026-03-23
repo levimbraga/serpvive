@@ -5,7 +5,7 @@ import posthog from "posthog-js";
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-12 pt-[140px] sm:pt-[160px] pb-16 text-center overflow-hidden">
-      {/* ── 1. Dot grid pattern — subtle depth ── */}
+      {/* Dot grid pattern */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -16,13 +16,13 @@ export default function HeroSection() {
         }}
       />
 
-      {/* ── Decorative arcs (Surfer-style concentric rings) ── */}
+      {/* Decorative arcs */}
       <div className="absolute top-[-350px] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full border border-[#1E293B]/40 pointer-events-none" />
       <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[#1E293B]/30 pointer-events-none" />
       <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full border border-[#1E293B]/20 pointer-events-none" />
       <div className="absolute top-[200px] left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full border border-[rgba(59,130,246,0.08)] pointer-events-none" />
 
-      {/* ── Radial glow behind headline — stronger ── */}
+      {/* Radial glow */}
       <div
         className="absolute top-[12%] left-1/2 -translate-x-1/2 w-[1000px] h-[800px] pointer-events-none"
         style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 60%)" }}
@@ -32,7 +32,7 @@ export default function HeroSection() {
         style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, transparent 60%)" }}
       />
 
-      {/* ── Headline ── */}
+      {/* Headline */}
       <h1
         className="relative font-extrabold leading-[1.05] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
         style={{ fontSize: "clamp(3.5rem, 7vw, 6.875rem)", letterSpacing: "-0.05em", maxWidth: "min(900px, 90vw)" }}
@@ -46,12 +46,12 @@ export default function HeroSection() {
         </span>
       </h1>
 
-      {/* ── Subtitle ── */}
+      {/* Subtitle */}
       <p className="relative leading-[1.7] text-[#94A3B8] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1.125rem, 1.8vw, 1.5rem)", maxWidth: "min(600px, 60vw)" }}>
         SerpVive finds the dying posts, explains why, and tells you exactly what to fix.
       </p>
 
-      {/* ── CTAs ── */}
+      {/* CTAs */}
       <div className="relative flex flex-col items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
         <a
           href="/signup"
@@ -72,14 +72,14 @@ export default function HeroSection() {
         </a>
       </div>
 
-      {/* ── Trust badge ── */}
+      {/* Trust badge */}
       <p className="relative text-[#475569] mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
         Powered by Claude Opus 4.6 &middot; Read-only access &middot; Cancel anytime
       </p>
 
-      {/* ── 2. Product screenshot with strong blue glow ── */}
+      {/* Product screenshot */}
       <div className="relative mt-16 mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]" style={{ width: "clamp(700px, 75vw, 1400px)", maxWidth: "95vw" }}>
-        {/* Blue glow — stronger, visible */}
+        {/* Blue glow */}
         <div
           className="absolute -inset-6 rounded-3xl pointer-events-none"
           style={{
@@ -179,7 +179,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* ── Social proof mini-bar ── */}
+      {/* Social proof mini-bar */}
       <div className="relative flex flex-wrap justify-center gap-x-2 mt-12 animate-[fadeInUp_0.6s_ease_0.6s_both]">
         {["Built for SEO professionals", "Revive your rankings", "Free plan available"].map((text, i) => (
           <span key={text} className="flex items-center gap-2 text-[12px] text-[#475569] font-medium uppercase tracking-wider">

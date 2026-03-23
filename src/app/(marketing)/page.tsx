@@ -16,11 +16,11 @@ import Footer from "@/components/marketing/Footer";
 import RevealObserver from "@/components/marketing/RevealObserver";
 
 export const metadata: Metadata = {
-  title: "SerpVive — Your Blog Is Losing Traffic. We Tell You Why.",
+  title: "SerpVive | Your Blog Is Losing Traffic. We Tell You Why.",
   description:
     "SerpVive finds the dying posts, explains why, and tells you exactly what to fix. AI-powered content decay monitor with actionable refresh briefs.",
   openGraph: {
-    title: "SerpVive — Your Blog Is Losing Traffic. We Tell You Why.",
+    title: "SerpVive | Your Blog Is Losing Traffic. We Tell You Why.",
     description:
       "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
     url: "https://serpvive.com",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SerpVive — Your Blog Is Losing Traffic",
+    title: "SerpVive | Your Blog Is Losing Traffic",
     description:
       "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
     creator: "@serpvive",
