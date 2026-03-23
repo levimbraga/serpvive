@@ -12,6 +12,7 @@ export type PipelineResult = {
   brief: RefreshBriefResult;
   totalCostUsd: number;
   processingTimeMs: number;
+  modelUsed: string;
 };
 
 export type ExternalPipelineResult = {
@@ -22,6 +23,7 @@ export type ExternalPipelineResult = {
   tokensOutput: number;
   totalCostUsd: number;
   processingTimeMs: number;
+  modelUsed: string;
 };
 
 /**
@@ -152,7 +154,7 @@ export async function runDiagnosisPipeline(
         results: serpResults,
         fetched_at: new Date().toISOString(),
       },
-      model_used: "claude-opus-4-6",
+      model_used: diagResult.modelUsed,
       tokens_input: diagResult.tokensInput + briefResult.tokensInput,
       tokens_output: diagResult.tokensOutput + briefResult.tokensOutput,
       cost_usd: totalCostUsd,
@@ -177,7 +179,7 @@ export async function runDiagnosisPipeline(
     })
     .eq("id", pageId);
 
-  console.log(`[pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}`);
+  console.log(`[pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}`);
 
   return {
     diagnosisId: diagnosisRecord.id,
@@ -185,6 +187,7 @@ export async function runDiagnosisPipeline(
     brief: briefResult.brief,
     totalCostUsd,
     processingTimeMs,
+    modelUsed: diagResult.modelUsed,
   };
 }
 
@@ -287,7 +290,7 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
   const tokensInput = diagResult.tokensInput + briefResult.tokensInput;
   const tokensOutput = diagResult.tokensOutput + briefResult.tokensOutput;
 
-  console.log(`[external-pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}`);
+  console.log(`[external-pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}`);
 
   return {
     diagnosis: diagResult.diagnosis,
@@ -301,5 +304,6 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     tokensOutput,
     totalCostUsd,
     processingTimeMs,
+    modelUsed: diagResult.modelUsed,
   };
 }

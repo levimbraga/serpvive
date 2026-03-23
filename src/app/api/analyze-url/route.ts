@@ -149,7 +149,7 @@ export async function POST(request: Request) {
           diagnosis: result.diagnosis,
           refresh_brief: result.brief,
           serp_snapshot: result.serpSnapshot,
-          model_used: "claude-opus-4-6",
+          model_used: result.modelUsed,
           tokens_input: result.tokensInput,
           tokens_output: result.tokensOutput,
           cost_usd: result.totalCostUsd,

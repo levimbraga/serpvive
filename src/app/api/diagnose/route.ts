@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
+import { FallbackExhaustedError } from "@/lib/ai/fallback-chain";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getPostHogServer } from "@/lib/posthog/server";
 
@@ -205,6 +206,9 @@ function getUserFriendlyError(message: string): string {
 
   if (lower.includes("page not found")) {
     return "This page could not be found. It may have been removed from your site.";
+  }
+  if (lower.includes("all ai providers failed")) {
+    return "AI analysis is temporarily unavailable. Please try again in a few minutes.";
   }
   if (lower.includes("overloaded") || lower.includes("529") || lower.includes("capacity")) {
     return "Our AI service is temporarily overloaded. Please try again in a few minutes.";

@@ -1,9 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { extractJson } from "./json-extract";
 import { sanitizeAiOutput } from "./sanitize";
-
-const anthropic = new Anthropic({ maxRetries: 0 });
+import { runWithFallback } from "./fallback-chain";
+import { getDiagnosisChain } from "./chain";
+import type { AIMessage } from "./providers";
 
 // ── Zod Schemas ──
 
@@ -359,14 +359,18 @@ export type DiagnoseResult = {
   tokensInput: number;
   tokensOutput: number;
   costUsd: number;
+  modelUsed: string;
 };
 
 /**
- * Runs AI diagnosis via Claude Opus 4.6.
+ * Runs AI diagnosis via the fallback provider chain.
+ * Tries Claude Opus → Sonnet → Gemini → GPT-4o.
  * Uses decay prompt for established pages, content analysis prompt for new pages.
  * Retries 1x with lightweight prompt if JSON is invalid.
  */
 export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResult> {
+  const chain = getDiagnosisChain();
+
   const prompt = params.isNewPage
     ? buildNewPagePrompt({
         url: params.url,
@@ -392,31 +396,36 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
         queryData: params.queryData ?? "No query data available",
       });
 
-  // First attempt
-  let response = await anthropic.messages.create({
-    model: "claude-opus-4-6",
-    max_tokens: 8192,
-    messages: [{ role: "user", content: prompt }],
-  });
+  const callOptions = { maxTokens: 8192, temperature: 0 };
 
-  let text = response.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("");
+  // Accumulate tokens/cost across attempts
+  let totalTokensInput = 0;
+  let totalTokensOutput = 0;
+  let totalCostUsd = 0;
+  let modelUsed = "unknown";
+
+  // First attempt via fallback chain
+  const messages: AIMessage[] = [{ role: "user", content: prompt }];
+  let result = await runWithFallback(chain, messages, callOptions);
+  totalTokensInput += result.tokensInput;
+  totalTokensOutput += result.tokensOutput;
+  totalCostUsd += result.costUsd;
+  modelUsed = result.provider;
 
   console.log("[diagnose] Response:", {
-    tokens_output: response.usage?.output_tokens,
-    stop_reason: response.stop_reason,
+    provider: result.provider,
+    fallbackUsed: result.fallbackUsed,
+    tokens_output: result.tokensOutput,
     page_url: params.url,
   });
 
-  let json: unknown = extractJson(text);
+  let json: unknown = extractJson(result.text);
 
-  // Truncate causes if Opus returned more than 5 (avoids unnecessary retry)
+  // Truncate causes if model returned more than 5 (avoids unnecessary retry)
   if (json && typeof json === "object" && "causes" in json && Array.isArray((json as Record<string, unknown>).causes)) {
     const causes = (json as Record<string, unknown>).causes as unknown[];
     if (causes.length > 5) {
-      console.warn("[diagnose] Opus returned", causes.length, "causes, truncating to 5");
+      console.warn("[diagnose] Model returned", causes.length, "causes, truncating to 5");
       (json as Record<string, unknown>).causes = causes.slice(0, 5);
     }
   }
@@ -426,38 +435,33 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   // Retry 1x with lightweight prompt if invalid
   if (!parsed.success) {
     console.error("[diagnose] Zod validation FAILED — details:", {
-      tokens_used: response.usage?.output_tokens,
-      stop_reason: response.stop_reason,
-      page_url: params.url,
+      provider: result.provider,
       raw_json_keys: json ? Object.keys(json) : "NULL_JSON",
       raw_json_preview: JSON.stringify(json).slice(0, 500),
       zod_issues: JSON.stringify(parsed.error.issues, null, 2),
     });
 
-    response = await anthropic.messages.create({
-      model: "claude-opus-4-6",
-      max_tokens: 8192,
-      messages: [
-        { role: "user", content: "Return valid JSON for an SEO diagnosis." },
-        { role: "assistant", content: text },
-        {
-          role: "user",
-          content: `Your previous JSON had validation errors:\n${JSON.stringify(parsed.error.issues, null, 2)}\n\nFix these issues and return the COMPLETE valid JSON. Start with { and end with }.`,
-        },
-      ],
-    });
+    const retryMessages: AIMessage[] = [
+      { role: "user", content: "Return valid JSON for an SEO diagnosis." },
+      { role: "assistant", content: result.text },
+      {
+        role: "user",
+        content: `Your previous JSON had validation errors:\n${JSON.stringify(parsed.error.issues, null, 2)}\n\nFix these issues and return the COMPLETE valid JSON. Start with { and end with }.`,
+      },
+    ];
 
-    text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("");
+    result = await runWithFallback(chain, retryMessages, callOptions);
+    totalTokensInput += result.tokensInput;
+    totalTokensOutput += result.tokensOutput;
+    totalCostUsd += result.costUsd;
+    modelUsed = result.provider;
 
     console.log("[diagnose] Retry response:", {
-      tokens_output: response.usage?.output_tokens,
-      stop_reason: response.stop_reason,
+      provider: result.provider,
+      tokens_output: result.tokensOutput,
     });
 
-    json = extractJson(text);
+    json = extractJson(result.text);
     parsed = DiagnosisSchema.safeParse(json);
 
     if (!parsed.success) {
@@ -470,11 +474,6 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
     }
   }
 
-  const tokensInput = response.usage.input_tokens;
-  const tokensOutput = response.usage.output_tokens;
-  // Opus 4.6 pricing: $5/M input, $25/M output
-  const costUsd = (tokensInput * 5 + tokensOutput * 25) / 1_000_000;
-
   // Strip reasoning (internal scratchpad, not shown to user)
   const { reasoning: _reasoning, ...diagnosisWithoutReasoning } = parsed.data;
 
@@ -483,8 +482,9 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
 
   return {
     diagnosis: sanitizedDiagnosis,
-    tokensInput,
-    tokensOutput,
-    costUsd: Math.round(costUsd * 10000) / 10000,
+    tokensInput: totalTokensInput,
+    tokensOutput: totalTokensOutput,
+    costUsd: Math.round(totalCostUsd * 10000) / 10000,
+    modelUsed,
   };
 }

@@ -11,6 +11,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@base-ui/react": "^1.2.0",
+    "@google/generative-ai": "^0.24.1",
     "@react-email/components": "^1.0.8",
     "@react-email/render": "^2.0.4",
     "@stripe/stripe-js": "^8.9.0",
@@ -26,6 +27,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-mdx-remote": "^6.0.0",
+    "openai": "^6.32.0",
     "posthog-js": "^1.360.0",
     "posthog-node": "^5.28.0",
     "react": "19.2.3",
