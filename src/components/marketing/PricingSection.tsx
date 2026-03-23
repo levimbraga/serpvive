@@ -158,18 +158,18 @@ export default function PricingSection() {
                 <div
                   className={`rounded-xl p-6 sm:p-7 text-left border transition-all duration-300 hover:-translate-y-0.5 relative flex flex-col h-full ${
                     plan.popular
-                      ? "border-[#0D9488] shadow-[0_0_40px_rgba(13,148,136,0.12)]"
+                      ? "border-[#3B82F6] shadow-[0_0_40px_rgba(59,130,246,0.12)]"
                       : "border-[#1E293B] hover:border-[#334155]"
                   }`}
                   style={{
                     background: "#0F1219",
-                    ...(plan.popular ? { borderTopWidth: "4px", borderTopColor: "#0D9488" } : {}),
+                    ...(plan.popular ? { borderTopWidth: "4px", borderTopColor: "#3B82F6" } : {}),
                   }}
                 >
                   {/* Popular badge */}
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#0D9488] px-3.5 py-1.5 rounded-full whitespace-nowrap">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#3B82F6] px-3.5 py-1.5 rounded-full whitespace-nowrap">
                         Most Popular
                       </span>
                     </div>
