@@ -3,6 +3,7 @@ import { getStripe, resolvePlanFromPriceId, resolveIntervalFromPriceId } from "@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPostHogServer } from "@/lib/posthog/server";
+import { sendCancelFeedbackEmail } from "@/lib/email/send";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
@@ -158,6 +159,12 @@ export async function POST(request: Request) {
         }
 
         getPostHogServer().capture({ distinctId: userId, event: "plan_cancel_scheduled", properties: { plan, effectiveAt: periodEnd } });
+
+        // Send founder cancel feedback email (fire-and-forget)
+        sendCancelFeedbackEmail(userId).catch((err) =>
+          console.error("[stripe/webhook] Cancel feedback email failed:", err),
+        );
+
         break;
       }
 

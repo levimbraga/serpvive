@@ -1,4 +1,4 @@
-import { resend, FROM_EMAIL } from "./resend";
+import { resend, FROM_EMAIL, FOUNDER_EMAIL } from "./resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generateUnsubscribeToken } from "@/lib/email/unsubscribe";
 import WeeklyDigest from "./templates/weekly-digest";
@@ -229,5 +229,50 @@ export async function sendOnboardingDay3(userId: string) {
     console.error("[email] Onboarding day 3 error:", error);
   } else {
     console.log("[email] Onboarding day 3 sent to", profile.email);
+  }
+}
+
+export async function sendCancelFeedbackEmail(userId: string) {
+  const admin = getSupabaseAdmin();
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("email, full_name")
+    .eq("id", userId)
+    .single();
+
+  if (!profile?.email) return;
+
+  const firstName = profile.full_name?.split(" ")[0] ?? "there";
+
+  const { error } = await resend.emails.send({
+    from: FOUNDER_EMAIL,
+    to: profile.email,
+    replyTo: "levi@serpvive.com",
+    subject: "Quick question about your cancellation",
+    text: `Hi ${firstName},
+
+I'm Levi, the founder of SerpVive. I noticed you just canceled.
+
+No hard feelings at all — but I'd love to understand why. Even 4 words would help me make SerpVive better.
+
+Was it:
+- Not useful enough?
+- Too expensive?
+- Missing a feature you needed?
+- Something else?
+
+Just reply to this email. I read every response personally.
+
+Thanks for giving SerpVive a try.
+
+— Levi
+Founder, SerpVive`,
+  });
+
+  if (error) {
+    console.error("[email] Cancel feedback error:", error);
+  } else {
+    console.log("[email] Cancel feedback sent to", profile.email);
   }
 }
