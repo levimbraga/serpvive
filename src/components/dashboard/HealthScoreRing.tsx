@@ -74,21 +74,22 @@ export default function HealthScoreRing({ score, delta, size = 200 }: HealthScor
         </svg>
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold text-[#111827]" style={{ fontFamily: "var(--font-mono, monospace)" }}>
-            {animatedScore}
-          </span>
-          <span className="text-[13px] text-[#6B7280] mt-0.5">Health Score</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[56px] font-bold text-[#111827] leading-none" style={{ fontFamily: "var(--font-mono, monospace)" }}>
+              {animatedScore}
+            </span>
+            <span className="text-[16px] text-[#9CA3AF] font-medium">/100</span>
+          </div>
         </div>
       </div>
 
       {/* Delta */}
       {delta !== null && delta !== 0 && (
-        <div className={`flex items-center gap-1 text-sm font-medium ${
-          delta > 0 ? "text-[#16A34A]" : "text-[#DC2626]"
-        }`}>
-          <span>{delta > 0 ? "+" : ""}{delta}</span>
-          <span>{delta > 0 ? "↑" : "↓"}</span>
-          <span className="text-[#9CA3AF] font-normal ml-1">vs last week</span>
+        <div className="flex items-center gap-1 text-[13px]">
+          <span className={`font-semibold ${delta > 0 ? "text-[#16A34A]" : "text-[#DC2626]"}`}>
+            {delta > 0 ? "↑" : "↓"}{Math.abs(delta)}
+          </span>
+          <span className="text-[#9CA3AF]">vs last week</span>
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 const PAGE_SIZE = 25;
@@ -19,11 +20,6 @@ type PageRow = {
 type DecayListProps = {
   pages: PageRow[];
   isNewSite?: boolean;
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  healthy: "#16A34A", warning: "#D97706", critical: "#DC2626",
-  dead: "#6B7280", new: "#2563EB", unknown: "#9CA3AF", redirected: "#9CA3AF",
 };
 
 export default function DecayList({ pages, isNewSite }: DecayListProps) {
@@ -58,48 +54,40 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
   return (
     <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
       {/* Header */}
-      <div className="hidden md:grid grid-cols-[1fr_100px_100px_100px_120px] gap-4 px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+      <div className="hidden md:grid grid-cols-[120px_1fr_90px_90px_90px_20px] gap-3 px-5 py-3 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+        <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Status</span>
         <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">Page</span>
-        <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider text-right">Clicks (28d)</span>
         <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider text-right">
           {isNewSite ? "Position" : "Decay"}
         </span>
         <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider text-right">
           {isNewSite ? "Impressions" : "Velocity"}
         </span>
-        <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider text-right">Status</span>
+        <span className="text-xs font-medium text-[#6B7280] uppercase tracking-wider text-right">Clicks</span>
+        <span />
       </div>
 
       {/* Rows */}
-      {displayPages.map((page) => {
-        const dotColor = STATUS_COLORS[page.status] ?? "#9CA3AF";
-        return (
+      {displayPages.map((page) => (
           <div key={page.id}>
+          {/* Desktop */}
           <Link
             href={`/pages/${page.id}`}
-            className="hidden md:grid grid-cols-[1fr_100px_100px_100px_120px] gap-4 px-5 py-3.5 border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors duration-150 items-center"
+            className="hidden md:grid grid-cols-[120px_1fr_90px_90px_90px_20px] gap-3 px-5 py-3.5 border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors duration-150 items-center group"
           >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: dotColor }}
-              />
-              <span
-                className="text-sm text-[#111827] truncate"
-                style={{ fontFamily: "var(--font-mono, monospace)" }}
-              >
-                {page.path}
-              </span>
-            </div>
+            <StatusBadge status={page.status} />
 
-            <span className="text-sm text-[#111827] text-right font-medium tabular-nums">
-              {page.currentClicks28d.toLocaleString()}
+            <span
+              className="text-sm text-[#111827] truncate"
+              style={{ fontFamily: "var(--font-mono, monospace)" }}
+            >
+              {page.path}
             </span>
 
             {isNewSite ? (
               <span className="text-sm text-[#6B7280] text-right tabular-nums">—</span>
             ) : (
-              <span className={`text-sm text-right font-medium tabular-nums ${
+              <span className={`text-sm text-right font-semibold tabular-nums ${
                 page.decayScore >= 30 ? "text-[#DC2626]" :
                 page.decayScore >= 15 ? "text-[#D97706]" :
                 "text-[#111827]"
@@ -123,20 +111,19 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
               </span>
             )}
 
-            <div className="flex justify-end">
-              <StatusBadge status={page.status} />
-            </div>
+            <span className="text-sm text-[#111827] text-right font-medium tabular-nums">
+              {page.currentClicks28d.toLocaleString()}
+            </span>
+
+            <ChevronRight size={14} strokeWidth={1.5} className="text-[#D1D5DB] group-hover:text-[#6B7280] transition-colors" />
           </Link>
 
-          {/* Mobile card view */}
+          {/* Mobile */}
           <Link
             href={`/pages/${page.id}`}
             className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors"
           >
-            <div
-              className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: dotColor }}
-            />
+            <StatusBadge status={page.status} />
             <div className="flex-1 min-w-0">
               <span
                 className="text-sm text-[#111827] truncate block"
@@ -147,7 +134,7 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-xs text-[#6B7280]">{page.currentClicks28d} clicks</span>
                 {!isNewSite && page.decayScore > 0 && (
-                  <span className={`text-xs font-medium ${
+                  <span className={`text-xs font-semibold ${
                     page.decayScore >= 30 ? "text-[#DC2626]" :
                     page.decayScore >= 15 ? "text-[#D97706]" :
                     "text-[#111827]"
@@ -157,11 +144,10 @@ export default function DecayList({ pages, isNewSite }: DecayListProps) {
                 )}
               </div>
             </div>
-            <StatusBadge status={page.status} />
+            <ChevronRight size={14} strokeWidth={1.5} className="text-[#D1D5DB] flex-shrink-0" />
           </Link>
           </div>
-        );
-      })}
+      ))}
 
       {/* Show more / View all */}
       {hasMore && !showAll && (

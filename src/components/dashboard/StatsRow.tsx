@@ -9,11 +9,11 @@ type StatsRowProps = {
 };
 
 const stats = [
-  { key: "total", label: "Total Pages", icon: FileText, color: "#3B82F6", bgColor: "#EFF6FF" },
-  { key: "healthy", label: "Healthy", icon: CheckCircle2, color: "#16A34A", bgColor: "#F0FDF4" },
-  { key: "warning", label: "Warning", icon: AlertTriangle, color: "#D97706", bgColor: "#FFFBEB" },
-  { key: "critical", label: "Critical", icon: AlertCircle, color: "#DC2626", bgColor: "#FEF2F2" },
-  { key: "dead", label: "Dead", icon: Skull, color: "#6B7280", bgColor: "#F9FAFB" },
+  { key: "total", label: "pages", icon: FileText, color: "#3B82F6", bgColor: "#EFF6FF" },
+  { key: "healthy", label: "healthy", icon: CheckCircle2, color: "#16A34A", bgColor: "#F0FDF4" },
+  { key: "warning", label: "warning", icon: AlertTriangle, color: "#D97706", bgColor: "#FFFBEB" },
+  { key: "critical", label: "critical", icon: AlertCircle, color: "#DC2626", bgColor: "#FEF2F2" },
+  { key: "dead", label: "dead", icon: Skull, color: "#6B7280", bgColor: "#F9FAFB" },
 ] as const;
 
 export default function StatsRow({ totalPages, healthy, warning, critical, dead }: StatsRowProps) {
@@ -33,14 +33,14 @@ export default function StatsRow({ totalPages, healthy, warning, critical, dead 
           className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center gap-3 transition-shadow duration-150 hover:shadow-sm"
         >
           <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center"
+            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: bgColor }}
           >
-            <Icon size={20} strokeWidth={1.5} style={{ color }} />
+            <Icon size={18} strokeWidth={1.5} style={{ color }} />
           </div>
           <div>
-            <p className="text-[28px] font-extrabold text-[#111827]">{values[key]}</p>
-            <p className="text-[13px] text-[#6B7280]">{label}</p>
+            <p className="text-[32px] font-bold text-[#111827] leading-none">{values[key]}</p>
+            <p className="text-[11px] font-medium text-[#9CA3AF] uppercase tracking-wider mt-1">{label}</p>
           </div>
         </div>
       ))}

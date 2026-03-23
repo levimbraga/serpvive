@@ -140,9 +140,11 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
         <span className="text-xs text-[#9CA3AF] capitalize">{plan} plan</span>
       </div>
 
-      <div className="flex items-baseline gap-1 mb-2">
-        <span className="text-2xl font-bold text-[#111827]">{used}</span>
-        <span className="text-sm text-[#6B7280]">/ {limit} this month</span>
+      <div className="mb-2">
+        <div className="flex items-baseline gap-1">
+          <span className="text-[28px] font-bold text-[#111827] leading-none">{used}/{limit}</span>
+        </div>
+        <p className="text-[11px] font-medium text-[#9CA3AF] uppercase tracking-wider mt-1">diagnoses this month</p>
       </div>
 
       <div className="w-full bg-[#E5E7EB] rounded-full h-2 overflow-hidden">
