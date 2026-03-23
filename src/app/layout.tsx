@@ -4,9 +4,9 @@ import { PostHogProvider } from "@/lib/posthog/provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SerpVive — Revive Your Rankings | AI-Powered Content Decay Monitor",
+  title: "SerpVive | AI-Powered Content Decay Monitor",
   description:
-    "SerpVive monitors your blog, detects posts losing traffic, diagnoses WHY with AI, and tells you exactly WHAT to do to recover.",
+    "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings.",
   metadataBase: new URL("https://serpvive.com"),
   icons: {
     icon: [
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "SerpVive — Revive Your Rankings",
+    title: "SerpVive | AI-Powered Content Decay Monitor",
     description:
-      "Detect content decay, get AI-powered diagnoses, and recover your rankings with actionable refresh briefs.",
+      "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings.",
     url: "https://serpvive.com",
     siteName: "SerpVive",
     locale: "en_US",
@@ -28,9 +28,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SerpVive — Revive Your Rankings",
+    title: "SerpVive | AI-Powered Content Decay Monitor",
     description:
-      "AI-powered content decay monitor. Detect decay, diagnose causes, recover rankings.",
+      "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix.",
   },
 };
 

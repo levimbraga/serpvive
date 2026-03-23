@@ -18,11 +18,19 @@ import RevealObserver from "@/components/marketing/RevealObserver";
 export const metadata: Metadata = {
   title: "SerpVive | Your Blog Is Losing Traffic. We Tell You Why.",
   description:
-    "SerpVive finds the dying posts, explains why, and tells you exactly what to fix. AI-powered content decay monitor with actionable refresh briefs.",
+    "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings. Free plan available. Powered by Claude Opus 4.6.",
+  keywords: ["content decay", "SEO monitoring", "blog traffic", "content refresh", "SEO tool", "SerpVive"],
+  alternates: {
+    canonical: "https://serpvive.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: "SerpVive | Your Blog Is Losing Traffic. We Tell You Why.",
     description:
-      "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
+      "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings.",
     url: "https://serpvive.com",
     siteName: "SerpVive",
     type: "website",
@@ -31,14 +39,38 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SerpVive | Your Blog Is Losing Traffic",
     description:
-      "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
+      "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings.",
     creator: "@serpvive",
+  },
+};
+
+// Static JSON-LD for Google rich results (hardcoded, no user input)
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "SerpVive",
+  applicationCategory: "SEO Tool",
+  operatingSystem: "Web",
+  description:
+    "Content decay monitoring tool that detects posts losing traffic, diagnoses why with AI, and tells you exactly what to fix.",
+  url: "https://serpvive.com",
+  offers: {
+    "@type": "AggregateOffer",
+    priceCurrency: "USD",
+    lowPrice: "0",
+    highPrice: "129",
+    offerCount: "4",
   },
 };
 
 export default function MarketingPage() {
   return (
     <>
+      {/* Safe: jsonLd is a hardcoded constant, not user input */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <HeroSection />
       <SocialProof />
