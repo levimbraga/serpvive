@@ -1,4 +1,5 @@
 # ARCHITECTURE — SerpVive
+## Updated: March 22, 2026
 
 ## Stack Overview
 | Layer | Technology | Purpose |
@@ -30,11 +31,13 @@ CREATE TABLE public.profiles (
   full_name TEXT,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
-  plan TEXT NOT NULL DEFAULT 'trial' CHECK (plan IN ('trial', 'starter', 'pro', 'agency')),
-  plan_status TEXT NOT NULL DEFAULT 'trialing' CHECK (plan_status IN ('trialing', 'active', 'canceled', 'past_due')),
+  plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'trial', 'starter', 'pro', 'agency')),
+  plan_status TEXT NOT NULL DEFAULT 'active' CHECK (plan_status IN ('active', 'trialing', 'canceled', 'past_due')),
   trial_ends_at TIMESTAMPTZ,
   diagnoses_used_this_month INT NOT NULL DEFAULT 0,
   diagnoses_reset_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  free_diagnosis_used BOOLEAN NOT NULL DEFAULT FALSE,
+  referral_source TEXT,  -- "How did you hear about us?" dropdown
   digest_day TEXT DEFAULT 'monday',
   timezone TEXT DEFAULT 'UTC',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -60,8 +63,11 @@ CREATE TABLE public.sites (
   pages_warning INT NOT NULL DEFAULT 0,
   pages_critical INT NOT NULL DEFAULT 0,
   pages_dead INT NOT NULL DEFAULT 0,
+  auto_diagnosis_status TEXT DEFAULT 'pending' CHECK (auto_diagnosis_status IN ('pending', 'running', 'completed', 'failed', 'skipped')),
+  auto_diagnosis_page_id UUID REFERENCES public.pages(id),
+  engine_last_run_at TIMESTAMPTZ,  -- prevents duplicate runs on same day
   last_sync_at TIMESTAMPTZ,
-  last_engine_run_at TIMESTAMPTZ,
+  is_demo BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, gsc_property)
@@ -142,7 +148,7 @@ CREATE TABLE public.diagnoses (
   tokens_output INT,
   cost_usd DECIMAL(6,4),
   processing_time_ms INT,
-  triggered_by TEXT NOT NULL CHECK (triggered_by IN ('auto', 'manual', 'batch')),
+  triggered_by TEXT NOT NULL CHECK (triggered_by IN ('auto', 'manual', 'batch', 'demo')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 ```
@@ -173,6 +179,32 @@ CREATE TABLE public.refreshes (
 );
 ```
 
+### cancel_feedback (NEW)
+```sql
+CREATE TABLE public.cancel_feedback (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id),
+  email TEXT NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### demo_analyses (already built)
+```sql
+CREATE TABLE public.demo_analyses (
+  id TEXT PRIMARY KEY,  -- nanoid(8)
+  url TEXT NOT NULL,
+  keyword TEXT NOT NULL,
+  diagnosis JSONB NOT NULL,
+  refresh_brief JSONB,
+  serp_snapshot JSONB,
+  views INT NOT NULL DEFAULT 0,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
 ### waitlist (pré-lançamento)
 ```sql
 CREATE TABLE public.waitlist (
@@ -193,14 +225,19 @@ src/
 │   │   ├── dashboard/        # Health Score + decay list
 │   │   ├── pages/            # All pages table
 │   │   ├── pages/[id]/       # Diagnosis + brief detail
+│   │   ├── pages/analyze/    # Analyze any URL (without GSC)
 │   │   ├── refreshes/        # Refresh history + results
 │   │   ├── settings/         # Account, billing, preferences
 │   │   └── onboarding/       # Connect GSC, select site, import
+│   ├── demo/[id]/            # Public demo permalink
+│   ├── admin/demo/           # Admin demo generation
 │   └── api/
 │       ├── auth/google-gsc/  # Custom OAuth for GSC scope
 │       ├── gsc/              # Properties list, import trigger
-│       ├── diagnose/         # On-demand AI diagnosis
+│       ├── diagnose/         # On-demand AI diagnosis + feedback
 │       ├── refresh/          # Mark refresh done
+│       ├── demo/             # Demo generation + feedback
+│       ├── admin/seed-demo/  # Seed demo data
 │       ├── waitlist/         # Email capture
 │       ├── cron/             # 5 cron jobs
 │       └── stripe/           # Checkout, portal, webhooks
@@ -215,13 +252,16 @@ src/
 ├── lib/
 │   ├── supabase/             # client, server, admin, middleware
 │   ├── gsc/                  # OAuth tokens, API calls, transforms
-│   ├── engine/               # decay-scorer, velocity, seasonal, classifier, health-score
-│   ├── ai/                   # Anthropic client, prompts, schemas, parser
-│   ├── serp/                 # Serper client, content fetcher
+│   ├── engine/               # decay-scorer, velocity, seasonal, classifier, health-score, run-for-site
+│   ├── ai/                   # diagnose.ts, brief.ts, pipeline.ts, auto-diagnosis.ts, sanitize.ts, json-extract.ts
+│   ├── serp/                 # Serper client (client.ts), content fetcher (fetcher.ts)
 │   ├── email/                # Resend client, templates
 │   ├── stripe/               # Client, plans, webhook handlers
+│   ├── export/               # format-analysis.ts (markdown, JSON export)
 │   ├── limits.ts             # Plan limit checks
 │   └── constants.ts          # Thresholds, config
+├── scripts/
+│   └── seed-demo.ts          # Demo data seeding
 ├── hooks/                    # use-site, use-pages, use-diagnosis, use-usage
 └── types/                    # database, gsc, diagnosis, brief, serp
 ```
@@ -229,11 +269,13 @@ src/
 ## Cron Jobs (vercel.json)
 | Cron | Schedule | What it does |
 |------|----------|-------------|
-| sync-gsc | 3AM UTC daily | Pull new GSC data for all active sites |
-| run-engine | 4AM UTC daily | Run decay scoring, velocity, classification |
+| sync-gsc | 3AM UTC daily | Pull new GSC data for all active sites (paid = daily, free = weekly/Sunday only) |
+| run-engine | 4AM UTC daily | Run decay scoring, velocity, classification. Skip sites that already ran today (engine_last_run_at). Free plan: limited engine (no velocity, no seasonal, no cannibalization). |
 | batch-alert | 5AM UTC daily | Identify new critical posts and flag for user (alert only, NO auto-diagnosis) |
 | measure-results | 6AM UTC Sunday | Measure refresh results (28+ days after) |
-| send-digests | 9AM UTC Monday | Send weekly email digest |
+| send-digests | 9AM UTC Monday | Send weekly email digest (paid plans only) |
+
+**Engine also runs IMMEDIATELY** after import completes for new sites via `runEngineForSite()`. This is separate from the cron. After engine, triggers `maybeTriggerAutoDiagnosis()` for first-time sites.
 
 ## Environment Variables
 ```
@@ -251,15 +293,17 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 RESEND_API_KEY=
 NEXT_PUBLIC_APP_URL=
 CRON_SECRET=
+ADMIN_EMAIL=
 ```
 
 ## Plan Limits Constants
 ```typescript
 export const PLAN_LIMITS = {
-  trial:   { sites: 1, pages: 100, diagnoses_per_month: 3,   team_members: 1 },
-  starter: { sites: 1, pages: 100, diagnoses_per_month: 10,  team_members: 1 },
-  pro:     { sites: 3, pages: 500, diagnoses_per_month: 50,  team_members: 3 },
-  agency:  { sites: 10, pages: 2000, diagnoses_per_month: 150, team_members: 10 },
+  free:    { sites: 1, pages: 100, diagnoses_per_month: 0, diagnoses_lifetime: 1, team_members: 1, monitoring: 'weekly' },
+  trial:   { sites: 1, pages: 100, diagnoses_per_month: 10, team_members: 1, monitoring: 'daily' },
+  starter: { sites: 1, pages: 100, diagnoses_per_month: 10, team_members: 1, monitoring: 'daily' },
+  pro:     { sites: 3, pages: 1000, diagnoses_per_month: 40, team_members: 3, monitoring: 'daily' },
+  agency:  { sites: 10, pages: 5000, diagnoses_per_month: 120, team_members: 10, monitoring: 'daily' },
 };
 ```
 

@@ -122,17 +122,13 @@ src/
 - NUNCA commitar .env, tokens, secrets
 
 ## Docs de Referência (ler antes de implementar)
-- `/docs/PRODUCT-SPEC.md` — Visão, pricing, features, unit economics, tech stack
+- `/docs/PRODUCT-SPEC.md` — Visão, pricing, features, personas, AI Search stats
 - `/docs/BRAND.md` — Nome SerpVive, positioning, taglines, voice, visual identity
-- `/docs/MARKET-RESEARCH.md` — Mercado $2T, urgência AI Search, personas, willingness to pay
-- `/docs/COMPETITORS.md` — SEOTesting, Surfer, Clearscope, Frase, FreshRank — gaps
-- `/docs/SCOPE-MVP.md` — O que entra e NÃO entra no MVP, 12 telas, timeline
+- `/docs/SCOPE-MVP.md` — O que entra e NÃO entra no MVP, telas, demo system
 - `/docs/ARCHITECTURE.md` — Schema SQL, project structure, crons, env vars
-- `/docs/DESIGN.md` — Paleta, tipografia, componentes, animações (Surfer-inspired)
-- `/docs/BACKEND-ENGINE.md` — Algoritmos de decay, prompts AI com micro-drafts, pipeline
-- `/docs/ONBOARDING-AND-UX.md` — 6 telas de onboarding, UX simplicity, glossário
-- `/docs/VALIDATION-STRATEGY.md` — Onde postar, metas de signups, cronograma 14 dias
-- `/docs/WORKFLOW.md` — Claude Code + Cowork + Chat como equipe de 10
+- `/docs/DESIGN.md` — Paleta, tipografia, componentes, layout patterns
+- `/docs/BACKEND-ENGINE.md` — Algoritmos de decay, prompts AI, pipeline
+- `/docs/ONBOARDING-AND-UX.md` — Onboarding flow (free vs paid), UX, glossário
 
 ## Estilo Visual (inspirado no Surfer SEO)
 - Landing page: dark (#0A0E1A), alternância dark/light entre seções
