@@ -1,14 +1,32 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Zap, BarChart3, ArrowRight } from "lucide-react";
+import { getSupabaseServer } from "@/lib/supabase/server";
+import ReferralSourcePrompt from "@/components/onboarding/ReferralSourcePrompt";
 
 export const metadata: Metadata = {
   title: "Get Started — SerpVive",
 };
 
-export default function OnboardingChoosePage() {
+export default async function OnboardingChoosePage() {
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("referral_source")
+    .eq("id", user.id)
+    .single();
+
+  const needsReferral = !profile?.referral_source;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      {needsReferral && <ReferralSourcePrompt />}
+
       <div className="max-w-2xl w-full text-center mb-10">
         <h1 className="text-2xl font-semibold text-[#111827] mb-2">
           How do you want to start?

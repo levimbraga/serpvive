@@ -7,17 +7,6 @@ import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import posthog from "posthog-js";
 
-const REFERRAL_SOURCES = [
-  { value: "", label: "Select one (optional)" },
-  { value: "google_search", label: "Google Search" },
-  { value: "reddit", label: "Reddit" },
-  { value: "twitter", label: "Twitter / X" },
-  { value: "friend", label: "Friend or colleague" },
-  { value: "blog_post", label: "Blog post or article" },
-  { value: "youtube", label: "YouTube" },
-  { value: "other", label: "Other" },
-];
-
 const COUNTRIES = [
   { value: "", label: "Select country (optional)" },
   { value: "US", label: "United States" },
@@ -49,7 +38,6 @@ export default function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [country, setCountry] = useState("");
-  const [referralSource, setReferralSource] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -120,14 +108,13 @@ export default function SignupForm() {
         .update({
           full_name: fullName.trim(),
           ...(country ? { country } : {}),
-          ...(referralSource ? { referral_source: referralSource } : {}),
         })
         .eq("id", data.user.id);
     }
 
     if (data.user) {
       posthog.identify(data.user.id, { email, name: fullName.trim(), ...(country ? { country } : {}) });
-      posthog.capture("user_signed_up", { method: "email", country: country || null, referral_source: referralSource || null });
+      posthog.capture("user_signed_up", { method: "email", country: country || null });
     }
 
     if (!data.session) {
@@ -258,20 +245,6 @@ export default function SignupForm() {
             >
               {COUNTRIES.map((c) => (
                 <option key={c.value} value={c.value} className="bg-[#07090F]">{c.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="referralSource" className="block text-sm font-medium text-[#94A3B8] mb-2">How did you hear about us?</label>
-            <select
-              id="referralSource"
-              value={referralSource}
-              onChange={(e) => setReferralSource(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl bg-[#07090F] border border-[#1E293B] text-white text-[15px] outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 transition-colors cursor-pointer"
-            >
-              {REFERRAL_SOURCES.map((s) => (
-                <option key={s.value} value={s.value} className="bg-[#07090F]">{s.label}</option>
               ))}
             </select>
           </div>
