@@ -248,7 +248,7 @@ export async function sendCancelFeedbackEmail(userId: string) {
   const { error } = await resend.emails.send({
     from: FOUNDER_EMAIL,
     to: profile.email,
-    replyTo: "levi@serpvive.com",
+    replyTo: "levimaiabraga@gmail.com",
     subject: "Quick question about your cancellation",
     text: `Hi ${firstName},
 
