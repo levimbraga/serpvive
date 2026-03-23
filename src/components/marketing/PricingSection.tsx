@@ -8,6 +8,7 @@ const PLANS = [
   {
     key: "free",
     name: "Free",
+    subtitle: "For getting started",
     monthly: 0,
     annual: 0,
     annualTotal: 0,
@@ -27,6 +28,7 @@ const PLANS = [
   {
     key: "starter",
     name: "Starter",
+    subtitle: "For solo bloggers",
     monthly: 29,
     annual: 24,
     annualTotal: 288,
@@ -46,6 +48,7 @@ const PLANS = [
   {
     key: "pro",
     name: "Pro",
+    subtitle: "For freelancers & consultants",
     monthly: 69,
     annual: 58,
     annualTotal: 696,
@@ -65,6 +68,7 @@ const PLANS = [
   {
     key: "agency",
     name: "Agency",
+    subtitle: "For teams & agencies",
     monthly: 129,
     annual: 108,
     annualTotal: 1296,
@@ -98,8 +102,13 @@ export default function PricingSection() {
           </h2>
         </Reveal>
         <Reveal>
-          <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[460px] mx-auto mb-10">
+          <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[520px] mx-auto mb-4">
             Get started free. No credit card required. Cancel anytime.
+          </p>
+        </Reveal>
+        <Reveal>
+          <p className="text-[14px] text-[#64748B] italic mb-10">
+            SEO consultants charge $500–3,000/month for content refresh audits.
           </p>
         </Reveal>
 
@@ -149,23 +158,29 @@ export default function PricingSection() {
                 <div
                   className={`rounded-xl p-6 sm:p-7 text-left border transition-all duration-300 hover:-translate-y-0.5 relative flex flex-col h-full ${
                     plan.popular
-                      ? "border-[#3B82F6] shadow-[0_0_40px_rgba(59,130,246,0.1)]"
+                      ? "border-[#0D9488] shadow-[0_0_40px_rgba(13,148,136,0.12)]"
                       : "border-[#1E293B] hover:border-[#334155]"
                   }`}
-                  style={{ background: "#0F1219" }}
+                  style={{
+                    background: "#0F1219",
+                    ...(plan.popular ? { borderTopWidth: "4px", borderTopColor: "#0D9488" } : {}),
+                  }}
                 >
                   {/* Popular badge */}
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#3B82F6] px-3.5 py-1.5 rounded-full whitespace-nowrap">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#0D9488] px-3.5 py-1.5 rounded-full whitespace-nowrap">
                         Most Popular
                       </span>
                     </div>
                   )}
 
-                  {/* Plan name */}
-                  <div className="text-[13px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-4">
+                  {/* Plan name + segment */}
+                  <div className="text-[13px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1">
                     {plan.name}
+                  </div>
+                  <div className="text-[12px] text-[#475569] mb-4">
+                    {plan.subtitle}
                   </div>
 
                   {/* Price */}
@@ -297,9 +312,16 @@ export default function PricingSection() {
           </Reveal>
         </div>
 
+        {/* Reassurance */}
+        <Reveal>
+          <p className="mt-8 text-[14px] text-[#94A3B8] max-w-[520px] mx-auto">
+            Free plan available. No credit card required. No setup fees. Cancel anytime.
+          </p>
+        </Reveal>
+
         {/* Note */}
         <Reveal>
-          <p className="mt-8 text-[13px] text-[#64748B] leading-relaxed max-w-[680px] mx-auto">
+          <p className="mt-3 text-[13px] text-[#64748B] leading-relaxed max-w-[680px] mx-auto">
             All plans include: Health Score, decay detection, velocity tracking,
             seasonal filtering, cannibalization detection, and result tracking.
           </p>
