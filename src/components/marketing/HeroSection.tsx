@@ -59,7 +59,7 @@ export default function HeroSection() {
           className="inline-flex items-center gap-2.5 rounded-xl bg-[#0D9488] text-white font-bold no-underline transition-all duration-200 hover:bg-[#0F766E] hover:shadow-[0_8px_50px_rgba(13,148,136,0.25)] hover:-translate-y-0.5"
           style={{ fontSize: "clamp(1.05rem, 1.3vw, 1.25rem)", padding: "clamp(16px, 1.5vw, 22px) clamp(32px, 3.5vw, 56px)" }}
         >
-          Start your 7-day free trial
+          Get started free
           <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
         </a>
         <a
@@ -74,7 +74,7 @@ export default function HeroSection() {
 
       {/* Trust badge */}
       <p className="relative text-[#475569] mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
-        Powered by Claude Opus 4.6 &middot; Read-only access &middot; Cancel anytime
+        Powered by Claude Opus 4.6 &middot; Read-only access &middot; No credit card required
       </p>
 
       {/* Product screenshot */}
