@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPostHogServer } from "@/lib/posthog/server";
 import { sendCancelFeedbackEmail } from "@/lib/email/send";
+import { resend, FROM_EMAIL } from "@/lib/email/resend";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
@@ -357,6 +358,59 @@ export async function POST(request: Request) {
           .eq("id", profile.id);
 
         console.log(`[stripe/webhook] invoice.payment_failed: user=${profile.id}`);
+      }
+      break;
+    }
+
+    case "charge.dispute.created": {
+      const dispute = event.data.object as Stripe.Dispute;
+      const amount = (dispute.amount / 100).toFixed(2);
+      const currency = dispute.currency.toUpperCase();
+      const customerId = typeof dispute.customer === "string" ? dispute.customer : "";
+
+      const { data: disputeProfile } = customerId
+        ? await admin.from("profiles").select("email, full_name").eq("stripe_customer_id", customerId).single()
+        : { data: null };
+
+      const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: adminEmail,
+        subject: `DISPUTE: $${amount} ${currency} — ${dispute.reason}`,
+        text: `New chargeback dispute filed.
+
+Customer: ${disputeProfile?.full_name ?? "unknown"} (${disputeProfile?.email ?? "unknown"})
+Amount: $${amount} ${currency}
+Reason: ${dispute.reason}
+Dispute ID: ${dispute.id}
+
+ACTION REQUIRED:
+1. Open Stripe Dashboard → Disputes
+2. Submit evidence within 7 days
+3. Include: login timestamps, feature usage, ToS acceptance, confirmation emails
+
+https://dashboard.stripe.com/disputes/${dispute.id}`,
+      }).catch((err) => console.error("[stripe/webhook] Dispute email failed:", err));
+
+      console.log(`[stripe/webhook] charge.dispute.created: $${amount} ${currency}, reason=${dispute.reason}`);
+      break;
+    }
+
+    case "charge.dispute.updated": {
+      const dispute = event.data.object as Stripe.Dispute;
+      if (dispute.status === "won" || dispute.status === "lost") {
+        const amount = (dispute.amount / 100).toFixed(2);
+        const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: adminEmail,
+          subject: `Dispute ${dispute.status.toUpperCase()}: $${amount}`,
+          text: `Dispute ${dispute.id} was ${dispute.status}. Amount: $${amount}.`,
+        }).catch((err) => console.error("[stripe/webhook] Dispute update email failed:", err));
+
+        console.log(`[stripe/webhook] charge.dispute.${dispute.status}: $${amount}`);
       }
       break;
     }
