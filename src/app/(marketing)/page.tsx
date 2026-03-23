@@ -16,22 +16,22 @@ import Footer from "@/components/marketing/Footer";
 import RevealObserver from "@/components/marketing/RevealObserver";
 
 export const metadata: Metadata = {
-  title: "SerpVive — Revive Your Rankings | AI Content Decay Monitor",
+  title: "SerpVive — Your Blog Is Losing Traffic. We Tell You Why.",
   description:
-    "AI-powered content decay monitor that detects posts losing traffic, diagnoses WHY with evidence, tells you exactly WHAT to fix, and proves it worked.",
+    "SerpVive finds the dying posts, explains why, and tells you exactly what to fix. AI-powered content decay monitor with actionable refresh briefs.",
   openGraph: {
-    title: "SerpVive — Revive Your Rankings",
+    title: "SerpVive — Your Blog Is Losing Traffic. We Tell You Why.",
     description:
-      "Detect posts losing traffic, diagnose why with AI, and get actionable refresh briefs with micro-drafts.",
+      "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
     url: "https://serpvive.com",
     siteName: "SerpVive",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SerpVive — Revive Your Rankings",
+    title: "SerpVive — Your Blog Is Losing Traffic",
     description:
-      "AI-powered content decay monitor. Detect, diagnose, fix, prove.",
+      "SerpVive finds the dying posts, explains why, and tells you exactly what to fix.",
     creator: "@serpvive",
   },
 };

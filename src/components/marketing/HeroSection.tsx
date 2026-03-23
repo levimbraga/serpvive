@@ -32,66 +32,50 @@ export default function HeroSection() {
         style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.05) 0%, transparent 60%)" }}
       />
 
-      {/* ── Tag pill ── */}
-      <div
-        className="relative inline-flex items-center gap-2 rounded-full font-medium text-[#FB923C] mb-9 animate-[fadeInUp_0.6s_ease_both]"
-        style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.2)", fontSize: "clamp(0.875rem, 1.2vw, 1.125rem)", padding: "clamp(8px, 0.8vw, 12px) clamp(20px, 2vw, 32px)" }}
-      >
-        <span style={{ fontSize: "clamp(14px, 1.2vw, 18px)" }}>&#x2726;</span>
-        AI Content Decay Monitor
-      </div>
-
-      {/* ── Headline with gradient text ── */}
+      {/* ── Headline ── */}
       <h1
         className="relative font-extrabold leading-[1.05] mb-8 animate-[fadeInUp_0.6s_ease_0.1s_both]"
-        style={{ fontSize: "clamp(3.5rem, 7vw, 6.875rem)", letterSpacing: "-0.05em", maxWidth: "min(1600px, 90vw)" }}
+        style={{ fontSize: "clamp(3.5rem, 7vw, 6.875rem)", letterSpacing: "-0.05em", maxWidth: "min(900px, 90vw)" }}
       >
-        Your posts are losing traffic.
-        <br />
+        Your blog is losing traffic{" "}
         <span
           className="bg-clip-text text-transparent"
           style={{ backgroundImage: "linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)" }}
         >
-          We tell you why — and how to fix them.
+          right now.
         </span>
       </h1>
 
       {/* ── Subtitle ── */}
-      <p className="relative leading-[1.7] text-[#94A3B8] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1.125rem, 1.8vw, 1.5rem)", maxWidth: "min(750px, 60vw)" }}>
-        SerpVive monitors every page on your blog. When traffic drops, our AI reads your competitors, compares with your content, and delivers a{" "}
-        <strong className="text-[#F1F5F9] font-semibold">specific action plan</strong> — not generic advice.
+      <p className="relative leading-[1.7] text-[#94A3B8] mx-auto mb-11 animate-[fadeInUp_0.6s_ease_0.2s_both]" style={{ fontSize: "clamp(1.125rem, 1.8vw, 1.5rem)", maxWidth: "min(600px, 60vw)" }}>
+        SerpVive finds the dying posts, explains why, and tells you exactly what to fix.
       </p>
 
-      {/* ── 4. Dual CTAs (Supademo hierarchy) ── */}
-      <div className="relative flex flex-col sm:flex-row items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
+      {/* ── CTAs ── */}
+      <div className="relative flex flex-col items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
         <a
           href="/signup"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "primary" })}
-          className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 w-full sm:w-auto justify-center"
-          style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
+          className="inline-flex items-center gap-2.5 rounded-xl bg-[#0D9488] text-white font-bold no-underline transition-all duration-200 hover:bg-[#0F766E] hover:shadow-[0_8px_50px_rgba(13,148,136,0.25)] hover:-translate-y-0.5"
+          style={{ fontSize: "clamp(1.05rem, 1.3vw, 1.25rem)", padding: "clamp(16px, 1.5vw, 22px) clamp(32px, 3.5vw, 56px)" }}
         >
-          Get Started Free
+          Start your 7-day free trial
           <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
         </a>
         <a
           href="#features"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "secondary" })}
-          className="inline-flex items-center gap-2 rounded-xl text-[#94A3B8] font-medium no-underline transition-all duration-200 hover:text-white hover:border-[rgba(59,130,246,0.4)] hover:bg-[rgba(59,130,246,0.06)] w-full sm:w-auto justify-center"
-          style={{ border: "1.5px solid #1E293B", fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
+          className="text-[#64748B] font-medium no-underline transition-colors duration-200 hover:text-[#94A3B8]"
+          style={{ fontSize: "clamp(0.9rem, 1.1vw, 1.05rem)" }}
         >
-          See how it works
+          See how it works &darr;
         </a>
       </div>
 
-      {/* ── Trust signals ── */}
-      <div className="relative flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]">
-        {["No credit card required", "1 free AI diagnosis included", "Setup in under 5 minutes"].map((text) => (
-          <span key={text} className="flex items-center gap-1.5 text-[#64748B]" style={{ fontSize: "clamp(13px, 1.1vw, 16px)" }}>
-            <span className="text-[#3B82F6] font-bold" style={{ fontSize: "clamp(12px, 1vw, 15px)" }}>&#x2713;</span>
-            {text}
-          </span>
-        ))}
-      </div>
+      {/* ── Trust badge ── */}
+      <p className="relative text-[#475569] mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
+        Powered by Claude Opus 4.6 &middot; Read-only access &middot; Cancel anytime
+      </p>
 
       {/* ── 2. Product screenshot with strong blue glow ── */}
       <div className="relative mt-16 mx-auto animate-[fadeInUp_0.8s_ease_0.5s_both]" style={{ width: "clamp(700px, 75vw, 1400px)", maxWidth: "95vw" }}>
@@ -195,9 +179,9 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* ── 3. Social proof mini-bar ── */}
+      {/* ── Social proof mini-bar ── */}
       <div className="relative flex flex-wrap justify-center gap-x-2 mt-12 animate-[fadeInUp_0.6s_ease_0.6s_both]">
-        {["Built for SEO professionals", "Powered by Claude AI", "Free plan available"].map((text, i) => (
+        {["Built for SEO professionals", "Revive your rankings", "Free plan available"].map((text, i) => (
           <span key={text} className="flex items-center gap-2 text-[12px] text-[#475569] font-medium uppercase tracking-wider">
             {text}
             {i < 2 && <span className="text-[#1E293B]">&#x2022;</span>}
