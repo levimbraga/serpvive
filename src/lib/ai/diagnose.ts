@@ -8,6 +8,7 @@ const anthropic = new Anthropic({ maxRetries: 0 });
 // ── Zod Schemas ──
 
 export const DiagnosisSchema = z.object({
+  reasoning: z.string().max(5000),
   summary: z.string().max(5000),
   strengths: z.array(z.string().max(5000)).min(1).max(5),
   topic_coverage: z.object({
@@ -40,7 +41,7 @@ export const DiagnosisSchema = z.object({
   }),
 });
 
-export type DiagnosisResult = z.infer<typeof DiagnosisSchema>;
+export type DiagnosisResult = Omit<z.infer<typeof DiagnosisSchema>, "reasoning">;
 
 // ── Prompt Builders ──
 
@@ -88,11 +89,32 @@ ${params.queryData}
 
 INSTRUCTIONS — Analyze WHY this page is losing traffic.
 
+REASONING (fill this field FIRST in your JSON output):
+Before writing your diagnosis, think through what you observe in 2-4 sentences. Compare the user's content against the top competitors. What stands out? What's the most likely primary cause? Is there strong evidence or is this uncertain? This reasoning will NOT be shown to the user — it's your analysis scratchpad to ensure your causes are well-grounded.
+
+SUMMARY RULES:
+The summary field is the most important part of your output. It will be displayed prominently and may be the only thing the user reads before deciding to act. It must:
+1. State the PRIMARY cause in plain language
+2. Mention at least one specific competitor, data point, or evidence
+3. Convey urgency through concrete loss (position drop, clicks lost, competitor action)
+4. Be concise — ideally under 200 characters, maximum 300
+GOOD summary: "Traffic down 85% because 2 competitors added comparison tables with 2026 pricing. Your data is from 2024. Position dropped #3 → #8 in 6 weeks."
+BAD summary: "Multiple factors appear to be contributing to the decline of this page, including competitive improvements and content freshness issues that may warrant attention."
+
 COMMUNICATION RULES:
 - ALWAYS start your summary with what the page does WELL. Find at least one genuine strength before listing problems. End the summary with an encouraging note about the page's realistic potential.
 - Use 'your' and 'you' language throughout, never clinical third-person.
 - Use analogies to make technical concepts instantly clear. Example: 'Your title is like a pizza shop sign saying Italian Food when everyone searches for Italian Pizza.'
 - For each cause, estimate the traffic impact in clicks/month. Use the GSC impressions data and CTR models: Position 1: ~28% CTR, Position 3: ~10%, Position 5: ~5%, Position 10: ~2%, Position 20+: ~0.5%. Calculate: current_impressions × target_CTR - current_clicks = recovery potential.
+
+WRITING STYLE:
+- Write as a senior SEO consultant presenting findings to a knowledgeable colleague. Direct and evidence-based.
+- BANNED phrases (never use these): "I'd suggest", "you might want to", "it appears that", "consider perhaps", "it seems like", "you could potentially", "it may be worth", "there might be an opportunity"
+- REQUIRED pattern for causes: State the problem directly, then the evidence. "Your pricing table shows 2024 data. Competitor at position #2 updated to 2026 pricing on March 8." Not "It appears that your pricing information may be somewhat outdated compared to what some competitors are showing."
+- Use SEO vocabulary naturally when relevant: search intent shift, SERP feature displacement, CTR erosion, thin content risk, QDF signal, E-E-A-T gap, content velocity, cannibalization
+- Numbers must be specific: "dropped from #3 to #8" not "dropped significantly"
+- Dates must be specific: "updated March 8, 2026" not "recently updated"
+- Competitor references must include the URL or domain: "competitor at pcmag.com" not "a competitor"
 
 HEALTHY PAGE HANDLING:
 Not every page needs fixing. If the page is performing well:
@@ -131,6 +153,14 @@ INTENT ANALYSIS:
 - Explain what the searcher REALLY needs (beyond the surface query)
 - Frame each cause as an intent gap when possible
 
+E-E-A-T ANALYSIS:
+When comparing the user's page against competitors, also evaluate E-E-A-T signals:
+- Experience: Does the page demonstrate first-hand experience? (case studies, personal examples, original data)
+- Expertise: Is the content written with demonstrable depth? (technical accuracy, nuance, comprehensive coverage)
+- Authoritativeness: Do competitors show stronger authority? (author bios with credentials, domain reputation, cited sources)
+- Trust: Are there trust gaps? (outdated information, missing author attribution, no publication date, broken links)
+If the user's page is weaker than competitors on any E-E-A-T dimension, include it as a cause with specific evidence. Example: "Competitors #1 and #3 include author bios with credentials. Your page has no author attribution, weakening Trust signals for this commercial query."
+
 GSC DATA USAGE:
 - Reference specific queries from the GSC data with positions and impressions
 - Identify clusters of related queries the page could capture
@@ -155,9 +185,13 @@ When relevant, note that well-structured, factual, and frequently updated conten
 
 Do NOT make this the focus of the diagnosis — Google organic is still the primary goal. But when a recommendation would ALSO improve AI search visibility, mention it briefly as a bonus benefit. Example: 'This also makes your content more likely to be cited by ChatGPT and Perplexity.'
 
+REFOCUS:
+Based on ALL the evidence above — the GSC performance data, the SERP snapshot, the competitor content analysis, and the user's own content — provide your diagnosis. Every cause MUST cite specific evidence from the data provided. Do not invent information not present in the context. Do not include a cause unless you can point to concrete evidence for it.
+
 Return ONLY valid JSON matching this schema:
 {
-  "summary": "string",
+  "reasoning": "string (2-4 sentences: your analysis scratchpad — what stands out, primary cause hypothesis, evidence strength. NOT shown to user)",
+  "summary": "string (under 300 chars: primary cause + specific evidence + urgency)",
   "strengths": ["string (1-5 specific things this page does well)"],
   "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "outdated_content|new_competitors|intent_shift|missing_topic|format_gap|technical_issue|cannibalization|thin_content" }],
@@ -203,10 +237,28 @@ ${params.userContent}
 
 INSTRUCTIONS — Analyze this new page's competitive positioning.
 
+REASONING (fill this field FIRST in your JSON output):
+Before writing your diagnosis, think through what you observe in 2-4 sentences. Compare the user's content against the top competitors. What stands out? What are the biggest gaps? This reasoning will NOT be shown to the user — it's your analysis scratchpad.
+
+SUMMARY RULES:
+The summary is the most important part. It may be the only thing the user reads. It must:
+1. State the PRIMARY gap in plain language
+2. Mention at least one specific competitor or data point
+3. Be concise — ideally under 200 characters, maximum 300
+GOOD: "Your page covers 6 of 11 key subtopics. SERP #1 (pcmag.com) has 3,200 words vs your 1,400 — adding FAQ and comparison table could close the gap."
+BAD: "There appear to be several areas where the content could potentially be improved to better compete."
+
 COMMUNICATION RULES:
 - ALWAYS start your summary with what the page does WELL. Find at least one genuine strength before listing problems. End the summary with an encouraging note about the page's realistic potential.
 - Use 'your' and 'you' language throughout, never clinical third-person.
 - Use analogies to make technical concepts instantly clear.
+
+WRITING STYLE:
+- Write as a senior SEO consultant presenting findings to a knowledgeable colleague. Direct and evidence-based.
+- BANNED phrases (never use these): "I'd suggest", "you might want to", "it appears that", "consider perhaps", "it seems like", "you could potentially", "it may be worth", "there might be an opportunity"
+- REQUIRED pattern: State the problem directly, then the evidence. Not hedging language.
+- Use SEO vocabulary naturally: search intent shift, thin content risk, E-E-A-T gap, content velocity
+- Numbers must be specific, competitor references must include domain
 
 HEALTHY PAGE HANDLING:
 Not every page needs fixing. If the page is performing well:
@@ -243,6 +295,12 @@ STRENGTHS (mandatory — returned as structured JSON):
 INTENT ANALYSIS:
 - Explain what the searcher REALLY needs (beyond the surface query)
 
+E-E-A-T SIGNALS:
+For new pages, focus on Expertise and Trust:
+- Expertise: Does the content demonstrate depth compared to competitors? (word count, subtopic coverage, technical accuracy)
+- Trust: Are basic trust signals present? (author attribution, publication date, cited sources, no broken links)
+If competitors have stronger E-E-A-T signals, note it as a cause with specific evidence.
+
 When possible, estimate traffic impact per cause in clicks/month. Be transparent if these are estimates.
 
 Maximum 5 causes, minimum 0 (return 0 if page is genuinely healthy). Order by severity: high → medium → low.
@@ -262,9 +320,13 @@ When relevant, note that well-structured, factual, and frequently updated conten
 
 Do NOT make this the focus of the diagnosis — Google organic is still the primary goal. But when a recommendation would ALSO improve AI search visibility, mention it briefly as a bonus benefit. Example: 'This also makes your content more likely to be cited by ChatGPT and Perplexity.'
 
+REFOCUS:
+Based on ALL the evidence above — the SERP snapshot, the competitor content analysis, and the user's own content — provide your diagnosis. Every cause MUST cite specific evidence from the data provided. Do not invent information not present in the context.
+
 Return ONLY valid JSON matching this schema:
 {
-  "summary": "string",
+  "reasoning": "string (2-4 sentences: your analysis scratchpad — what stands out, primary gaps, evidence strength. NOT shown to user)",
+  "summary": "string (under 300 chars: primary gap + specific evidence)",
   "strengths": ["string (1-5 specific things this page does well)"],
   "topic_coverage": { "covered": number, "total": number, "percentage": number, "missing": ["string"] },
   "causes": [{ "title": "string", "description": "string", "severity": "high|medium|low", "evidence": "string", "category": "content_gap|format_gap|thin_content|title_meta|internal_linking|content_structure" }],
@@ -413,8 +475,11 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   // Opus 4.6 pricing: $5/M input, $25/M output
   const costUsd = (tokensInput * 5 + tokensOutput * 25) / 1_000_000;
 
+  // Strip reasoning (internal scratchpad, not shown to user)
+  const { reasoning: _reasoning, ...diagnosisWithoutReasoning } = parsed.data;
+
   // Sanitize AI output to remove potential XSS vectors before saving
-  const sanitizedDiagnosis = sanitizeAiOutput(parsed.data) as DiagnosisResult;
+  const sanitizedDiagnosis = sanitizeAiOutput(diagnosisWithoutReasoning) as DiagnosisResult;
 
   return {
     diagnosis: sanitizedDiagnosis,

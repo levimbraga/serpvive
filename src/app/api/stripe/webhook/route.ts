@@ -366,7 +366,8 @@ export async function POST(request: Request) {
       const dispute = event.data.object as Stripe.Dispute;
       const amount = (dispute.amount / 100).toFixed(2);
       const currency = dispute.currency.toUpperCase();
-      const customerId = typeof dispute.customer === "string" ? dispute.customer : "";
+      const rawCustomer = (dispute as unknown as Record<string, unknown>).customer;
+      const customerId = typeof rawCustomer === "string" ? rawCustomer : "";
 
       const { data: disputeProfile } = customerId
         ? await admin.from("profiles").select("email, full_name").eq("stripe_customer_id", customerId).single()
