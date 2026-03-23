@@ -68,7 +68,7 @@ function renderMarkdown(text: string) {
       return (
         <h3
           key={i}
-          className="text-lg font-semibold text-[#E2E8F0] mt-8 mb-3"
+          className="text-lg font-semibold text-[#1F2937] mt-8 mb-3"
         >
           {heading}
         </h3>
@@ -84,7 +84,7 @@ function renderMarkdown(text: string) {
           {items.map((item, j) => (
             <li
               key={j}
-              className="text-[15px] text-[#CBD5E1] leading-relaxed"
+              className="text-[15px] text-[#374151] leading-relaxed"
             >
               {renderInline(
                 item.replace(/^[-\d]+[.)]\s*/, "")
@@ -96,7 +96,7 @@ function renderMarkdown(text: string) {
     }
 
     return (
-      <p key={i} className="text-[15px] text-[#CBD5E1] leading-relaxed mb-4">
+      <p key={i} className="text-[15px] text-[#374151] leading-relaxed mb-4">
         {renderInline(para)}
       </p>
     );
@@ -108,7 +108,7 @@ function renderInline(text: string) {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} className="text-[#F1F5F9] font-semibold">
+        <strong key={i} className="text-[#111827] font-semibold">
           {part.slice(2, -2)}
         </strong>
       );
@@ -209,39 +209,47 @@ export default async function ComparisonPage({ params }: Props) {
         </div>
       </header>
 
-      {/* Content */}
+      {/* Dark → Light transition */}
+      <div
+        className="h-16 sm:h-24"
+        style={{
+          background: "linear-gradient(to bottom, #07090F, #FFFFFF)",
+        }}
+      />
+
+      {/* Content (Light) */}
       <section
         className="pb-20 sm:pb-28 px-5 sm:px-12"
-        style={{ background: "#07090F" }}
+        style={{ background: "#FFFFFF" }}
       >
         <div className="mx-auto flex flex-col gap-14" style={{ maxWidth: "820px" }}>
           {/* TL;DR Box */}
-          <div className="rounded-2xl border border-[#3B82F6]/20 bg-[#3B82F6]/5 p-6 sm:p-8">
-            <div className="flex items-center gap-2 text-[13px] font-bold text-[#3B82F6] uppercase tracking-wider mb-5">
+          <div className="rounded-2xl border border-[#0D9488]/20 bg-[#F0FDFA] p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-[13px] font-bold text-[#0D9488] uppercase tracking-wider mb-5">
               <Zap size={14} strokeWidth={1.5} />
               TL;DR
             </div>
             <div className="grid sm:grid-cols-2 gap-6 mb-5">
               <div>
-                <p className="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">
+                <p className="text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
                   {data.competitorName} is best for
                 </p>
-                <p className="text-[14px] text-[#CBD5E1] leading-relaxed">
+                <p className="text-[14px] text-[#374151] leading-relaxed">
                   {data.tldr.competitorBestFor}
                 </p>
               </div>
               <div>
-                <p className="text-[12px] font-bold text-[#3B82F6] uppercase tracking-wider mb-2">
+                <p className="text-[12px] font-bold text-[#0D9488] uppercase tracking-wider mb-2">
                   SerpVive is best for
                 </p>
-                <p className="text-[14px] text-[#CBD5E1] leading-relaxed">
+                <p className="text-[14px] text-[#374151] leading-relaxed">
                   {data.tldr.serpviveBestFor}
                 </p>
               </div>
             </div>
-            <div className="pt-4 border-t border-[#1E293B]">
-              <p className="text-[14px] text-[#94A3B8] leading-relaxed">
-                <strong className="text-[#F1F5F9]">The short version:</strong>{" "}
+            <div className="pt-4 border-t border-[#0D9488]/15">
+              <p className="text-[14px] text-[#4B5563] leading-relaxed">
+                <strong className="text-[#111827]">The short version:</strong>{" "}
                 {data.tldr.summary}
               </p>
             </div>
@@ -249,7 +257,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Side-by-Side Table */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               {data.competitorName} vs SerpVive: Side-by-Side
             </h2>
             <ComparisonTable
@@ -260,7 +268,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* What Competitor Does Best */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               What {data.competitorName} Does Best
             </h2>
             {renderMarkdown(data.competitorStrengths)}
@@ -268,7 +276,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Where SerpVive Wins */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Where SerpVive Wins
             </h2>
             {renderMarkdown(data.serpviveWins)}
@@ -276,7 +284,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Feature-by-Feature Breakdown */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Feature-by-Feature Breakdown
             </h2>
             {renderMarkdown(data.featureBreakdown)}
@@ -284,7 +292,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Pricing Comparison */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Pricing Comparison
             </h2>
             <PricingTable
@@ -298,7 +306,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Who Should Choose Competitor */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Who Should Choose {data.competitorName}
             </h2>
             {renderMarkdown(data.whoShouldChooseCompetitor)}
@@ -306,7 +314,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Who Should Choose SerpVive */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Who Should Choose SerpVive
             </h2>
             {renderMarkdown(data.whoShouldChooseSerpvive)}
@@ -314,7 +322,7 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* Can You Use Both */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Can You Use Both?
             </h2>
             {renderMarkdown(data.canUseBoth)}
@@ -322,24 +330,24 @@ export default async function ComparisonPage({ params }: Props) {
 
           {/* FAQ */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-5">
               Frequently Asked Questions
             </h2>
             <FAQSection faqs={data.faqs} />
           </div>
 
           {/* CTA */}
-          <div className="rounded-2xl border border-[#3B82F6]/20 bg-gradient-to-br from-[#3B82F6]/5 to-[#7C3AED]/5 p-8 sm:p-10 text-center">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] mb-3">
+          <div className="rounded-2xl border border-[#0D9488]/20 bg-[#F0FDFA] p-8 sm:p-10 text-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-3">
               Try SerpVive Free
             </h2>
-            <p className="text-[15px] text-[#94A3B8] mb-6 max-w-lg mx-auto">
+            <p className="text-[15px] text-[#4B5563] mb-6 max-w-lg mx-auto">
               No credit card required. Connect your Google Search Console, see
               your Health Score, and get your first AI diagnosis in minutes.
             </p>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] text-white font-semibold px-7 py-3.5 text-[15px] no-underline hover:bg-[#2563EB] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#0D9488] text-white font-semibold px-7 py-3.5 text-[15px] no-underline hover:bg-[#0F766E] transition-all hover:shadow-[0_0_30px_rgba(13,148,136,0.15)]"
             >
               Get Started Free
               <ArrowRight size={16} strokeWidth={1.5} />
@@ -349,7 +357,7 @@ export default async function ComparisonPage({ params }: Props) {
           {/* Related Comparisons */}
           {relatedComparisons.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-[#F1F5F9] mb-4">
+              <h2 className="text-lg font-bold text-[#111827] mb-4">
                 Related Comparisons
               </h2>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -358,20 +366,20 @@ export default async function ComparisonPage({ params }: Props) {
                     <Link
                       key={comp.slug}
                       href={`/vs/${comp.slug}`}
-                      className="flex items-center justify-between rounded-xl border border-[#1E293B] bg-[#0F1219] p-4 no-underline group hover:border-[#3B82F6]/30 transition-colors"
+                      className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 no-underline group hover:border-[#0D9488]/40 transition-colors"
                     >
                       <div>
-                        <p className="text-[14px] font-semibold text-[#F1F5F9] group-hover:text-[#3B82F6] transition-colors">
+                        <p className="text-[14px] font-semibold text-[#111827] group-hover:text-[#0D9488] transition-colors">
                           {comp.competitorName} vs SerpVive
                         </p>
-                        <p className="text-[12px] text-[#64748B] mt-0.5">
+                        <p className="text-[12px] text-[#6B7280] mt-0.5">
                           Honest comparison for 2026
                         </p>
                       </div>
                       <ArrowRight
                         size={16}
                         strokeWidth={1.5}
-                        className="text-[#475569] group-hover:text-[#3B82F6] transition-colors"
+                        className="text-[#9CA3AF] group-hover:text-[#0D9488] transition-colors"
                       />
                     </Link>
                   ) : null
@@ -381,7 +389,7 @@ export default async function ComparisonPage({ params }: Props) {
           )}
 
           {/* Disclaimer */}
-          <div className="flex items-start gap-2.5 p-4 rounded-lg bg-[#1E293B]/30 text-[12px] text-[#64748B]">
+          <div className="flex items-start gap-2.5 p-4 rounded-lg bg-[#F3F4F6] text-[12px] text-[#6B7280]">
             <Info size={14} strokeWidth={1.5} className="mt-0.5 shrink-0" />
             <span>
               This comparison was last updated on{" "}
@@ -396,7 +404,7 @@ export default async function ComparisonPage({ params }: Props) {
                 href={data.competitorUrl}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="text-[#3B82F6] hover:underline"
+                className="text-[#0D9488] hover:underline"
               >
                 {data.competitorName}&apos;s website
               </a>{" "}

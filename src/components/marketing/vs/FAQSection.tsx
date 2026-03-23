@@ -14,19 +14,19 @@ export default function FAQSection({ faqs }: { faqs: FAQ[] }) {
         return (
           <div
             key={i}
-            className="rounded-xl border border-[#1E293B] bg-[#0F1219] overflow-hidden"
+            className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden"
           >
             <button
               onClick={() => setOpenIndex(isOpen ? null : i)}
-              className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-[#1E293B]/20"
+              className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-[#F9FAFB]"
             >
-              <span className="text-[15px] font-semibold text-[#F1F5F9]">
+              <span className="text-[15px] font-semibold text-[#111827]">
                 {faq.question}
               </span>
               <ChevronDown
                 size={18}
                 strokeWidth={1.5}
-                className={`shrink-0 text-[#64748B] transition-transform duration-200 ${
+                className={`shrink-0 text-[#9CA3AF] transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />
@@ -36,7 +36,7 @@ export default function FAQSection({ faqs }: { faqs: FAQ[] }) {
                 isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <p className="px-5 pb-4 text-[14px] text-[#94A3B8] leading-relaxed">
+              <p className="px-5 pb-4 text-[14px] text-[#4B5563] leading-relaxed">
                 {faq.answer}
               </p>
             </div>

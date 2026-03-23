@@ -146,10 +146,18 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </header>
 
-      {/* Content + ToC */}
+      {/* Dark → Light transition */}
+      <div
+        className="h-16 sm:h-24"
+        style={{
+          background: "linear-gradient(to bottom, #07090F, #FFFFFF)",
+        }}
+      />
+
+      {/* Content + ToC (Light) */}
       <section
         className="pb-20 sm:pb-28 px-5 sm:px-12"
-        style={{ background: "#07090F" }}
+        style={{ background: "#FFFFFF" }}
       >
         <div
           className="mx-auto flex gap-12"

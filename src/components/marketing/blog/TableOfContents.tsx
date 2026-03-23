@@ -32,11 +32,11 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
 
   return (
     <nav className="hidden xl:block sticky top-28 w-56 shrink-0 self-start">
-      <div className="flex items-center gap-2 text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider mb-4">
+      <div className="flex items-center gap-2 text-[12px] font-bold text-[#6B7280] uppercase tracking-wider mb-4">
         <List size={14} strokeWidth={1.5} />
         On this page
       </div>
-      <ul className="flex flex-col gap-1 border-l border-[#1E293B]">
+      <ul className="flex flex-col gap-1 border-l border-[#E5E7EB]">
         {headings.map((h) => (
           <li key={h.id}>
             <a
@@ -45,8 +45,8 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
                 h.level === 3 ? "pl-6" : "pl-4"
               } ${
                 activeId === h.id
-                  ? "text-[#3B82F6] border-l-2 border-[#3B82F6] -ml-px font-medium"
-                  : "text-[#64748B] hover:text-[#94A3B8]"
+                  ? "text-[#0D9488] border-l-2 border-[#0D9488] -ml-px font-medium"
+                  : "text-[#9CA3AF] hover:text-[#4B5563]"
               }`}
             >
               {h.text}

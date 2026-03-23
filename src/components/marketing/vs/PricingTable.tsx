@@ -8,17 +8,17 @@ export default function PricingTable({
   competitorName: string;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-[#1E293B]">
+    <div className="overflow-x-auto rounded-xl border border-[#E5E7EB]">
       <table className="w-full text-left text-[14px]">
         <thead>
-          <tr className="border-b border-[#1E293B] bg-[#0C0F18]">
-            <th className="px-5 py-4 font-semibold text-[#94A3B8] w-[30%]">
+          <tr className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
+            <th className="px-5 py-4 font-semibold text-[#6B7280] w-[30%]">
               Tier
             </th>
-            <th className="px-5 py-4 font-semibold text-[#94A3B8] w-[35%]">
+            <th className="px-5 py-4 font-semibold text-[#6B7280] w-[35%]">
               {competitorName}
             </th>
-            <th className="px-5 py-4 font-semibold text-[#3B82F6] w-[35%]">
+            <th className="px-5 py-4 font-semibold text-[#0D9488] w-[35%]">
               SerpVive
             </th>
           </tr>
@@ -27,17 +27,17 @@ export default function PricingTable({
           {pricing.map((tier, i) => (
             <tr
               key={tier.plan}
-              className={`border-b border-[#1E293B]/60 ${
-                i % 2 === 0 ? "bg-[#0F1219]" : "bg-[#0C0F18]/50"
+              className={`border-b border-[#E5E7EB]/60 ${
+                i % 2 === 0 ? "bg-white" : "bg-[#F9FAFB]/50"
               }`}
             >
-              <td className="px-5 py-3.5 font-medium text-[#E2E8F0]">
+              <td className="px-5 py-3.5 font-medium text-[#111827]">
                 {tier.plan}
               </td>
-              <td className="px-5 py-3.5 text-[#CBD5E1]">
+              <td className="px-5 py-3.5 text-[#374151]">
                 {tier.competitor}
               </td>
-              <td className="px-5 py-3.5 text-[#CBD5E1] font-medium">
+              <td className="px-5 py-3.5 text-[#374151] font-medium">
                 {tier.serpvive}
               </td>
             </tr>

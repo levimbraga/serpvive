@@ -19,7 +19,6 @@ const LINKS = {
   Company: [
     { label: "About", href: "/about" },
     { label: "Contact", href: "mailto:serpvive@gmail.com" },
-    { label: "Feedback", href: "mailto:serpvive@gmail.com?subject=Feedback" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy-policy" },
@@ -58,15 +57,19 @@ export default function Footer() {
                 <h4 className="text-[12px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1">
                   {title}
                 </h4>
-                {links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="text-[14px] text-[#64748B] hover:text-[#F1F5F9] transition-colors no-underline"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                {links.map((link) => {
+                  const isExternal = link.href.startsWith("http");
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-[14px] text-[#64748B] hover:text-[#F1F5F9] transition-colors no-underline"
+                      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    >
+                      {link.label}
+                    </a>
+                  );
+                })}
               </div>
             ))}
           </div>

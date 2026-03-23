@@ -643,14 +643,14 @@ section, nav, footer { position: relative; z-index: 1; }
   .avatars { gap: 16px; flex-wrap: wrap; }
 }
 
-/* ─── Blog Prose ─────────────────────────────── */
+/* ─── Blog Prose (Light Theme) ────────────────── */
 .prose-serpvive {
-  color: #CBD5E1;
+  color: #374151;
   font-size: clamp(15px, 1.1vw, 17px);
   line-height: 1.8;
 }
 .prose-serpvive h2 {
-  color: #F1F5F9;
+  color: #111827;
   font-size: clamp(1.35rem, 2.5vw, 1.75rem);
   font-weight: 700;
   margin-top: 2.5em;
@@ -659,7 +659,7 @@ section, nav, footer { position: relative; z-index: 1; }
   line-height: 1.3;
 }
 .prose-serpvive h3 {
-  color: #E2E8F0;
+  color: #1F2937;
   font-size: clamp(1.1rem, 2vw, 1.35rem);
   font-weight: 600;
   margin-top: 2em;
@@ -670,16 +670,16 @@ section, nav, footer { position: relative; z-index: 1; }
   margin-bottom: 1.25em;
 }
 .prose-serpvive a {
-  color: #3B82F6;
+  color: #0D9488;
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.15s;
 }
 .prose-serpvive a:hover {
-  color: #60A5FA;
+  color: #0F766E;
 }
 .prose-serpvive strong {
-  color: #F1F5F9;
+  color: #111827;
   font-weight: 600;
 }
 .prose-serpvive ul,
@@ -691,32 +691,32 @@ section, nav, footer { position: relative; z-index: 1; }
   margin-bottom: 0.4em;
 }
 .prose-serpvive ul li::marker {
-  color: #3B82F6;
+  color: #0D9488;
 }
 .prose-serpvive ol li::marker {
-  color: #64748B;
+  color: #6B7280;
   font-weight: 600;
 }
 .prose-serpvive blockquote {
-  border-left: 3px solid #3B82F6;
+  border-left: 3px solid #0D9488;
   padding: 0.75em 1.25em;
   margin: 1.5em 0;
-  background: rgba(59, 130, 246, 0.05);
+  background: #F0FDFA;
   border-radius: 0 8px 8px 0;
-  color: #94A3B8;
+  color: #4B5563;
   font-style: italic;
 }
 .prose-serpvive code {
-  background: #1E293B;
-  color: #E2E8F0;
+  background: #F3F4F6;
+  color: #111827;
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
   font-family: var(--font-mono);
 }
 .prose-serpvive pre {
-  background: #0F1219;
-  border: 1px solid #1E293B;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
   border-radius: 12px;
   padding: 1.25em 1.5em;
   overflow-x: auto;
@@ -737,23 +737,24 @@ section, nav, footer { position: relative; z-index: 1; }
 .prose-serpvive th {
   text-align: left;
   font-weight: 600;
-  color: #F1F5F9;
+  color: #111827;
   padding: 0.75em 1em;
-  border-bottom: 2px solid #1E293B;
+  border-bottom: 2px solid #E5E7EB;
 }
 .prose-serpvive td {
   padding: 0.75em 1em;
-  border-bottom: 1px solid #1E293B;
+  border-bottom: 1px solid #E5E7EB;
 }
 .prose-serpvive tr:hover td {
-  background: rgba(30, 41, 59, 0.3);
+  background: #F9FAFB;
 }
 .prose-serpvive hr {
   border: none;
-  border-top: 1px solid #1E293B;
+  border-top: 1px solid #E5E7EB;
   margin: 2.5em 0;
 }
 .prose-serpvive img {
   border-radius: 12px;
   margin: 1.5em 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
