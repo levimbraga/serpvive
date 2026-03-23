@@ -5,6 +5,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\s/g, "");
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!.replace(/\s/g, "");
 
 export async function updateSession(request: NextRequest) {
+  // Skip middleware for OAuth callbacks — the callback route must exchange
+  // the code for a session before anything touches the PKCE cookies.
+  if (request.nextUrl.pathname === "/callback") {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
