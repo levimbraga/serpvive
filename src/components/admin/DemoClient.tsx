@@ -322,33 +322,31 @@ export default function DemoClient() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 justify-end">
-                          {demo.status === "completed" && (
-                            <>
-                              <a
-                                href={`/demo/${demo.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                                title="View demo"
-                              >
-                                <ExternalLink size={14} strokeWidth={1.5} />
-                              </a>
-                              <button
-                                onClick={() => handleCopyLink(demo.id)}
-                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                                title="Copy link"
-                              >
-                                <Copy size={14} strokeWidth={1.5} />
-                              </button>
-                              <button
-                                onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
-                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                                title="Export JSON"
-                              >
-                                <Download size={14} strokeWidth={1.5} />
-                              </button>
-                            </>
-                          )}
+                          <a
+                            href={`/demo/${demo.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`p-1.5 rounded-md hover:bg-[#F3F4F6] transition-colors ${demo.status === "completed" ? "text-[#6B7280]" : "text-[#D1D5DB] pointer-events-none"}`}
+                            title="View demo"
+                          >
+                            <ExternalLink size={14} strokeWidth={1.5} />
+                          </a>
+                          <button
+                            onClick={() => handleCopyLink(demo.id)}
+                            disabled={demo.status !== "completed"}
+                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors disabled:text-[#D1D5DB] disabled:pointer-events-none"
+                            title="Copy link"
+                          >
+                            <Copy size={14} strokeWidth={1.5} />
+                          </button>
+                          <button
+                            onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                            disabled={demo.status !== "completed"}
+                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors disabled:text-[#D1D5DB] disabled:pointer-events-none"
+                            title="Export JSON"
+                          >
+                            <Download size={14} strokeWidth={1.5} />
+                          </button>
                           <button
                             onClick={() => handleDelete(demo.id)}
                             className="p-1.5 rounded-md hover:bg-[#FEF2F2] text-[#9CA3AF] hover:text-[#DC2626] transition-colors"
