@@ -52,6 +52,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const mdxComponents = {
   BlogCTA,
+  table: (props: React.ComponentProps<"table">) => (
+    <div className="overflow-x-auto my-6 rounded-xl border border-[#E5E7EB]">
+      <table {...props} />
+    </div>
+  ),
 };
 
 export default async function BlogPostPage({ params }: Props) {
