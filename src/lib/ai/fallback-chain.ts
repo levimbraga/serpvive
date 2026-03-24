@@ -28,7 +28,7 @@ export class FallbackExhaustedError extends Error {
 // ── Configuration ──
 
 const DEFAULT_TIMEOUT_MS = 120_000; // 2 minutes per attempt
-const RETRY_SAME_PROVIDER = 1; // Retry same provider once before moving to next
+const RETRY_SAME_PROVIDER = 0; // No retry on same provider — fall through to next immediately
 const RETRY_DELAY_MS = 2_000; // Brief pause before retry
 
 // ── Error classification ──

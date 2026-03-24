@@ -58,6 +58,7 @@ export async function fetchPageContent(
 
       html = await res.text();
     }
+    console.log(`[fetcher] ${url} raw HTML: ${html.length} chars`);
     const $ = cheerio.load(html);
 
     // Extract structured data (JSON-LD) before removing <script> tags
@@ -174,13 +175,13 @@ export async function fetchPageContent(
     // Remove head for body text extraction
     $("head").remove();
 
-    // Extract body text, truncate to 3000 chars
-    const bodyText = $("body").text()
+    // Extract body text — calculate word count from full text, then truncate for prompt
+    const fullBodyText = $("body").text()
       .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 3000);
+      .trim();
 
-    const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+    const wordCount = fullBodyText.split(/\s+/).filter(Boolean).length;
+    const bodyText = fullBodyText.slice(0, 15_000);
 
     // Try to find published date (multiple sources)
     const publishedDate =
