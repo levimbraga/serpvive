@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "SerpVive | Your Blog Is Losing Traffic",
     description:
       "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings.",
-    creator: "@serpvive",
+    creator: "@levimbraga",
   },
 };
 

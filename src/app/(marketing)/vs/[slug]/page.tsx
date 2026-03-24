@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: data.title,
       description: data.metaDescription,
-      creator: "@serpvive",
+      creator: "@levimbraga",
     },
   };
 }

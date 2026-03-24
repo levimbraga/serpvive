@@ -26,7 +26,7 @@ const LINKS = {
     { label: "Cookie Policy", href: "/cookie-policy" },
   ],
   Connect: [
-    { label: "Twitter/X", href: "https://x.com/serpvive" },
+    { label: "Twitter/X", href: "https://x.com/levimbraga" },
     { label: "Email", href: "mailto:serpvive@gmail.com" },
   ],
 };

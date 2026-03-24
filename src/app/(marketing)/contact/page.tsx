@@ -78,7 +78,7 @@ export default function ContactPage() {
               </a>
 
               <a
-                href="https://x.com/serpvive"
+                href="https://x.com/levimbraga"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 no-underline group hover:border-[#2563EB]/30 transition-colors"
@@ -91,7 +91,7 @@ export default function ContactPage() {
                     Twitter / X
                   </p>
                   <p className="text-[13px] text-[#6B7280]">
-                    @serpvive
+                    @levimbraga
                   </p>
                 </div>
               </a>
