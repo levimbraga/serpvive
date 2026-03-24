@@ -29,7 +29,6 @@ const RESOURCE_SECTIONS: ResourceSection[] = [
     items: [
       { label: "Decay Calculator", href: "/tools/decay-calculator" },
       { label: "Refresh Checklist", href: "/resources/content-decay-checklist" },
-      { label: "Free Analysis", href: "/pages/analyze" },
     ],
   },
   {
