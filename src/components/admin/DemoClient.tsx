@@ -223,6 +223,17 @@ export default function DemoClient() {
               >
                 <ExternalLink size={14} strokeWidth={1.5} /> View demo
               </a>
+              {(() => {
+                const demo = demos.find((d) => d.id === generatedId);
+                return demo ? (
+                  <button
+                    onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                    className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
+                  >
+                    <Download size={14} strokeWidth={1.5} /> Export JSON
+                  </button>
+                ) : null;
+              })()}
             </div>
           </div>
         ) : (
