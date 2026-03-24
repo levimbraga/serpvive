@@ -15,6 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         "/feedback/",
         "/api/",
         "/callback",
+        "/demo/",
       ],
     },
     sitemap: "https://serpvive.com/sitemap.xml",

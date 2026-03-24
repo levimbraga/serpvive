@@ -3,7 +3,8 @@ import LegalPage, { H2, P, UL, LI, Strong, A } from "@/components/marketing/Lega
 
 export const metadata: Metadata = {
   title: "Cookie Policy — SerpVive",
-  description: "How SerpVive uses cookies.",
+  description: "How SerpVive uses cookies and how you can manage them.",
+  alternates: { canonical: "https://serpvive.com/cookie-policy" },
 };
 
 const SECTIONS = [

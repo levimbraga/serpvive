@@ -4,6 +4,7 @@ import LegalPage, { H2, P, UL, LI, Strong, A } from "@/components/marketing/Lega
 export const metadata: Metadata = {
   title: "Privacy Policy — SerpVive",
   description: "How SerpVive collects, uses, and protects your data, including Google User Data.",
+  alternates: { canonical: "https://serpvive.com/privacy-policy" },
 };
 
 const SECTIONS = [

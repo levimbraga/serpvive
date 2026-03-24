@@ -4,6 +4,7 @@ import LegalPage, { H2, P, UL, LI, Strong, A } from "@/components/marketing/Lega
 export const metadata: Metadata = {
   title: "Terms of Service — SerpVive",
   description: "Terms and conditions for using SerpVive.",
+  alternates: { canonical: "https://serpvive.com/terms-of-service" },
 };
 
 const SECTIONS = [

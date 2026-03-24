@@ -183,18 +183,20 @@ export default function Navbar() {
 
             {/* Mega Dropdown Panel */}
             <div
-              className={`absolute top-full right-0 mt-3 rounded-2xl border border-[#1E293B] shadow-[0_12px_48px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-200 origin-top ${
+              className={`absolute top-full mt-3 rounded-2xl border border-[#1E293B] shadow-[0_12px_48px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-200 origin-top ${
                 resourcesOpen
                   ? "opacity-100 scale-100 pointer-events-auto"
                   : "opacity-0 scale-95 pointer-events-none"
               }`}
               style={{
                 background: "#0C0F18",
-                width: "720px",
+                width: "580px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 backdropFilter: "blur(24px)",
               }}
             >
-              <div className="grid grid-cols-3 gap-8 p-7">
+              <div className="grid grid-cols-3 gap-5 p-5">
                 {RESOURCE_SECTIONS.map((section) => {
                   const colors = SECTION_COLORS[section.title] ?? { iconBg: "#F5F3FF", iconColor: "#7C3AED" };
                   return (
@@ -208,23 +210,23 @@ export default function Navbar() {
                             key={item.href}
                             href={item.href}
                             onClick={closeAll}
-                            className="flex items-start gap-3 px-3 py-3 rounded-lg no-underline group hover:bg-[#1E293B]/60 transition-colors"
+                            className="flex items-start gap-2.5 px-2.5 py-2.5 rounded-lg no-underline group hover:bg-[#1E293B]/60 transition-colors"
                           >
                             <div
-                              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                               style={{ background: colors.iconBg }}
                             >
                               <item.icon
-                                size={20}
+                                size={18}
                                 strokeWidth={1.5}
                                 style={{ color: colors.iconColor }}
                               />
                             </div>
                             <div>
-                              <p className="text-[15px] font-semibold text-[#E2E8F0] group-hover:text-white transition-colors leading-snug">
+                              <p className="text-[14px] font-semibold text-[#E2E8F0] group-hover:text-white transition-colors leading-snug">
                                 {item.label}
                               </p>
-                              <p className="text-[13px] text-[#64748B] group-hover:text-[#94A3B8] leading-snug mt-0.5 transition-colors">
+                              <p className="text-[12px] text-[#64748B] group-hover:text-[#94A3B8] leading-snug mt-0.5 transition-colors">
                                 {item.desc}
                               </p>
                             </div>
