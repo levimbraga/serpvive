@@ -670,13 +670,13 @@ section, nav, footer { position: relative; z-index: 1; }
   margin-bottom: 1.25em;
 }
 .prose-serpvive a {
-  color: #0D9488;
+  color: #2563EB;
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.15s;
 }
 .prose-serpvive a:hover {
-  color: #0F766E;
+  color: #1D4ED8;
 }
 .prose-serpvive strong {
   color: #111827;
@@ -691,17 +691,17 @@ section, nav, footer { position: relative; z-index: 1; }
   margin-bottom: 0.4em;
 }
 .prose-serpvive ul li::marker {
-  color: #0D9488;
+  color: #2563EB;
 }
 .prose-serpvive ol li::marker {
   color: #6B7280;
   font-weight: 600;
 }
 .prose-serpvive blockquote {
-  border-left: 3px solid #0D9488;
+  border-left: 3px solid #2563EB;
   padding: 0.75em 1.25em;
   margin: 1.5em 0;
-  background: #F0FDFA;
+  background: #EFF6FF;
   border-radius: 0 8px 8px 0;
   color: #4B5563;
   font-style: italic;
