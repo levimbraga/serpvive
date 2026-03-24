@@ -18,7 +18,7 @@ const LINKS = {
   ],
   Company: [
     { label: "About", href: "/about" },
-    { label: "Contact", href: "mailto:serpvive@gmail.com" },
+    { label: "Contact", href: "/contact" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy-policy" },

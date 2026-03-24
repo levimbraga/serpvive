@@ -373,7 +373,7 @@ export async function POST(request: Request) {
         ? await admin.from("profiles").select("email, full_name").eq("stripe_customer_id", customerId).single()
         : { data: null };
 
-      const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+      const adminEmail = process.env.ADMIN_EMAIL ?? "serpvive@gmail.com";
 
       await resend.emails.send({
         from: FROM_EMAIL,
@@ -402,7 +402,7 @@ https://dashboard.stripe.com/disputes/${dispute.id}`,
       const dispute = event.data.object as Stripe.Dispute;
       if (dispute.status === "won" || dispute.status === "lost") {
         const amount = (dispute.amount / 100).toFixed(2);
-        const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+        const adminEmail = process.env.ADMIN_EMAIL ?? "serpvive@gmail.com";
 
         await resend.emails.send({
           from: FROM_EMAIL,
