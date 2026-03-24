@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { runDiagnosisPipeline } from "./pipeline";
+import { sendAutoDiagnosisReady } from "@/lib/email/send";
 
 const TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
 
@@ -98,6 +99,11 @@ export async function runServerAutoDiagnosis(
       has_free_diagnosis: true,
       updated_at: new Date().toISOString(),
     }).eq("id", siteId);
+
+    // Send "Your first AI analysis is ready" email (fire-and-forget)
+    sendAutoDiagnosisReady(userId, bestPage.id).catch((emailErr) => {
+      console.error("[auto-diagnosis] Email send failed:", emailErr);
+    });
 
     console.log(`[auto-diagnosis] Complete for site ${siteId}`);
     return { status: "completed", pageId: bestPage.id };

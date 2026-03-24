@@ -372,7 +372,7 @@ function MicroDraft({ suggestions }: { suggestions: string[] }) {
         {copied ? <Check size={14} strokeWidth={1.5} /> : <Copy size={14} strokeWidth={1.5} />}
       </button>
       <p className="text-[10px] font-semibold text-[#16A34A] uppercase tracking-wider mb-2">Micro-draft</p>
-      <div className="space-y-1.5 pr-8">
+      <div className="space-y-1.5 pr-8 font-mono">
         {suggestions.map((s, i) => (
           <p key={i} className="text-sm text-[#166534]">{s}</p>
         ))}

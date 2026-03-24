@@ -5,6 +5,7 @@ import WeeklyDigest from "./templates/weekly-digest";
 import OnboardingDay0 from "./templates/onboarding-day0";
 import OnboardingDay2 from "./templates/onboarding-day2";
 import OnboardingDay3 from "./templates/onboarding-day3";
+import AutoDiagnosisReady from "./templates/auto-diagnosis-ready";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://serpvive.com";
 
@@ -232,6 +233,59 @@ export async function sendOnboardingDay3(userId: string) {
   }
 }
 
+export async function sendAutoDiagnosisReady(
+  userId: string,
+  pageId: string,
+) {
+  const admin = getSupabaseAdmin();
+
+  const [profileRes, pageRes] = await Promise.all([
+    admin.from("profiles").select("email, full_name").eq("id", userId).single(),
+    admin.from("pages").select("url, path").eq("id", pageId).single(),
+  ]);
+
+  const profile = profileRes.data;
+  const page = pageRes.data;
+  if (!profile?.email || !page) return;
+
+  // Get the diagnosis for this page
+  const { data: diagnosis } = await admin
+    .from("diagnoses")
+    .select("diagnosis")
+    .eq("page_id", pageId)
+    .eq("user_id", userId)
+    .eq("triggered_by", "auto")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const diagObj = diagnosis?.diagnosis as Record<string, unknown> | null;
+  const causes = Array.isArray(diagObj?.causes) ? diagObj.causes : [];
+  const summary = typeof diagObj?.summary === "string"
+    ? diagObj.summary
+    : "View your full diagnosis for details.";
+
+  const { error } = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: profile.email,
+    subject: "Your first AI analysis is ready",
+    react: AutoDiagnosisReady({
+      userName: profile.full_name?.split(" ")[0] ?? "there",
+      pageUrl: page.url,
+      pagePath: page.path,
+      causeCount: causes.length,
+      summary,
+      diagnosisUrl: `${APP_URL}/pages/${pageId}`,
+    }),
+  });
+
+  if (error) {
+    console.error("[email] Auto-diagnosis ready error:", error);
+  } else {
+    console.log("[email] Auto-diagnosis ready sent to", profile.email);
+  }
+}
+
 export async function sendCancelFeedbackEmail(userId: string) {
   const admin = getSupabaseAdmin();
 
@@ -248,7 +302,7 @@ export async function sendCancelFeedbackEmail(userId: string) {
   const { error } = await resend.emails.send({
     from: FOUNDER_EMAIL,
     to: profile.email,
-    replyTo: "levimaiabraga@gmail.com",
+    replyTo: "serpvive@gmail.com",
     subject: "Quick question about your cancellation",
     text: `Hi ${firstName},
 

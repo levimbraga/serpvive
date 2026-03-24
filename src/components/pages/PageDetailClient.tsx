@@ -1163,7 +1163,7 @@ export default function PageDetailClient({
                               </p>
                               <CopyMicroDraftButton suggestions={action.micro_draft.suggestions} />
                             </div>
-                            <ul className="space-y-3">
+                            <ul className="space-y-3 font-mono">
                               {action.micro_draft.suggestions.map((s, j) => (
                                 <li key={j} className="text-sm text-[#111827] flex gap-2">
                                   <span className="text-[#16A34A] flex-shrink-0 mt-0.5">→</span>
@@ -1533,7 +1533,7 @@ function ReadOnlyBriefCard({ brief }: { brief: BriefData }) {
                       </p>
                       <CopyMicroDraftButton suggestions={action.micro_draft.suggestions} />
                     </div>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 font-mono">
                       {action.micro_draft.suggestions.map((s, j) => (
                         <li key={j} className="text-sm text-[#111827] flex gap-2">
                           <span className="text-[#16A34A] flex-shrink-0">→</span>
