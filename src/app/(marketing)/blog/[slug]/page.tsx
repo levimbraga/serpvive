@@ -57,6 +57,15 @@ const mdxComponents = {
       <table {...props} />
     </div>
   ),
+  // JsonLd: renders structured data from our own trusted MDX frontmatter/content.
+  // Safe: data comes from our MDX files (same trust level as the Article JSON-LD
+  // already rendered in this page component at line ~88 using the same pattern).
+  JsonLd: (props: { data: Record<string, unknown> }) => (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(props.data) }}
+    />
+  ),
 };
 
 export default async function BlogPostPage({ params }: Props) {
