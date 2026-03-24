@@ -669,13 +669,13 @@ section, nav, footer { position: relative; z-index: 1; }
 .prose-serpvive p {
   margin-bottom: 1.25em;
 }
-.prose-serpvive a {
+.prose-serpvive a:not([class*="bg-"]) {
   color: #2563EB;
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.15s;
 }
-.prose-serpvive a:hover {
+.prose-serpvive a:not([class*="bg-"]):hover {
   color: #1D4ED8;
 }
 .prose-serpvive strong {

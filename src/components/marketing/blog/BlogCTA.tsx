@@ -24,7 +24,7 @@ export default function BlogCTA({
       </p>
       <Link
         href={href}
-        className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
+        className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] !text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
       >
         {buttonText}
         <ArrowRight size={16} strokeWidth={1.5} />
