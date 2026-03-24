@@ -11,35 +11,56 @@ import {
   BookOpen,
   User,
   Sparkles,
+  Globe,
   Menu,
   X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const RESOURCE_SECTIONS = [
+type ResourceItem = {
+  label: string;
+  href: string;
+  desc: string;
+  icon: LucideIcon;
+};
+
+type ResourceSection = {
+  title: string;
+  items: ResourceItem[];
+};
+
+const RESOURCE_SECTIONS: ResourceSection[] = [
   {
     title: "Compare",
     items: [
-      { label: "vs Semrush", href: "/vs/semrush", desc: "Features, pricing, and use cases", icon: BarChart3 },
-      { label: "vs Surfer SEO", href: "/vs/surfer-seo", desc: "Creation vs content protection", icon: BarChart3 },
+      { label: "vs Semrush", href: "/vs/semrush", desc: "Features, pricing, and honest comparison", icon: BarChart3 },
+      { label: "vs Surfer SEO", href: "/vs/surfer-seo", desc: "Content creation vs content protection", icon: BarChart3 },
       { label: "vs Frase", href: "/vs/frase", desc: "Which content decay tool is better", icon: BarChart3 },
     ],
   },
   {
     title: "Tools",
     items: [
-      { label: "Decay Calculator", href: "/tools/decay-calculator", desc: "Estimate lost traffic revenue", icon: Calculator },
-      { label: "Refresh Checklist", href: "/resources/content-decay-checklist", desc: "15-step content refresh guide", icon: ClipboardList },
+      { label: "Decay Calculator", href: "/tools/decay-calculator", desc: "Estimate your monthly traffic loss", icon: Calculator },
+      { label: "Refresh Checklist", href: "/resources/content-decay-checklist", desc: "15-step guide to refreshing any post", icon: ClipboardList },
+      { label: "Free Analysis", href: "/pages/analyze", desc: "Analyze any URL with AI, no signup", icon: Globe },
     ],
   },
   {
     title: "Learn",
     items: [
-      { label: "Blog", href: "/blog", desc: "SEO, content decay, and monitoring", icon: BookOpen },
-      { label: "About", href: "/about", desc: "Who built SerpVive and why", icon: User },
-      { label: "Changelog", href: "/changelog", desc: "What's new in SerpVive", icon: Sparkles },
+      { label: "Blog", href: "/blog", desc: "Articles on SEO and content decay", icon: BookOpen },
+      { label: "About", href: "/about", desc: "Our mission and approach", icon: User },
+      { label: "Changelog", href: "/changelog", desc: "Latest updates and improvements", icon: Sparkles },
     ],
   },
 ];
+
+const SECTION_COLORS: Record<string, { iconBg: string; iconColor: string }> = {
+  Compare: { iconBg: "#EFF6FF", iconColor: "#2563EB" },
+  Tools:   { iconBg: "#F0FDFA", iconColor: "#0D9488" },
+  Learn:   { iconBg: "#F5F3FF", iconColor: "#7C3AED" },
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -56,7 +77,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close dropdown on Escape
   useEffect(() => {
     function onEscape(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -68,13 +88,11 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", onEscape);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  // Hover handlers for desktop dropdown (with 150ms close delay)
   const handleMouseEnter = useCallback(() => {
     if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
     setResourcesOpen(true);
@@ -163,49 +181,59 @@ export default function Navbar() {
               />
             </button>
 
-            {/* Dropdown Panel */}
+            {/* Mega Dropdown Panel */}
             <div
-              className={`absolute top-full right-0 mt-3 rounded-xl border border-[#1E293B] shadow-[0_8px_40px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-200 origin-top ${
+              className={`absolute top-full right-0 mt-3 rounded-2xl border border-[#1E293B] shadow-[0_12px_48px_rgba(0,0,0,0.6)] overflow-hidden transition-all duration-200 origin-top ${
                 resourcesOpen
                   ? "opacity-100 scale-100 pointer-events-auto"
                   : "opacity-0 scale-95 pointer-events-none"
               }`}
               style={{
                 background: "#0C0F18",
-                width: "620px",
+                width: "720px",
                 backdropFilter: "blur(24px)",
               }}
             >
-              <div className="grid grid-cols-3 gap-0 p-4">
-                {RESOURCE_SECTIONS.map((section) => (
-                  <div key={section.title} className="flex flex-col">
-                    <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider px-3 py-2">
-                      {section.title}
-                    </p>
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={closeAll}
-                        className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg no-underline group hover:bg-[#1E293B]/50 transition-colors"
-                      >
-                        <item.icon
-                          size={16}
-                          strokeWidth={1.5}
-                          className="mt-0.5 text-[#475569] group-hover:text-[#3B82F6] transition-colors shrink-0"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium text-[#E2E8F0] group-hover:text-white transition-colors">
-                            {item.label}
-                          </p>
-                          <p className="text-[11px] text-[#64748B] leading-snug mt-0.5">
-                            {item.desc}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ))}
+              <div className="grid grid-cols-3 gap-8 p-7">
+                {RESOURCE_SECTIONS.map((section) => {
+                  const colors = SECTION_COLORS[section.title] ?? { iconBg: "#F5F3FF", iconColor: "#7C3AED" };
+                  return (
+                    <div key={section.title} className="flex flex-col">
+                      <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">
+                        {section.title}
+                      </p>
+                      <div className="flex flex-col gap-1">
+                        {section.items.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={closeAll}
+                            className="flex items-start gap-3 px-3 py-3 rounded-lg no-underline group hover:bg-[#1E293B]/60 transition-colors"
+                          >
+                            <div
+                              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                              style={{ background: colors.iconBg }}
+                            >
+                              <item.icon
+                                size={20}
+                                strokeWidth={1.5}
+                                style={{ color: colors.iconColor }}
+                              />
+                            </div>
+                            <div>
+                              <p className="text-[15px] font-semibold text-[#E2E8F0] group-hover:text-white transition-colors leading-snug">
+                                {item.label}
+                              </p>
+                              <p className="text-[13px] text-[#64748B] group-hover:text-[#94A3B8] leading-snug mt-0.5 transition-colors">
+                                {item.desc}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -254,10 +282,7 @@ export default function Navbar() {
         style={{ top: bannerVisible ? "105px" : "68px" }}
       >
         {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/60"
-          onClick={closeAll}
-        />
+        <div className="absolute inset-0 bg-black/60" onClick={closeAll} />
 
         {/* Panel */}
         <div
@@ -266,7 +291,7 @@ export default function Navbar() {
           }`}
           style={{ background: "#0C0F18" }}
         >
-          <div className="flex flex-col p-6 gap-2">
+          <div className="flex flex-col p-6 gap-1">
             {/* Main links */}
             <a
               href="/#features"
@@ -291,35 +316,43 @@ export default function Navbar() {
             </Link>
 
             {/* Resources sections (expanded inline) */}
-            {RESOURCE_SECTIONS.map((section) => (
-              <div key={section.title} className="mt-3">
-                <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider px-3 py-2">
-                  {section.title}
-                </p>
-                {section.items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeAll}
-                    className="flex items-center gap-3 py-3 px-3 rounded-lg no-underline hover:bg-[#1E293B]/50 transition-colors"
-                  >
-                    <item.icon
-                      size={16}
-                      strokeWidth={1.5}
-                      className="text-[#475569] shrink-0"
-                    />
-                    <div>
-                      <p className="text-[14px] font-medium text-[#E2E8F0]">
-                        {item.label}
-                      </p>
-                      <p className="text-[11px] text-[#64748B] leading-snug">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ))}
+            {RESOURCE_SECTIONS.map((section) => {
+              const colors = SECTION_COLORS[section.title] ?? { iconBg: "#F5F3FF", iconColor: "#7C3AED" };
+              return (
+                <div key={section.title} className="mt-4">
+                  <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider px-3 py-2">
+                    {section.title}
+                  </p>
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeAll}
+                      className="flex items-center gap-3 py-3 px-3 rounded-lg no-underline hover:bg-[#1E293B]/50 transition-colors min-h-[48px]"
+                    >
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: colors.iconBg }}
+                      >
+                        <item.icon
+                          size={20}
+                          strokeWidth={1.5}
+                          style={{ color: colors.iconColor }}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-[15px] font-semibold text-[#E2E8F0]">
+                          {item.label}
+                        </p>
+                        <p className="text-[13px] text-[#64748B] leading-snug">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              );
+            })}
 
             {/* Divider + Auth */}
             <div className="border-t border-[#1E293B] mt-4 pt-4 flex flex-col gap-2">
