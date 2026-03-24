@@ -69,6 +69,17 @@ export default function DemoClient() {
         body: JSON.stringify({ url: url.trim(), keyword: keyword.trim() }),
       });
 
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("[DemoClient] Non-JSON response:", res.status, text.slice(0, 500));
+        throw new Error(
+          res.status === 504 ? "Request timed out. The AI pipeline may need more time." :
+          res.status === 502 ? "Server error. Please try again." :
+          `Server returned ${res.status} instead of JSON.`
+        );
+      }
+
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed");
 

@@ -27,28 +27,28 @@ async function getAdminUser() {
 
 // POST — Create new demo analysis
 export async function POST(request: Request) {
-  const user = await getAdminUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
-  const body = (await request.json()) as unknown;
-  const parsed = CreateDemoSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Valid URL and keyword required." }, { status: 400 });
-  }
-
-  // SSRF / URL validation
-  const urlCheck = await validateUrl(parsed.data.url);
-  if (!urlCheck.ok) {
-    return NextResponse.json({ error: urlCheck.error }, { status: 400 });
-  }
-
-  const url = urlCheck.url;
-  const { keyword } = parsed.data;
-  const admin = getSupabaseAdmin();
-
   try {
+    const user = await getAdminUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const body = (await request.json()) as unknown;
+    const parsed = CreateDemoSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Valid URL and keyword required." }, { status: 400 });
+    }
+
+    // SSRF / URL validation
+    const urlCheck = await validateUrl(parsed.data.url);
+    if (!urlCheck.ok) {
+      return NextResponse.json({ error: urlCheck.error }, { status: 400 });
+    }
+
+    const url = urlCheck.url;
+    const { keyword } = parsed.data;
+    const admin = getSupabaseAdmin();
+
     const result = await runExternalPipeline(url, keyword);
     const demoId = nanoid(8);
 
@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       });
 
     if (insertErr) {
-      throw new Error(`Failed to save demo: ${insertErr.message}`);
+      console.error("[api/admin/demo] Insert error:", insertErr.message);
+      return NextResponse.json({ error: `Failed to save demo: ${insertErr.message}` }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error("[api/admin/demo] Pipeline error:", message);
+    console.error("[api/admin/demo] Error:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
