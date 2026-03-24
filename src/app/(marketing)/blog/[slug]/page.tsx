@@ -8,6 +8,7 @@ import {
   getPostBySlug,
   getPostSlugs,
   extractHeadings,
+  extractFaqs,
 } from "@/lib/blog";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
@@ -57,15 +58,6 @@ const mdxComponents = {
       <table {...props} />
     </div>
   ),
-  // JsonLd: renders structured data from our own trusted MDX frontmatter/content.
-  // Safe: data comes from our MDX files (same trust level as the Article JSON-LD
-  // already rendered in this page component at line ~88 using the same pattern).
-  JsonLd: (props: { data: Record<string, unknown> }) => (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(props.data) }}
-    />
-  ),
 };
 
 export default async function BlogPostPage({ params }: Props) {
@@ -74,6 +66,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const headings = extractHeadings(post.content);
+  const faqs = extractFaqs(post.content);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -103,6 +96,22 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* FAQ JSON-LD: auto-extracted from ### headings under ## FAQ section */}
+      {faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: { "@type": "Answer", text: faq.answer },
+            })),
+          }) }}
+        />
+      )}
 
       {/* Header */}
       <header

@@ -76,6 +76,37 @@ export function getAllPosts(): BlogPostMeta[] {
   return posts;
 }
 
+/**
+ * Extracts FAQ pairs from MDX content by finding H3s under the
+ * "Frequently Asked Questions" H2. Returns pairs for FAQPage JSON-LD.
+ */
+export function extractFaqs(
+  content: string,
+): { question: string; answer: string }[] {
+  const faqSectionMatch = content.match(
+    /## Frequently Asked Questions\n([\s\S]*?)(?=\n## |\n<BlogCTA|$)/,
+  );
+  if (!faqSectionMatch?.[1]) return [];
+
+  const faqContent = faqSectionMatch[1];
+  const faqs: { question: string; answer: string }[] = [];
+  const parts = faqContent.split(/\n### /);
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const newlineIdx = trimmed.indexOf("\n");
+    if (newlineIdx === -1) continue;
+    const question = trimmed.slice(0, newlineIdx).trim();
+    const answer = trimmed.slice(newlineIdx + 1).trim();
+    if (question && answer) {
+      faqs.push({ question, answer });
+    }
+  }
+
+  return faqs;
+}
+
 export function extractHeadings(
   content: string
 ): { id: string; text: string; level: number }[] {
