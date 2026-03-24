@@ -501,7 +501,7 @@ section, nav, footer { position: relative; z-index: 1; }
 .pf li::before { content: '✓'; color: var(--sv-blue); font-weight: 700; font-size: 13px; }
 .price-card .btn { width: 100%; justify-content: center; font-size: 14px; padding: 14px 0; }
 .price-card .btn-outline { background: transparent; border: 1.5px solid var(--sv-border); color: var(--text2); }
-.price-card .btn-outline:hover { border-color: var(--sv-teal); color: var(--sv-teal); }
+.price-card .btn-outline:hover { border-color: var(--sv-blue); color: var(--sv-blue); }
 .pnote { text-align: center; font-size: 14px; color: var(--text3); }
 .pnote a { color: var(--sv-blue); text-decoration: none; }
 

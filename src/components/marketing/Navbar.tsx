@@ -58,7 +58,7 @@ const RESOURCE_SECTIONS: ResourceSection[] = [
 
 const SECTION_COLORS: Record<string, { iconBg: string; iconColor: string }> = {
   Compare: { iconBg: "#EFF6FF", iconColor: "#2563EB" },
-  Tools:   { iconBg: "#F0FDFA", iconColor: "#0D9488" },
+  Tools:   { iconBg: "#EFF6FF", iconColor: "#2563EB" },
   Learn:   { iconBg: "#F5F3FF", iconColor: "#7C3AED" },
 };
 

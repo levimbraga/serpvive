@@ -87,7 +87,7 @@ src/
 - Design tokens em `tailwind.config.ts` e CSS variables
 - Responsive: mobile-first
 - Dark sidebar (#0F172A), light content area (#F5F7FA)
-- Brand: teal (#0D9488), AI accent: purple (#7C3AED)
+- Brand: blue (#2563EB / #3B82F6), AI accent: purple (#7C3AED)
 - Status: green (#16A34A), amber (#D97706), red (#DC2626), gray (#6B7280), blue (#2563EB)
 
 ### Supabase

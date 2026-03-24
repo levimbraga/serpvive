@@ -45,7 +45,7 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
                 h.level === 3 ? "pl-6" : "pl-4"
               } ${
                 activeId === h.id
-                  ? "text-[#0D9488] border-l-2 border-[#0D9488] -ml-px font-medium"
+                  ? "text-[#2563EB] border-l-2 border-[#2563EB] -ml-px font-medium"
                   : "text-[#9CA3AF] hover:text-[#4B5563]"
               }`}
             >

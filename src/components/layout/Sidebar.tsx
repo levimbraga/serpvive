@@ -181,8 +181,8 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
           </>
         ) : autoDiagStatus === "failed" && hasGsc && !hasFreeDiagnosis ? (
           <div className="flex items-center gap-2">
-            <Zap size={13} strokeWidth={1.5} className="text-[#0D9488]" />
-            <Link href="/pages" className="text-[12px] text-[#0D9488] hover:text-[#14B8A6] transition-colors no-underline font-medium">
+            <Zap size={13} strokeWidth={1.5} className="text-[#2563EB]" />
+            <Link href="/pages" className="text-[12px] text-[#2563EB] hover:text-[#3B82F6] transition-colors no-underline font-medium">
               1 free diagnosis available
             </Link>
           </div>

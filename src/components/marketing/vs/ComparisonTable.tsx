@@ -19,7 +19,7 @@ export default function ComparisonTable({
             <th className="px-5 py-4 font-semibold text-[#6B7280] w-[30%]">
               {competitorName}
             </th>
-            <th className="px-5 py-4 font-semibold text-[#0D9488] w-[30%]">
+            <th className="px-5 py-4 font-semibold text-[#2563EB] w-[30%]">
               SerpVive
             </th>
           </tr>

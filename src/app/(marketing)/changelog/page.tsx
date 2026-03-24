@@ -32,7 +32,7 @@ type ChangelogMonth = {
 
 const BADGE_STYLES: Record<Category, { bg: string; text: string; label: string }> = {
   new:      { bg: "#EFF6FF", text: "#2563EB", label: "NEW" },
-  improved: { bg: "#F0FDFA", text: "#0D9488", label: "IMPROVED" },
+  improved: { bg: "#EFF6FF", text: "#2563EB", label: "IMPROVED" },
   fix:      { bg: "#FFFBEB", text: "#D97706", label: "FIX" },
   launch:   { bg: "#F5F3FF", text: "#7C3AED", label: "LAUNCH" },
 };

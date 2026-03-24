@@ -18,7 +18,7 @@ export default function PricingTable({
             <th className="px-5 py-4 font-semibold text-[#6B7280] w-[35%]">
               {competitorName}
             </th>
-            <th className="px-5 py-4 font-semibold text-[#0D9488] w-[35%]">
+            <th className="px-5 py-4 font-semibold text-[#2563EB] w-[35%]">
               SerpVive
             </th>
           </tr>

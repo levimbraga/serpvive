@@ -22,9 +22,9 @@ export const metadata: Metadata = {
 const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   Guide:        { bg: "#EFF6FF", text: "#2563EB" },
   SEO:          { bg: "#F5F3FF", text: "#7C3AED" },
-  Comparison:   { bg: "#F0FDFA", text: "#0D9488" },
-  "Content Audit": { bg: "#F0FDFA", text: "#0D9488" },
-  "SEO Tools":  { bg: "#F0FDFA", text: "#0D9488" },
+  Comparison:   { bg: "#EFF6FF", text: "#2563EB" },
+  "Content Audit": { bg: "#EFF6FF", text: "#2563EB" },
+  "SEO Tools":  { bg: "#EFF6FF", text: "#2563EB" },
   Tools:        { bg: "#FFFBEB", text: "#D97706" },
   "Google Search Console": { bg: "#EFF6FF", text: "#2563EB" },
 };

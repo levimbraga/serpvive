@@ -145,8 +145,8 @@ export default function ComparisonsIndex() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#0D9488] font-medium">SerpVive</span>
-                    <span className="font-medium text-[#0D9488]">Free</span>
+                    <span className="text-[#2563EB] font-medium">SerpVive</span>
+                    <span className="font-medium text-[#2563EB]">Free</span>
                   </div>
                 </div>
 
@@ -179,7 +179,7 @@ export default function ComparisonsIndex() {
                         </Link>
                       </th>
                     ))}
-                    <th className="px-4 py-3 font-semibold text-[#0D9488] bg-[#F0FDFA]/50">
+                    <th className="px-4 py-3 font-semibold text-[#2563EB] bg-[#EFF6FF]/50">
                       SerpVive
                     </th>
                   </tr>
@@ -200,7 +200,7 @@ export default function ComparisonsIndex() {
                           <CellValue value={s.values[feature] ?? "N/A"} />
                         </td>
                       ))}
-                      <td className="px-4 py-3 bg-[#F0FDFA]/30">
+                      <td className="px-4 py-3 bg-[#EFF6FF]/30">
                         <CellValue value={SERPVIVE_VALUES[feature] ?? "N/A"} />
                       </td>
                     </tr>

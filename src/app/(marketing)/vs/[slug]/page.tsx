@@ -216,8 +216,8 @@ export default async function ComparisonPage({ params }: Props) {
       >
         <div className="mx-auto flex flex-col gap-14" style={{ maxWidth: "820px" }}>
           {/* TL;DR Box */}
-          <div className="rounded-2xl border border-[#0D9488]/20 bg-[#F0FDFA] p-6 sm:p-8">
-            <div className="flex items-center gap-2 text-[13px] font-bold text-[#0D9488] uppercase tracking-wider mb-5">
+          <div className="rounded-2xl border border-[#2563EB]/20 bg-[#EFF6FF] p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-[13px] font-bold text-[#2563EB] uppercase tracking-wider mb-5">
               <Zap size={14} strokeWidth={1.5} />
               TL;DR
             </div>
@@ -231,7 +231,7 @@ export default async function ComparisonPage({ params }: Props) {
                 </p>
               </div>
               <div>
-                <p className="text-[12px] font-bold text-[#0D9488] uppercase tracking-wider mb-2">
+                <p className="text-[12px] font-bold text-[#2563EB] uppercase tracking-wider mb-2">
                   SerpVive is best for
                 </p>
                 <p className="text-[14px] text-[#374151] leading-relaxed">
@@ -239,7 +239,7 @@ export default async function ComparisonPage({ params }: Props) {
                 </p>
               </div>
             </div>
-            <div className="pt-4 border-t border-[#0D9488]/15">
+            <div className="pt-4 border-t border-[#2563EB]/15">
               <p className="text-[14px] text-[#4B5563] leading-relaxed">
                 <strong className="text-[#111827]">The short version:</strong>{" "}
                 {data.tldr.summary}
@@ -329,7 +329,7 @@ export default async function ComparisonPage({ params }: Props) {
           </div>
 
           {/* CTA */}
-          <div className="rounded-2xl border border-[#0D9488]/20 bg-[#F0FDFA] p-8 sm:p-10 text-center">
+          <div className="rounded-2xl border border-[#2563EB]/20 bg-[#EFF6FF] p-8 sm:p-10 text-center">
             <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-3">
               Try SerpVive Free
             </h2>
@@ -339,7 +339,7 @@ export default async function ComparisonPage({ params }: Props) {
             </p>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#0D9488] text-white font-semibold px-7 py-3.5 text-[15px] no-underline hover:bg-[#0F766E] transition-all hover:shadow-[0_0_30px_rgba(13,148,136,0.15)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-7 py-3.5 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
             >
               Get Started Free
               <ArrowRight size={16} strokeWidth={1.5} />
@@ -358,10 +358,10 @@ export default async function ComparisonPage({ params }: Props) {
                     <Link
                       key={comp.slug}
                       href={`/vs/${comp.slug}`}
-                      className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 no-underline group hover:border-[#0D9488]/40 transition-colors"
+                      className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 no-underline group hover:border-[#2563EB]/40 transition-colors"
                     >
                       <div>
-                        <p className="text-[14px] font-semibold text-[#111827] group-hover:text-[#0D9488] transition-colors">
+                        <p className="text-[14px] font-semibold text-[#111827] group-hover:text-[#2563EB] transition-colors">
                           {comp.competitorName} vs SerpVive
                         </p>
                         <p className="text-[12px] text-[#6B7280] mt-0.5">
@@ -371,7 +371,7 @@ export default async function ComparisonPage({ params }: Props) {
                       <ArrowRight
                         size={16}
                         strokeWidth={1.5}
-                        className="text-[#9CA3AF] group-hover:text-[#0D9488] transition-colors"
+                        className="text-[#9CA3AF] group-hover:text-[#2563EB] transition-colors"
                       />
                     </Link>
                   ) : null
@@ -396,7 +396,7 @@ export default async function ComparisonPage({ params }: Props) {
                 href={data.competitorUrl}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="text-[#0D9488] hover:underline"
+                className="text-[#2563EB] hover:underline"
               >
                 {data.competitorName}&apos;s website
               </a>{" "}
