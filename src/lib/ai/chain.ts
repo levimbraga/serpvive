@@ -31,3 +31,31 @@ export function getDiagnosisChain(): AIProvider[] {
 
   return chain;
 }
+
+/**
+ * Builds the brief fallback chain — starts with Sonnet (fast, good enough
+ * for transforming diagnosis causes into actionable items).
+ * Skips Opus entirely since briefs consistently timeout with it.
+ *
+ * Order:
+ *  1. Claude Sonnet 4.6  (primary, fast 20-40s)
+ *  2. Gemini 2.5 Pro     (different provider)
+ *  3. GPT-4o             (last resort)
+ */
+export function getBriefChain(): AIProvider[] {
+  const chain: AIProvider[] = [];
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    chain.push(createClaudeProvider("claude-sonnet-4-6"));
+  }
+
+  if (process.env.GOOGLE_GEMINI_API_KEY) {
+    chain.push(createGeminiProvider("gemini-2.5-pro"));
+  }
+
+  if (process.env.OPENAI_API_KEY) {
+    chain.push(createOpenAIProvider("gpt-4o"));
+  }
+
+  return chain;
+}

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { extractJson } from "./json-extract";
 import { sanitizeAiOutput } from "./sanitize";
 import { runWithFallback } from "./fallback-chain";
-import { getDiagnosisChain } from "./chain";
+import { getBriefChain } from "./chain";
 import type { AIMessage } from "./providers";
 
 // ── Zod Schema ──
@@ -52,7 +52,7 @@ export type BriefOutput = {
  * Second AI call in the pipeline (after diagnosis).
  */
 export async function generateBrief(params: BriefParams): Promise<BriefOutput> {
-  const chain = getDiagnosisChain();
+  const chain = getBriefChain();
 
   const prompt = `Generate a specific, actionable refresh brief with micro-drafts. Write like a senior consultant advising a friend.
 
