@@ -149,6 +149,7 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code fences, no explanatory te
 
   // First attempt via fallback chain
   const messages: AIMessage[] = [{ role: "user", content: prompt }];
+  console.log(`[brief] Prompt size: ${prompt.length} chars (~${Math.round(prompt.length / 4)} tokens)`);
   let result = await runWithFallback(chain, messages, callOptions);
   totalTokensInput += result.tokensInput;
   totalTokensOutput += result.tokensOutput;

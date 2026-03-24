@@ -280,13 +280,14 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
   });
   console.log(`[DEMO ${elapsed()}] Diagnosis complete (model: ${diagResult.modelUsed})`);
 
-  // Step 5: AI brief
-  console.log(`[DEMO ${elapsed()}] Starting AI brief`);
+  // Step 5: AI brief — truncate content since diagnosis already analyzed it
+  // Brief needs structure (headings, meta) not full body text
+  console.log(`[DEMO ${elapsed()}] Starting AI brief (userContent: ${userContentStr.length} chars → 5000, competitors: ${competitorsStr.length} chars → 3000)`);
   const briefResult = await generateBrief({
     url,
     diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
-    userContent: userContentStr,
-    competitors: competitorsStr,
+    userContent: userContentStr.slice(0, 5000),
+    competitors: competitorsStr.slice(0, 3000),
     noGscData: true,
   });
   console.log(`[DEMO ${elapsed()}] Brief complete`);

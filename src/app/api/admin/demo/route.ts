@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 
         const pipeline = runExternalPipeline(url, keyword);
         const timeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Demo pipeline timed out after 4 minutes")), PIPELINE_TIMEOUT_MS),
+          setTimeout(() => reject(new Error(`Demo pipeline timed out after ${PIPELINE_TIMEOUT_MS / 1000}s`)), PIPELINE_TIMEOUT_MS),
         );
         const result = await Promise.race([pipeline, timeout]);
 
