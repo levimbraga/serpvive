@@ -9,8 +9,8 @@ import { nanoid } from "nanoid";
 export const maxDuration = 300; // 5 minutes
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
-const PIPELINE_TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
-const STALE_MS = 5 * 60 * 1000; // 5 minutes — treat processing as failed
+const PIPELINE_TIMEOUT_MS = 270 * 1000; // 4.5 min — leaves 30s buffer before Vercel's 300s maxDuration
+const STALE_MS = 6 * 60 * 1000; // 6 minutes — must exceed PIPELINE_TIMEOUT + overhead
 
 const CreateDemoSchema = z.object({
   url: z.string().url().startsWith("https://"),

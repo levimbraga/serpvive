@@ -205,25 +205,28 @@ export async function runExternalPipeline(
   keyword: string,
 ): Promise<ExternalPipelineResult> {
   const startTime = Date.now();
+  const elapsed = () => `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
 
   // Step 1: Search Google
-  console.log(`[external-pipeline] Searching Google for "${keyword}"...`);
+  console.log(`[DEMO ${elapsed()}] Starting SERP fetch for "${keyword}"`);
   let serpResults: Awaited<ReturnType<typeof searchGoogle>> = [];
   try {
     serpResults = await searchGoogle(keyword);
   } catch (err) {
-    console.error("[external-pipeline] Serper failed:", err);
+    console.error(`[DEMO ${elapsed()}] Serper failed:`, err);
   }
+  console.log(`[DEMO ${elapsed()}] SERP fetched, ${serpResults.length} results`);
 
   const serpResultsStr = serpResults.length > 0
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch user content (SSRF-protected) + competitor content
-  console.log("[external-pipeline] Fetching user content...");
+  // Step 2: Fetch user content (SSRF-protected)
+  console.log(`[DEMO ${elapsed()}] Starting fetch URL: ${url}`);
   const userContent = await fetchPageContent(url, { ssrfProtection: true });
+  console.log(`[DEMO ${elapsed()}] URL fetched, ${userContent?.wordCount ?? 0} words`);
 
-  // Content quality check — reject pages with too little text
+  // Content quality check
   const contentError = validateContent(userContent?.wordCount ?? 0);
   if (contentError) {
     throw new Error(contentError);
@@ -240,10 +243,12 @@ export async function runExternalPipeline(
     .filter((r) => !r.url.includes(userHostname))
     .slice(0, 3);
 
-  console.log("[external-pipeline] Fetching competitor content...");
+  // Step 3: Fetch competitor content
+  console.log(`[DEMO ${elapsed()}] Starting competitor fetch (${competitorUrls.length} URLs)`);
   const competitorContents = await Promise.all(
     competitorUrls.map((r) => fetchPageContent(r.url)),
   );
+  console.log(`[DEMO ${elapsed()}] Competitors fetched`);
 
   const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, url));
   const competitorsStr = sanitizeForPrompt(
@@ -252,7 +257,6 @@ export async function runExternalPipeline(
       .join("\n\n---\n\n")
   );
 
-  // Step 3: Build GSC-less query data note
   const queryDataStr = `GSC data is not available for this analysis. The user provided the target keyword manually: '${sanitizeForPrompt(keyword)}'.
 
 Focus your analysis on SERP competition, content comparison, and on-page factors. You cannot reference impression counts, CTR from GSC, or actual click data.
@@ -261,8 +265,8 @@ When possible, estimate traffic impact per cause in clicks/month based on typica
 
 If the content was truncated during fetch, note it: 'Content may have been truncated during analysis.'`;
 
-  // Step 4: Run AI diagnosis (always uses "new page" style since no decay data)
-  console.log("[external-pipeline] Running AI diagnosis...");
+  // Step 4: AI diagnosis
+  console.log(`[DEMO ${elapsed()}] Starting AI diagnosis`);
   const diagResult = await runDiagnosis({
     isNewPage: true,
     url,
@@ -274,9 +278,10 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     userContent: userContentStr,
     queryData: queryDataStr,
   });
+  console.log(`[DEMO ${elapsed()}] Diagnosis complete (model: ${diagResult.modelUsed})`);
 
-  // Step 5: Run AI brief
-  console.log("[external-pipeline] Generating refresh brief...");
+  // Step 5: AI brief
+  console.log(`[DEMO ${elapsed()}] Starting AI brief`);
   const briefResult = await generateBrief({
     url,
     diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
@@ -284,13 +289,14 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     competitors: competitorsStr,
     noGscData: true,
   });
+  console.log(`[DEMO ${elapsed()}] Brief complete`);
 
   const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
   const processingTimeMs = Date.now() - startTime;
   const tokensInput = diagResult.tokensInput + briefResult.tokensInput;
   const tokensOutput = diagResult.tokensOutput + briefResult.tokensOutput;
 
-  console.log(`[external-pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}`);
+  console.log(`[DEMO ${elapsed()}] Pipeline done. Cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}, tokens: ${tokensInput}in/${tokensOutput}out`);
 
   return {
     diagnosis: diagResult.diagnosis,
