@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -9,6 +9,8 @@ import { nanoid } from "nanoid";
 export const maxDuration = 300; // 5 minutes
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+const PIPELINE_TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
+const STALE_MS = 5 * 60 * 1000; // 5 minutes — treat processing as failed
 
 const CreateDemoSchema = z.object({
   url: z.string().url().startsWith("https://"),
@@ -25,7 +27,7 @@ async function getAdminUser() {
   return user;
 }
 
-// POST — Create new demo analysis
+// POST — Create demo and run pipeline in background
 export async function POST(request: Request) {
   try {
     const user = await getAdminUser();
@@ -39,7 +41,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Valid URL and keyword required." }, { status: 400 });
     }
 
-    // SSRF / URL validation
     const urlCheck = await validateUrl(parsed.data.url);
     if (!urlCheck.ok) {
       return NextResponse.json({ error: urlCheck.error }, { status: 400 });
@@ -48,35 +49,63 @@ export async function POST(request: Request) {
     const url = urlCheck.url;
     const { keyword } = parsed.data;
     const admin = getSupabaseAdmin();
-
-    const result = await runExternalPipeline(url, keyword);
     const demoId = nanoid(8);
 
+    // Create pending record immediately
     const { error: insertErr } = await admin
       .from("demo_analyses")
       .insert({
         id: demoId,
         url,
         keyword,
-        diagnosis: result.diagnosis,
-        refresh_brief: result.brief,
-        serp_snapshot: result.serpSnapshot,
+        status: "pending",
         created_by: user.id,
       });
 
     if (insertErr) {
       console.error("[api/admin/demo] Insert error:", insertErr.message);
-      return NextResponse.json({ error: `Failed to save demo: ${insertErr.message}` }, { status: 500 });
+      return NextResponse.json({ error: `Failed to create demo: ${insertErr.message}` }, { status: 500 });
     }
 
-    return NextResponse.json({
-      data: {
-        id: demoId,
-        diagnosis: result.diagnosis,
-        brief: result.brief,
-        processingTimeMs: result.processingTimeMs,
-      },
+    // Run pipeline in background — after() keeps the function alive on Vercel
+    after(async () => {
+      try {
+        await admin
+          .from("demo_analyses")
+          .update({ status: "processing" })
+          .eq("id", demoId);
+
+        console.log(`[api/admin/demo] Starting pipeline for ${demoId}: ${url}`);
+
+        const pipeline = runExternalPipeline(url, keyword);
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Demo pipeline timed out after 4 minutes")), PIPELINE_TIMEOUT_MS),
+        );
+        const result = await Promise.race([pipeline, timeout]);
+
+        await admin
+          .from("demo_analyses")
+          .update({
+            status: "completed",
+            diagnosis: result.diagnosis,
+            refresh_brief: result.brief,
+            serp_snapshot: result.serpSnapshot,
+          })
+          .eq("id", demoId);
+
+        console.log(`[api/admin/demo] Completed ${demoId} in ${(result.processingTimeMs / 1000).toFixed(1)}s`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`[api/admin/demo] Failed ${demoId}:`, message);
+
+        await admin
+          .from("demo_analyses")
+          .update({ status: "failed", error_message: message })
+          .eq("id", demoId);
+      }
     });
+
+    return NextResponse.json({ data: { id: demoId, status: "pending" } });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[api/admin/demo] Error:", message);
@@ -84,17 +113,56 @@ export async function POST(request: Request) {
   }
 }
 
-// GET — List all demo analyses
-export async function GET() {
+// GET — List all demos, or poll one demo's status
+export async function GET(request: Request) {
   const user = await getAdminUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   const admin = getSupabaseAdmin();
+  const { searchParams } = new URL(request.url);
+  const pollId = searchParams.get("poll");
+
+  // Poll mode: return status for a single demo
+  if (pollId) {
+    const { data: demo } = await admin
+      .from("demo_analyses")
+      .select("id, status, error_message")
+      .eq("id", pollId)
+      .single();
+
+    if (!demo) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Stale detection: if processing for >5 min, treat as failed
+    if (demo.status === "processing" || demo.status === "pending") {
+      const { data: fullDemo } = await admin
+        .from("demo_analyses")
+        .select("created_at")
+        .eq("id", pollId)
+        .single();
+
+      if (fullDemo) {
+        const elapsed = Date.now() - new Date(fullDemo.created_at).getTime();
+        if (elapsed > STALE_MS) {
+          await admin
+            .from("demo_analyses")
+            .update({ status: "failed", error_message: "Pipeline timed out" })
+            .eq("id", pollId);
+          return NextResponse.json({ data: { id: pollId, status: "failed", error_message: "Pipeline timed out" } });
+        }
+      }
+    }
+
+    return NextResponse.json({ data: demo });
+  }
+
+  // List mode: return all demos
   const { data: demos } = await admin
     .from("demo_analyses")
-    .select("id, url, keyword, created_at, expires_at, views, diagnosis, refresh_brief")
+    .select("id, url, keyword, created_at, expires_at, views, diagnosis, refresh_brief, status")
     .order("created_at", { ascending: false });
 
   return NextResponse.json({ data: demos ?? [] });

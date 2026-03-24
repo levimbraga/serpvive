@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Zap, Search, FileText, Brain, Sparkles, CheckCircle2, Loader2,
   AlertCircle, Copy, Check, Trash2, ExternalLink, Eye, Download,
@@ -15,7 +15,17 @@ type DemoItem = {
   views: number;
   diagnosis: unknown;
   refresh_brief: unknown;
+  status: string;
 };
+
+const POLL_INTERVAL_MS = 5000;
+
+const STEPS = [
+  { icon: Search, label: "Fetching SERP data..." },
+  { icon: FileText, label: "Analyzing competitor content..." },
+  { icon: Brain, label: "AI is diagnosing..." },
+  { icon: Sparkles, label: "Generating refresh brief..." },
+];
 
 export default function DemoClient() {
   const [url, setUrl] = useState("");
@@ -25,19 +35,22 @@ export default function DemoClient() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [generatedId, setGeneratedId] = useState<string | null>(null);
-  const [lastResult, setLastResult] = useState<{ diagnosis: unknown; brief: unknown } | null>(null);
   const [copied, setCopied] = useState(false);
   const [demos, setDemos] = useState<DemoItem[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stepTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const cleanup = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (pollRef.current) clearInterval(pollRef.current);
+    stepTimeoutsRef.current.forEach(clearTimeout);
+  }, []);
 
   useEffect(() => {
     fetchDemos();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      timeoutsRef.current.forEach(clearTimeout);
-    };
-  }, []);
+    return cleanup;
+  }, [cleanup]);
 
   async function fetchDemos() {
     const res = await fetch("/api/admin/demo");
@@ -45,6 +58,40 @@ export default function DemoClient() {
       const json = await res.json();
       setDemos(json.data ?? []);
     }
+  }
+
+  function startStepTimers() {
+    stepTimeoutsRef.current = [
+      setTimeout(() => setLoadingStep(1), 15000),
+      setTimeout(() => setLoadingStep(2), 40000),
+      setTimeout(() => setLoadingStep(3), 80000),
+    ];
+  }
+
+  function startPolling(demoId: string) {
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/admin/demo?poll=${demoId}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const pollStatus = json.data?.status;
+
+        if (pollStatus === "completed") {
+          cleanup();
+          setLoadingStep(4); // all steps done
+          setGeneratedId(demoId);
+          setStatus("done");
+          fetchDemos();
+        } else if (pollStatus === "failed") {
+          cleanup();
+          setError(json.data?.error_message || "Pipeline failed. Check Vercel logs.");
+          setStatus("error");
+        }
+        // else still pending/processing — keep polling
+      } catch {
+        // Network blip — keep polling, don't crash
+      }
+    }, POLL_INTERVAL_MS);
   }
 
   async function handleGenerate() {
@@ -56,11 +103,9 @@ export default function DemoClient() {
     setElapsedSeconds(0);
     setGeneratedId(null);
 
+    // Start elapsed timer and step indicators
     timerRef.current = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
-    const t1 = setTimeout(() => setLoadingStep(1), 15000);
-    const t2 = setTimeout(() => setLoadingStep(2), 40000);
-    const t3 = setTimeout(() => setLoadingStep(3), 80000);
-    timeoutsRef.current = [t1, t2, t3];
+    startStepTimers();
 
     try {
       const res = await fetch("/api/admin/demo", {
@@ -71,28 +116,18 @@ export default function DemoClient() {
 
       const contentType = res.headers.get("content-type") ?? "";
       if (!contentType.includes("application/json")) {
-        const text = await res.text();
-        console.error("[DemoClient] Non-JSON response:", res.status, text.slice(0, 500));
-        throw new Error(
-          res.status === 504 ? "Request timed out. The AI pipeline may need more time." :
-          res.status === 502 ? "Server error. Please try again." :
-          `Server returned ${res.status} instead of JSON.`
-        );
+        throw new Error(`Server returned ${res.status} instead of JSON.`);
       }
 
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed");
 
-      setGeneratedId(json.data.id);
-      setLastResult({ diagnosis: json.data.diagnosis, brief: json.data.brief });
-      setStatus("done");
-      fetchDemos();
+      // POST returned immediately with the ID — start polling
+      startPolling(json.data.id);
     } catch (err) {
+      cleanup();
       setError(err instanceof Error ? err.message : "Something went wrong");
       setStatus("error");
-    } finally {
-      if (timerRef.current) clearInterval(timerRef.current);
-      timeoutsRef.current.forEach(clearTimeout);
     }
   }
 
@@ -123,13 +158,6 @@ export default function DemoClient() {
   }
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
-
-  const STEPS = [
-    { icon: Search, label: "Fetching SERP data..." },
-    { icon: FileText, label: "Analyzing competitor content..." },
-    { icon: Brain, label: "AI is diagnosing..." },
-    { icon: Sparkles, label: "Generating refresh brief..." },
-  ];
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -182,19 +210,19 @@ export default function DemoClient() {
             </div>
             <div className="flex items-center justify-center gap-4 mt-4">
               <button
-                onClick={() => { setStatus("idle"); setUrl(""); setKeyword(""); setLastResult(null); }}
+                onClick={() => { setStatus("idle"); setUrl(""); setKeyword(""); setGeneratedId(null); }}
                 className="text-sm text-[#3B82F6] hover:text-[#2563EB] font-medium"
               >
                 Generate another
               </button>
-              {lastResult && (
-                <button
-                  onClick={() => exportJson({ url, keyword, diagnosis: lastResult.diagnosis, brief: lastResult.brief })}
-                  className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
-                >
-                  <Download size={14} strokeWidth={1.5} /> Export JSON
-                </button>
-              )}
+              <a
+                href={`/demo/${generatedId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
+              >
+                <ExternalLink size={14} strokeWidth={1.5} /> View demo
+              </a>
             </div>
           </div>
         ) : (
@@ -253,6 +281,7 @@ export default function DemoClient() {
                   <tr className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
                     <th className="text-left px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">URL</th>
                     <th className="text-left px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Keyword</th>
+                    <th className="text-center px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Status</th>
                     <th className="text-center px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Views</th>
                     <th className="text-right px-4 py-2.5 text-xs font-medium text-[#6B7280] uppercase">Expires</th>
                     <th className="w-[130px] px-4 py-2.5"></th>
@@ -267,39 +296,48 @@ export default function DemoClient() {
                       <td className="px-4 py-3 text-sm text-[#6B7280] max-w-[150px] truncate">
                         {demo.keyword}
                       </td>
+                      <td className="px-4 py-3 text-center">
+                        <StatusBadge status={demo.status} />
+                      </td>
                       <td className="px-4 py-3 text-sm text-[#6B7280] text-center">
                         <span className="inline-flex items-center gap-1">
                           <Eye size={12} strokeWidth={1.5} /> {demo.views}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-[#9CA3AF] text-right">
-                        {new Date(demo.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        {demo.expires_at
+                          ? new Date(demo.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                          : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 justify-end">
-                          <a
-                            href={`/demo/${demo.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                            title="View demo"
-                          >
-                            <ExternalLink size={14} strokeWidth={1.5} />
-                          </a>
-                          <button
-                            onClick={() => handleCopyLink(demo.id)}
-                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                            title="Copy link"
-                          >
-                            <Copy size={14} strokeWidth={1.5} />
-                          </button>
-                          <button
-                            onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
-                            className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
-                            title="Export JSON"
-                          >
-                            <Download size={14} strokeWidth={1.5} />
-                          </button>
+                          {demo.status === "completed" && (
+                            <>
+                              <a
+                                href={`/demo/${demo.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
+                                title="View demo"
+                              >
+                                <ExternalLink size={14} strokeWidth={1.5} />
+                              </a>
+                              <button
+                                onClick={() => handleCopyLink(demo.id)}
+                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
+                                title="Copy link"
+                              >
+                                <Copy size={14} strokeWidth={1.5} />
+                              </button>
+                              <button
+                                onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                                className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors"
+                                title="Export JSON"
+                              >
+                                <Download size={14} strokeWidth={1.5} />
+                              </button>
+                            </>
+                          )}
                           <button
                             onClick={() => handleDelete(demo.id)}
                             className="p-1.5 rounded-md hover:bg-[#FEF2F2] text-[#9CA3AF] hover:text-[#DC2626] transition-colors"
@@ -319,4 +357,18 @@ export default function DemoClient() {
       )}
     </div>
   );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case "completed":
+      return <span className="inline-flex items-center gap-1 text-xs font-medium text-[#16A34A] bg-[#16A34A]/10 px-2 py-0.5 rounded-full"><CheckCircle2 size={12} strokeWidth={1.5} /> Done</span>;
+    case "processing":
+    case "pending":
+      return <span className="inline-flex items-center gap-1 text-xs font-medium text-[#7C3AED] bg-[#7C3AED]/10 px-2 py-0.5 rounded-full"><Loader2 size={12} strokeWidth={1.5} className="animate-spin" /> Processing</span>;
+    case "failed":
+      return <span className="inline-flex items-center gap-1 text-xs font-medium text-[#DC2626] bg-[#DC2626]/10 px-2 py-0.5 rounded-full"><AlertCircle size={12} strokeWidth={1.5} /> Failed</span>;
+    default:
+      return <span className="text-xs text-[#9CA3AF]">{status}</span>;
+  }
 }
