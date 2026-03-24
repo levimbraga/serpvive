@@ -1,3 +1,5 @@
+// Last verified: March 2026. Verify competitor pricing quarterly.
+
 export type FeatureRow = {
   feature: string;
   competitor: string;
@@ -104,7 +106,7 @@ const comparisons: Record<string, ComparisonData> = {
     pricing: [
       { plan: "Free / Trial", competitor: "7-day trial only", serpvive: "Free forever (1 site, 100 pages)" },
       { plan: "Entry", competitor: "Pro: $139.95/mo", serpvive: "Starter: $29/mo" },
-      { plan: "Mid", competitor: "Guru: $249.95/mo", serpvive: "Pro: $79/mo" },
+      { plan: "Mid", competitor: "Guru: $249.95/mo", serpvive: "Pro: $69/mo" },
       { plan: "Top", competitor: "Business: $499.95/mo", serpvive: "Agency: $129/mo" },
     ],
 
@@ -132,7 +134,7 @@ Semrush's Content Audit tool can identify pages losing traffic. But it stops the
 
 **Health Score.** One number (0-100) that tells you how your blog is doing overall. It accounts for decay velocity, seasonal patterns, and page importance. Semrush has no equivalent.
 
-**Price.** Semrush starts at $139.95/month. SerpVive's free plan covers 1 site with 100 pages monitored. The Pro plan ($79/month) covers 3 sites and 1,000 pages. For content decay monitoring specifically, SerpVive is 40-80% cheaper.`,
+**Price.** Semrush starts at $139.95/month. SerpVive's free plan covers 1 site with 100 pages monitored. The Pro plan ($69/month) covers 3 sites and 1,000 pages. For content decay monitoring specifically, SerpVive is 40-80% cheaper.`,
 
     featureBreakdown: `### Content Decay Detection
 
@@ -175,12 +177,12 @@ The **Guru plan ($249.95/month)** adds the Content Marketing Toolkit, historical
 SerpVive pricing reflects its focus:
 - **Free:** 1 site, 100 pages, weekly monitoring, Health Score
 - **Starter ($29/month):** 1 site, 100 pages, 10 AI diagnoses/month
-- **Pro ($79/month):** 3 sites, 1,000 pages, 40 AI diagnoses/month
+- **Pro ($69/month):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/month):** 10 sites, 5,000 pages, 120 AI diagnoses/month
 
 If you need keyword research, backlinks, AND content monitoring, Semrush Guru ($250/month) is your only option from them.
 
-If you already have a keyword tool and just need content decay monitoring, SerpVive Pro ($79/month) saves you $171/month compared to Semrush Guru.`,
+If you already have a keyword tool and just need content decay monitoring, SerpVive Pro ($69/month) saves you $181/month compared to Semrush Guru.`,
 
     whoShouldChooseCompetitor: `Choose Semrush if you:
 
@@ -217,7 +219,7 @@ They solve different problems in the content lifecycle:
 
 A realistic workflow: Use Semrush to find keywords and plan content. Publish. Then SerpVive monitors that content over months and years, alerting you when it starts to decay and telling you exactly how to fix it.
 
-Cost: Semrush Pro ($140) + SerpVive Pro ($79) = $219/month for complete content lifecycle management. That's still less than Semrush Guru alone.`,
+Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content lifecycle management. That's still less than Semrush Guru alone.`,
 
     faqs: [
       {
@@ -244,7 +246,7 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($79) = $219/month for complete content 
       {
         question: "What if I only need content monitoring from Semrush?",
         answer:
-          "If content monitoring is your primary need, SerpVive gives you better diagnosis at a lower price. Semrush's cheapest plan is $139.95/month and content audit is just one of its 50+ features. SerpVive's free plan covers basic monitoring, and Pro at $79/month includes 40 AI diagnoses per month.",
+          "If content monitoring is your primary need, SerpVive gives you better diagnosis at a lower price. Semrush's cheapest plan is $139.95/month and content audit is just one of its 50+ features. SerpVive's free plan covers basic monitoring, and Pro at $69/month includes 40 AI diagnoses per month.",
       },
     ],
 
@@ -280,7 +282,7 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($79) = $219/month for complete content 
     },
 
     features: [
-      { feature: "Starting price", competitor: "$99/mo (Essential)", serpvive: "Free ($0)", winner: "serpvive" },
+      { feature: "Starting price", competitor: "$119/mo (Standard)", serpvive: "Free ($0)", winner: "serpvive" },
       { feature: "Content Editor / Optimizer", competitor: "Yes (best-in-class)", serpvive: "No", winner: "competitor" },
       { feature: "NLP keyword suggestions", competitor: "Yes", serpvive: "No", winner: "competitor" },
       { feature: "Content Score", competitor: "Yes (0-100)", serpvive: "No (Health Score is different)", winner: "competitor" },
@@ -296,9 +298,9 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($79) = $219/month for complete content 
 
     pricing: [
       { plan: "Free / Trial", competitor: "No free plan", serpvive: "Free forever (1 site, 100 pages)" },
-      { plan: "Entry", competitor: "Essential: $99/mo", serpvive: "Starter: $29/mo" },
-      { plan: "Mid", competitor: "Scale: $219/mo", serpvive: "Pro: $79/mo" },
-      { plan: "Top", competitor: "Enterprise: custom", serpvive: "Agency: $129/mo" },
+      { plan: "Entry", competitor: "Standard: $119/mo", serpvive: "Starter: $29/mo" },
+      { plan: "Mid", competitor: "Pro: $219/mo", serpvive: "Pro: $69/mo" },
+      { plan: "Top", competitor: "Peace of Mind: $359/mo", serpvive: "Agency: $129/mo" },
     ],
 
     competitorStrengths: `**Surfer SEO is the gold standard for content optimization.**
@@ -355,27 +357,27 @@ These are complementary, not competing functions.
 
 ### Pricing Value
 
-**Surfer Essential ($99/mo):** Includes Content Editor, SERP Analyzer, and audit. Limited to 30 articles/month and 2 organization seats.
+**Surfer Standard ($119/mo):** Includes Content Editor, SERP Analyzer, and audit. Limited to 30 articles/month and 2 organization seats.
 
-**SerpVive Pro ($79/mo):** 3 sites, 1,000 pages monitored daily, 40 AI diagnoses/month, Health Score. Monitoring itself is unlimited.
+**SerpVive Pro ($69/mo):** 3 sites, 1,000 pages monitored daily, 40 AI diagnoses/month, Health Score. Monitoring itself is unlimited.
 
-For content teams already producing content, SerpVive at $79/month provides monitoring that Surfer doesn't truly offer. For teams focused on production, Surfer at $99/month provides optimization that SerpVive doesn't offer.`,
+For content teams already producing content, SerpVive at $69/month provides monitoring that Surfer doesn't truly offer. For teams focused on production, Surfer at $119/month provides optimization that SerpVive doesn't offer.`,
 
     pricingAnalysis: `Surfer's pricing tiers are based on content production volume:
 
-- **Essential ($99/mo):** 30 Content Editor articles, SERP Analyzer, audit. For solo SEO writers.
-- **Scale ($219/mo):** 100 articles, Grow Flow, more audit pages. For content teams.
-- **Enterprise (custom):** Unlimited articles, API access, white-label. For agencies.
+- **Standard ($119/mo):** 30 Content Editor articles, SERP Analyzer, audit. For solo SEO writers.
+- **Pro ($219/mo):** 100 articles, Grow Flow, more audit pages. For content teams.
+- **Peace of Mind ($359/mo):** Unlimited articles, dedicated support. For agencies.
 
 SerpVive's pricing tiers are based on monitoring scale:
 - **Free:** 1 site, 100 pages, weekly monitoring
 - **Starter ($29/mo):** 1 site, 100 pages, 10 AI diagnoses/month
-- **Pro ($79/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
+- **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses/month
 
 Key difference: Surfer charges per article produced. SerpVive charges per site monitored. If you publish 5 articles/month but monitor 500 existing ones, SerpVive's cost structure makes more sense for the monitoring job.
 
-Combined: Surfer Essential ($99) + SerpVive Pro ($79) = $178/month for complete content lifecycle management (optimize on publish, monitor forever after).`,
+Combined: Surfer Standard ($119) + SerpVive Pro ($69) = $188/month for complete content lifecycle management (optimize on publish, monitor forever after).`,
 
     whoShouldChooseCompetitor: `Choose Surfer SEO if you:
 
@@ -416,7 +418,7 @@ Surfer handles steps 2 and 7. SerpVive handles steps 4-6 and 8. Together, they c
 
 Many Surfer users already do step 7 when refreshing content. Adding SerpVive automates steps 4-6 so you know exactly when and what to refresh.
 
-Cost: Surfer Essential ($99) + SerpVive Starter ($29) = $128/month. Less than Surfer Scale alone.`,
+Cost: Surfer Standard ($119) + SerpVive Starter ($29) = $148/month. Less than Surfer Pro alone.`,
 
     faqs: [
       {
@@ -437,7 +439,7 @@ Cost: Surfer Essential ($99) + SerpVive Starter ($29) = $128/month. Less than Su
       {
         question: "Is SerpVive cheaper than Surfer SEO?",
         answer:
-          "Yes, for content monitoring. SerpVive starts free (1 site, 100 pages). Surfer starts at $99/month with no free plan. However, they serve different purposes. If you need content optimization, Surfer's price is justified. If you need content monitoring and decay diagnosis, SerpVive is more cost-effective.",
+          "Yes, for content monitoring. SerpVive starts free (1 site, 100 pages). Surfer starts at $119/month with no free plan. However, they serve different purposes. If you need content optimization, Surfer's price is justified. If you need content monitoring and decay diagnosis, SerpVive is more cost-effective.",
       },
     ],
 
@@ -473,7 +475,7 @@ Cost: Surfer Essential ($99) + SerpVive Starter ($29) = $128/month. Less than Su
     },
 
     features: [
-      { feature: "Starting price", competitor: "$15/mo (Solo)", serpvive: "Free ($0)", winner: "serpvive" },
+      { feature: "Starting price", competitor: "$49/mo (Starter)", serpvive: "Free ($0)", winner: "serpvive" },
       { feature: "Content decay detection", competitor: "Yes (Content Opportunities)", serpvive: "Yes (automatic, daily)", winner: "tie" },
       { feature: "AI diagnosis with evidence", competitor: "No (flags only)", serpvive: "Yes (Claude Opus)", winner: "serpvive" },
       { feature: "Micro-drafts for fixes", competitor: "No", serpvive: "Yes", winner: "serpvive" },
@@ -489,9 +491,9 @@ Cost: Surfer Essential ($99) + SerpVive Starter ($29) = $128/month. Less than Su
 
     pricing: [
       { plan: "Free / Trial", competitor: "No free plan", serpvive: "Free forever (1 site, 100 pages)" },
-      { plan: "Entry", competitor: "Solo: $15/mo", serpvive: "Starter: $29/mo" },
-      { plan: "Mid", competitor: "Basic: $45/mo", serpvive: "Pro: $79/mo" },
-      { plan: "Top", competitor: "Professional: $115/mo (required for Content Opportunities)", serpvive: "Agency: $129/mo" },
+      { plan: "Entry", competitor: "Starter: $49/mo", serpvive: "Starter: $29/mo" },
+      { plan: "Mid", competitor: "Professional: $129/mo (required for Content Opportunities)", serpvive: "Pro: $69/mo" },
+      { plan: "Top", competitor: "Scale: $299/mo", serpvive: "Agency: $129/mo" },
     ],
 
     competitorStrengths: `**Frase is a capable all-in-one content tool with a unique position in the market.**
@@ -504,7 +506,7 @@ Cost: Surfer Essential ($99) + SerpVive Starter ($29) = $128/month. Less than Su
 
 **Content Opportunities** (launched October 2025) is Frase's answer to content decay. It connects to Google Search Console and flags pages that are losing traffic. This puts Frase in direct competition with SerpVive for the monitoring use case.
 
-**Pricing** is Frase's major advantage. The Solo plan at $15/month is one of the cheapest content optimization tools available. Even the Professional plan at $115/month (which includes Content Opportunities) undercuts Semrush and Surfer.
+**Pricing** is competitive. The Starter plan at $49/month includes AI writing and research. The Professional plan at $129/month (which includes Content Opportunities) is priced between Surfer and Semrush.
 
 For small teams that need content research, writing, optimization, AND basic content monitoring in one affordable tool, Frase offers surprising value.`,
 
@@ -529,7 +531,7 @@ This is the difference between a smoke alarm and a fire investigator. Both detec
 
     featureBreakdown: `### Content Decay Detection
 
-**Frase Content Opportunities:** Connects to GSC, analyzes traffic trends, flags pages with significant declines. Requires the Professional plan ($115/month). Shows the decline but doesn't analyze why.
+**Frase Content Opportunities:** Connects to GSC, analyzes traffic trends, flags pages with significant declines. Requires the Professional plan ($129/month). Shows the decline but doesn't analyze why.
 
 **SerpVive:** Connects to GSC, runs daily decay scoring that accounts for velocity (how fast the decline), seasonality (is this a normal seasonal dip?), and page importance (higher-traffic pages get prioritized). Available on all plans including free.
 
@@ -555,35 +557,35 @@ The difference: Frase gives you tools. SerpVive gives you answers.
 
 ### Pricing for the Decay Feature
 
-**Frase:** Content Opportunities requires the Professional plan at $115/month. The cheaper Solo ($15) and Basic ($45) plans don't include it.
+**Frase:** Content Opportunities requires the Professional plan at $129/month. The cheaper Starter ($49) plan doesn't include it.
 
 **SerpVive:** Decay monitoring is available on every plan, including the free tier. AI diagnosis starts at $29/month (Starter).
 
-If content decay monitoring is your primary need, SerpVive's free plan gives you monitoring, and $29/month adds AI diagnosis. To get comparable detection in Frase, you need the $115/month plan.`,
+If content decay monitoring is your primary need, SerpVive's free plan gives you monitoring, and $29/month adds AI diagnosis. To get comparable detection in Frase, you need the $129/month plan.`,
 
     pricingAnalysis: `Frase has aggressive pricing for its content creation tools, but the decay monitoring feature is locked behind the Professional tier:
 
-- **Solo ($15/mo):** 4 articles/month, AI writer, research. No Content Opportunities.
-- **Basic ($45/mo):** 30 articles/month, team features. No Content Opportunities.
-- **Professional ($115/mo):** Unlimited articles, Content Opportunities, analytics. This is the tier you need for decay detection.
+- **Starter ($49/mo):** AI writer, research, content briefs. No Content Opportunities.
+- **Professional ($129/mo):** Content Opportunities, advanced analytics. This is the tier you need for decay detection.
+- **Scale ($299/mo):** Unlimited articles, team features, priority support.
 
 SerpVive's pricing is focused entirely on monitoring:
 - **Free:** 1 site, 100 pages, weekly monitoring, Health Score
 - **Starter ($29/mo):** 1 site, 100 pages, 10 AI diagnoses/month
-- **Pro ($79/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
+- **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses/month
 
-**For content creation:** Frase Solo ($15/mo) is unbeatable. SerpVive doesn't compete here.
+**For content creation:** Frase Starter ($49/mo) is solid value. SerpVive doesn't compete here.
 
-**For content monitoring:** SerpVive Free or Starter ($29/mo) beats Frase Professional ($115/mo) for the monitoring use case specifically.
+**For content monitoring:** SerpVive Free or Starter ($29/mo) beats Frase Professional ($129/mo) for the monitoring use case specifically.
 
-**For both:** Frase Professional ($115) gives you creation + basic monitoring. But if you want deep AI diagnosis, you'd need Frase Professional ($115) + SerpVive Starter ($29) = $144/month. Or just SerpVive Pro ($79) for monitoring and use a cheaper tool for creation.`,
+**For both:** Frase Professional ($129) gives you creation + basic monitoring. But if you want deep AI diagnosis, you'd need Frase Professional ($129) + SerpVive Starter ($29) = $158/month. Or just SerpVive Pro ($69) for monitoring and use a cheaper tool for creation.`,
 
     whoShouldChooseCompetitor: `Choose Frase if you:
 
 - Need **content research, writing, and optimization** in one affordable tool
 - Want **Content Opportunities** detection bundled with your content creation workflow
-- Have a **small budget** and need to combine creation + monitoring ($115/month for everything)
+- Have a **small budget** and need to combine creation + monitoring ($129/month for everything)
 - Publish frequently and need an **AI writer** integrated with SEO research
 - Prefer **one tool** for the entire content workflow rather than specialized tools
 - Don't need deep diagnosis of *why* content is declining (just knowing *which* pages is enough)
@@ -598,7 +600,7 @@ Frase is the right choice when you want a capable, affordable all-in-one content
 - Want a **Health Score** that gives you a quick pulse on your entire blog
 - Prefer **deep monitoring** over bundled creation tools
 - Already have a content creation workflow and need a **dedicated monitoring layer**
-- Want **free monitoring** without committing to a $115/month plan
+- Want **free monitoring** without committing to a $129/month plan
 
 SerpVive is the right choice when content decay is your primary problem and you need more than basic detection. If you've ever stared at a declining post wondering "what changed?", SerpVive answers that question.`,
 
@@ -610,9 +612,9 @@ The practical combination:
 1. **Frase** for content creation: research, writing, optimization
 2. **SerpVive** for content monitoring: decay detection, AI diagnosis, refresh briefs, result tracking
 
-In this setup, you'd use Frase Basic ($45/month) for creation without Content Opportunities, and SerpVive Pro ($79/month) for monitoring. Total: $124/month.
+In this setup, you'd use Frase Starter ($49/month) for creation without Content Opportunities, and SerpVive Pro ($69/month) for monitoring. Total: $118/month.
 
-Alternatively, Frase Professional ($115/month) gives you creation + basic detection, and SerpVive Starter ($29/month) adds deep AI diagnosis on top. Total: $144/month.
+Alternatively, Frase Professional ($129/month) gives you creation + basic detection, and SerpVive Starter ($29/month) adds deep AI diagnosis on top. Total: $158/month.
 
 The honest take: if you're on Frase Professional and the Content Opportunities feature gives you enough insight to refresh effectively, you may not need SerpVive. Where SerpVive adds value is when "this page is declining" isn't enough and you need "here's exactly why and what to change."`,
 
@@ -625,7 +627,7 @@ The honest take: if you're on Frase Professional and the Content Opportunities f
       {
         question: "Is SerpVive more expensive than Frase?",
         answer:
-          "For content monitoring specifically, SerpVive is cheaper. SerpVive's free plan includes monitoring. Frase requires the Professional plan ($115/month) for Content Opportunities. However, Frase's cheaper plans ($15-45/month) include content creation tools that SerpVive doesn't offer.",
+          "For content monitoring specifically, SerpVive is cheaper. SerpVive's free plan includes monitoring. Frase requires the Professional plan ($129/month) for Content Opportunities. However, Frase's cheaper Starter plan ($49/month) includes content creation tools that SerpVive doesn't offer.",
       },
       {
         question: "Can SerpVive write content like Frase?",

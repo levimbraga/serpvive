@@ -15,6 +15,7 @@ const LINKS = {
     { label: "vs Semrush", href: "/vs/semrush" },
     { label: "vs Surfer SEO", href: "/vs/surfer-seo" },
     { label: "vs Frase", href: "/vs/frase" },
+    { label: "All Comparisons", href: "/vs" },
   ],
   Company: [
     { label: "About", href: "/about" },
