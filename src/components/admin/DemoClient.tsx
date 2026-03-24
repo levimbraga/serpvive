@@ -15,6 +15,7 @@ type DemoItem = {
   views: number;
   diagnosis: unknown;
   refresh_brief: unknown;
+  serp_snapshot: unknown;
   status: string;
 };
 
@@ -144,15 +145,22 @@ export default function DemoClient() {
     });
   }
 
-  function exportJson(data: { url: string; keyword: string; diagnosis: unknown; brief: unknown }) {
+  function exportJson(demo: DemoItem) {
     const blob = new Blob(
-      [JSON.stringify({ url: data.url, keyword: data.keyword, diagnosis: data.diagnosis, refresh_brief: data.brief }, null, 2)],
+      [JSON.stringify({
+        id: demo.id,
+        url: demo.url,
+        keyword: demo.keyword,
+        diagnosis: demo.diagnosis,
+        refresh_brief: demo.refresh_brief,
+        serp_snapshot: demo.serp_snapshot,
+        created_at: demo.created_at,
+      }, null, 2)],
       { type: "application/json" },
     );
-    const slug = new URL(data.url).pathname.replace(/\//g, "_").replace(/^_/, "") || "page";
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `serpvive-${slug}-${Date.now()}.json`;
+    a.download = `serpvive-demo-${demo.id}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -227,7 +235,7 @@ export default function DemoClient() {
                 const demo = demos.find((d) => d.id === generatedId);
                 return demo ? (
                   <button
-                    onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                    onClick={() => exportJson(demo)}
                     className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
                   >
                     <Download size={14} strokeWidth={1.5} /> Export JSON
@@ -340,7 +348,7 @@ export default function DemoClient() {
                             <Copy size={14} strokeWidth={1.5} />
                           </button>
                           <button
-                            onClick={() => exportJson({ url: demo.url, keyword: demo.keyword, diagnosis: demo.diagnosis, brief: demo.refresh_brief })}
+                            onClick={() => exportJson(demo)}
                             disabled={demo.status !== "completed"}
                             className="p-1.5 rounded-md hover:bg-[#F3F4F6] text-[#6B7280] transition-colors disabled:text-[#D1D5DB] disabled:pointer-events-none"
                             title="Export JSON"

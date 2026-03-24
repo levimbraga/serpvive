@@ -162,7 +162,7 @@ export async function GET(request: Request) {
   // List mode: return all demos
   const { data: demos } = await admin
     .from("demo_analyses")
-    .select("id, url, keyword, created_at, expires_at, views, diagnosis, refresh_brief, status")
+    .select("id, url, keyword, created_at, expires_at, views, diagnosis, refresh_brief, serp_snapshot, status")
     .order("created_at", { ascending: false });
 
   return NextResponse.json({ data: demos ?? [] });
