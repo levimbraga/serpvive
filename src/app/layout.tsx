@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PostHogProvider } from "@/lib/posthog/provider";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -42,9 +44,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <GoogleAnalytics />
         <PostHogProvider>
           <TooltipProvider>{children}</TooltipProvider>
         </PostHogProvider>
+        <CookieConsentBanner />
       </body>
     </html>
   );

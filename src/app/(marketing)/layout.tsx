@@ -1,6 +1,3 @@
-import { GoogleAnalytics } from "@/components/analytics/google-analytics";
-import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
-
 export default function MarketingLayout({
   children,
 }: {
@@ -8,9 +5,7 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="landing">
-      <GoogleAnalytics />
       {children}
-      <CookieConsentBanner />
     </div>
   );
 }
