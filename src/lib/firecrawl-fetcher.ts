@@ -29,26 +29,28 @@ function getFirecrawl(): InstanceType<typeof Firecrawl> | null {
 const EXCLUDE_TAGS = [
   // Comments
   ".comments", "#comments", ".comment-section", "#disqus_thread",
-  '[class*="comment"]',
+  ".disqus-comment-count", ".comment-list", ".comment-form",
   // Related/recommended
   ".related-posts", ".recommended", ".you-may-also-like",
-  '[class*="related"]', '[class*="recommended"]',
+  ".more-stories", ".suggested-posts", ".related-articles",
   // Newsletter/popups
   ".newsletter", ".subscribe", ".popup", ".modal", ".overlay",
-  '[class*="newsletter"]', '[class*="subscribe"]',
-  // Social
-  ".social-share", ".share-buttons", '[class*="social"]', '[class*="share"]',
+  ".newsletter-signup", ".subscribe-form", ".email-signup",
+  // Social sharing
+  ".social-share", ".share-buttons", ".sharing", ".share-bar",
+  ".social-links", ".share-icons",
   // Author bio
-  ".author-bio", ".author-box", ".about-author",
+  ".author-bio", ".author-box", ".about-author", ".author-info",
   // Navigation
-  ".breadcrumb", ".breadcrumbs", '[class*="breadcrumb"]',
+  ".breadcrumb", ".breadcrumbs",
   // Ads
   ".ad", ".ads", ".advertisement", ".sponsored",
-  '[class*="advert"]', '[class*="sponsor"]',
-  // Cookie/consent
-  ".cookie", ".consent", '[class*="cookie"]', '[class*="consent"]',
-  // TOC
-  ".toc", ".table-of-contents", '[class*="toc"]',
+  ".ad-container", ".ad-wrapper", ".adsbygoogle",
+  // Cookie/consent banners
+  ".cookie-banner", ".cookie-notice", ".consent-banner",
+  ".cookie-consent", ".gdpr-banner",
+  // Table of contents
+  ".toc", ".table-of-contents", ".toc-container",
   // Sidebar widgets
   ".widget", ".sidebar-widget",
 ];
