@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { searchGoogle } from "@/lib/serp/client";
-import { fetchPageContent, formatContentForPrompt } from "@/lib/serp/fetcher";
+import { fetchPage, batchFetch, formatPageForPrompt } from "@/lib/firecrawl-fetcher";
 import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
@@ -30,7 +30,7 @@ export type ExternalPipelineResult = {
  * Full AI diagnosis pipeline:
  * 1. Get primary keyword from page data
  * 2. Search Google via Serper ($0.001)
- * 3. Fetch top 3 competitor content + user content (Cheerio)
+ * 3. Fetch top 3 competitor content + user content (Firecrawl → Cheerio fallback)
  * 4. Run Claude Opus diagnosis (~$0.07)
  * 5. Run Claude Opus refresh brief (~$0.05)
  * 6. Save everything to DB
@@ -77,21 +77,21 @@ export async function runDiagnosisPipeline(
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch content (user + top 3 competitors)
+  // Step 2: Fetch content (user + top 3 competitors) via Firecrawl
   console.log("[pipeline] Fetching content...");
   const competitorUrls = serpResults
     .filter((r) => !r.url.includes(new URL(page.url).hostname))
     .slice(0, 3);
 
-  const [userContent, ...competitorContents] = await Promise.all([
-    fetchPageContent(page.url),
-    ...competitorUrls.map((r) => fetchPageContent(r.url)),
+  const [userContent, competitorContents] = await Promise.all([
+    fetchPage(page.url),
+    batchFetch(competitorUrls.map((r) => r.url)),
   ]);
 
-  const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, page.url));
+  const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, page.url));
   const competitorsStr = sanitizeForPrompt(
     competitorUrls
-      .map((r, i) => formatContentForPrompt(competitorContents[i] ?? null, r.url))
+      .map((r, i) => formatPageForPrompt(competitorContents[i] ?? null, r.url))
       .join("\n\n---\n\n")
   );
 
@@ -195,7 +195,7 @@ export async function runDiagnosisPipeline(
  * External page analysis pipeline (no GSC data required):
  * 1. User provides URL + keyword
  * 2. Search Google via Serper
- * 3. Fetch competitors + user content (Cheerio)
+ * 3. Fetch competitors + user content (Firecrawl → Cheerio fallback)
  * 4. Run Claude Opus diagnosis (new page prompt, no GSC data)
  * 5. Run Claude Opus refresh brief
  * Returns result without saving — caller decides where to store.
@@ -221,9 +221,9 @@ export async function runExternalPipeline(
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch user content (SSRF-protected)
+  // Step 2: Fetch user content (SSRF-protected via URL validation in caller)
   console.log(`[DEMO ${elapsed()}] Starting fetch URL: ${url}`);
-  const userContent = await fetchPageContent(url, { ssrfProtection: true });
+  const userContent = await fetchPage(url, { ssrfProtection: true });
   console.log(`[DEMO ${elapsed()}] URL fetched, ${userContent?.wordCount ?? 0} words`);
 
   // Content quality check
@@ -245,15 +245,13 @@ export async function runExternalPipeline(
 
   // Step 3: Fetch competitor content
   console.log(`[DEMO ${elapsed()}] Starting competitor fetch (${competitorUrls.length} URLs)`);
-  const competitorContents = await Promise.all(
-    competitorUrls.map((r) => fetchPageContent(r.url)),
-  );
+  const competitorContents = await batchFetch(competitorUrls.map((r) => r.url));
   console.log(`[DEMO ${elapsed()}] Competitors fetched`);
 
-  const userContentStr = sanitizeForPrompt(formatContentForPrompt(userContent, url));
+  const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, url));
   const competitorsStr = sanitizeForPrompt(
     competitorUrls
-      .map((r, i) => formatContentForPrompt(competitorContents[i] ?? null, r.url))
+      .map((r, i) => formatPageForPrompt(competitorContents[i] ?? null, r.url))
       .join("\n\n---\n\n")
   );
 
