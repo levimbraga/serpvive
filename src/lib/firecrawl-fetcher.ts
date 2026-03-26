@@ -125,6 +125,7 @@ export async function fetchPage(
       internalLinks: links.internal.slice(0, 50),
       externalLinks: links.external.slice(0, 50),
       tables: tables.slice(0, 10),
+      statusCode: metadata.statusCode,
       markdown,
     };
   } catch (error) {

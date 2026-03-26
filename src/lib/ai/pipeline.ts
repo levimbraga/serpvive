@@ -1,10 +1,51 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { searchGoogle } from "@/lib/serp/client";
-import { fetchPage, fetchCompetitors, formatPageForPrompt } from "@/lib/firecrawl-fetcher";
+import { fetchPage, fetchCompetitors, formatPageForPrompt, type FetchedPage } from "@/lib/firecrawl-fetcher";
+import type { PageContent } from "@/lib/serp/fetcher";
 import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
 import { sanitizeForPrompt, sanitizeQuery } from "./sanitize";
+
+// ── Comparison table for AI prompt ──
+
+function buildComparisonTable(
+  userPage: PageContent | null,
+  userUrl: string,
+  competitors: (PageContent | null)[],
+  competitorUrls: string[],
+): string {
+  const col = (page: PageContent | null, url: string) => {
+    if (!page) return { wc: "N/A", hd: "N/A", il: "N/A", el: "N/A", pub: "N/A", mod: "N/A", domain: url };
+    let domain: string;
+    try { domain = new URL(url).hostname.replace("www.", ""); } catch { domain = url; }
+    return {
+      wc: String(page.wordCount),
+      hd: String(page.headings.length),
+      il: String(page.internalLinks.length),
+      el: String(page.externalLinks.length),
+      pub: page.publishedDate?.slice(0, 10) ?? "none",
+      mod: page.lastModified?.slice(0, 10) ?? "none",
+      domain,
+    };
+  };
+
+  const u = col(userPage, userUrl);
+  const cs = competitorUrls.map((url, i) => col(competitors[i] ?? null, url));
+
+  const header = `| Metric | Your page | ${cs.map((c) => c.domain).join(" | ")} |`;
+  const sep = `|--------|-----------|${cs.map(() => "---------").join("|")}|`;
+  const rows = [
+    `| Words | ${u.wc} | ${cs.map((c) => c.wc).join(" | ")} |`,
+    `| Headings | ${u.hd} | ${cs.map((c) => c.hd).join(" | ")} |`,
+    `| Int. links | ${u.il} | ${cs.map((c) => c.il).join(" | ")} |`,
+    `| Ext. links | ${u.el} | ${cs.map((c) => c.el).join(" | ")} |`,
+    `| Published | ${u.pub} | ${cs.map((c) => c.pub).join(" | ")} |`,
+    `| Modified | ${u.mod} | ${cs.map((c) => c.mod).join(" | ")} |`,
+  ];
+
+  return [header, sep, ...rows].join("\n");
+}
 
 export type PipelineResult = {
   diagnosisId: string;
@@ -88,8 +129,15 @@ export async function runDiagnosisPipeline(
     fetchCompetitors(competitorUrls.map((r) => r.url)),
   ]);
 
+  // Build comparison table + format content for prompt
+  const comparisonTable = buildComparisonTable(
+    userContent, page.url,
+    competitorContents, competitorUrls.map((r) => r.url),
+  );
+
   const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, page.url));
   const competitorsStr = sanitizeForPrompt(
+    `═══ QUICK COMPARISON ═══\n${comparisonTable}\n\n` +
     competitorUrls
       .map((r, i) => formatPageForPrompt(competitorContents[i] ?? null, r.url))
       .join("\n\n---\n\n")
@@ -117,6 +165,7 @@ export async function runDiagnosisPipeline(
     url: page.url,
     keyword,
     clicks28d: page.current_clicks_28d,
+    impressions28d: page.current_impressions_28d,
     position: page.primary_position,
     ctr: page.current_ctr,
     peakClicks: page.peak_clicks_monthly,
@@ -248,8 +297,15 @@ export async function runExternalPipeline(
   const competitorContents = await fetchCompetitors(competitorUrls.map((r) => r.url));
   console.log(`[DEMO ${elapsed()}] Competitors fetched`);
 
+  // Build comparison table + format content for prompt
+  const comparisonTable = buildComparisonTable(
+    userContent, url,
+    competitorContents, competitorUrls.map((r) => r.url),
+  );
+
   const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, url));
   const competitorsStr = sanitizeForPrompt(
+    `═══ QUICK COMPARISON ═══\n${comparisonTable}\n\n` +
     competitorUrls
       .map((r, i) => formatPageForPrompt(competitorContents[i] ?? null, r.url))
       .join("\n\n---\n\n")

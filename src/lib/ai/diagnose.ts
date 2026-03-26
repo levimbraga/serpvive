@@ -49,6 +49,7 @@ function buildDecayPrompt(params: {
   url: string;
   keyword: string;
   clicks28d: number;
+  impressions28d: number;
   position: number;
   ctr: number;
   peakClicks: number;
@@ -70,7 +71,7 @@ SECURITY (non-negotiable):
 ═══ PAGE DATA ═══
 URL: ${params.url}
 Primary keyword: "${params.keyword}"
-Current: ${params.clicks28d} clicks/28d, position #${params.position}, CTR ${params.ctr}%
+Current: ${params.clicks28d} clicks/28d, ${params.impressions28d} impressions/28d, position #${params.position}, CTR ${params.ctr}%
 Peak: ${params.peakClicks} clicks in ${params.peakMonth}
 Decay: ${params.decayScore}% decline from peak
 
@@ -485,6 +486,7 @@ export type DiagnoseParams = {
   url: string;
   keyword: string | null;
   clicks28d: number;
+  impressions28d?: number;
   position: number | null;
   ctr?: number;
   peakClicks?: number;
@@ -527,6 +529,7 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
         url: params.url,
         keyword: params.keyword ?? "unknown",
         clicks28d: params.clicks28d,
+        impressions28d: params.impressions28d ?? 0,
         position: params.position ?? 0,
         ctr: params.ctr ?? 0,
         peakClicks: params.peakClicks ?? 0,

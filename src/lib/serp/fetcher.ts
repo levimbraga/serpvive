@@ -23,6 +23,7 @@ export type PageContent = {
   internalLinks: LinkInfo[];
   externalLinks: LinkInfo[];
   tables: TableData[];
+  statusCode?: number;
 };
 
 /**
@@ -219,42 +220,78 @@ export async function fetchPageContent(
 
 /**
  * Formats page content into a string for the AI prompt.
+ * Compact format: saves ~700 tokens per page vs verbose format.
  */
 export function formatContentForPrompt(content: PageContent | null, url: string): string {
   if (!content) return `[Failed to fetch content from ${url}]`;
 
-  const headingsStr = content.headings
-    .map((h) => `${h.level.toUpperCase()}: ${h.text}`)
-    .join("\n");
+  // Change 6: Explicit missing data
+  const pubLine = content.publishedDate
+    ? `Published: ${content.publishedDate}`
+    : "Published: not detected (no meta tag found)";
+  const modLine = content.lastModified
+    ? `Last modified: ${content.lastModified}`
+    : "Last modified: not detected (no meta tag found)";
+  const wcLine = content.wordCount < 100
+    ? `Word count: ${content.wordCount} (possibly incomplete extraction)`
+    : `Word count: ${content.wordCount}`;
 
   const parts = [
     `URL: ${url}`,
     `Title: ${content.title}`,
     `Meta: ${content.metaDescription}`,
-    `Published: ${content.publishedDate ?? "unknown"}`,
-    `Last Modified: ${content.lastModified ?? "unknown"}`,
-    `Word Count: ${content.wordCount}`,
-    "",
-    "HEADINGS:",
-    headingsStr,
+    pubLine,
+    modLine,
+    wcLine,
   ];
 
+  // Change 7: StatusCode when abnormal
+  if (content.statusCode && content.statusCode !== 200) {
+    parts.push(`HTTP Status: ${content.statusCode} (not a normal 200 response)`);
+  }
+
+  // Change 4: Compact headings — grouped by level
+  if (content.headings.length > 0) {
+    const byLevel: Record<string, string[]> = {};
+    for (const h of content.headings) {
+      const lvl = h.level.toUpperCase();
+      if (!byLevel[lvl]) byLevel[lvl] = [];
+      byLevel[lvl].push(h.text);
+    }
+    const levelCounts = Object.entries(byLevel)
+      .map(([lvl, texts]) => `${texts.length}x${lvl}`)
+      .join(", ");
+    parts.push("", `HEADINGS (${content.headings.length} total — ${levelCounts}):`);
+    for (const [lvl, texts] of Object.entries(byLevel)) {
+      if (texts.length === 1) {
+        parts.push(`  ${lvl}: ${texts[0]}`);
+      } else {
+        parts.push(`  ${lvl}: ${texts.join(" | ")}`);
+      }
+    }
+  }
+
   if (content.imageAltTexts.length > 0) {
-    parts.push("", "IMAGE_ALT_TEXTS:", content.imageAltTexts.join(", "));
+    parts.push("", `IMAGE_ALT_TEXTS (${content.imageAltTexts.length}): ${content.imageAltTexts.slice(0, 15).join(", ")}`);
   }
 
-  if (content.internalLinks.length > 0) {
-    parts.push("", `INTERNAL_LINKS (${content.internalLinks.length}):`);
-    content.internalLinks.slice(0, 20).forEach((l) => {
-      parts.push(`  "${l.text}" → ${l.href}`);
-    });
-  }
-
-  if (content.externalLinks.length > 0) {
-    parts.push("", `EXTERNAL_LINKS (${content.externalLinks.length}):`);
-    content.externalLinks.slice(0, 10).forEach((l) => {
-      parts.push(`  "${l.text}" → ${l.href}`);
-    });
+  // Change 3: Compact links — counts + paths/domains only
+  const intCount = content.internalLinks.length;
+  const extCount = content.externalLinks.length;
+  if (intCount > 0 || extCount > 0) {
+    parts.push("", `LINKS: ${intCount} internal, ${extCount} external`);
+    if (intCount > 0) {
+      const paths = content.internalLinks.slice(0, 10).map((l) => {
+        try { return new URL(l.href).pathname; } catch { return l.href; }
+      });
+      parts.push(`  Internal (top ${Math.min(intCount, 10)}): ${paths.join(", ")}`);
+    }
+    if (extCount > 0) {
+      const domains = content.externalLinks.slice(0, 5).map((l) => {
+        try { return new URL(l.href).hostname.replace("www.", ""); } catch { return l.href; }
+      });
+      parts.push(`  External (top ${Math.min(extCount, 5)}): ${domains.join(", ")}`);
+    }
   }
 
   if (content.tables.length > 0) {
@@ -268,7 +305,8 @@ export function formatContentForPrompt(content: PageContent | null, url: string)
     });
   }
 
-  parts.push("", "BODY (truncated):", content.bodyText);
+  // Change 1: Signal markdown structure
+  parts.push("", "BODY (content preserves original heading structure in markdown — ## = H2, ### = H3):", content.bodyText);
 
   return parts.join("\n");
 }
