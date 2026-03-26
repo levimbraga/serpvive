@@ -447,8 +447,8 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
   const briefResult = await generateBrief({
     url,
     diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
-    userContent: userContentStr.slice(0, 5000),
-    competitors: competitorsStr.slice(0, 3000),
+    userContent: userContentStr.slice(0, 12000),
+    competitors: competitorsStr.slice(0, 8000),
     noGscData: true,
   });
   const briefDurationMs = Date.now() - briefStart;

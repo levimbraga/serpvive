@@ -96,6 +96,9 @@ Each micro-draft must be READY TO USE, not vague guidance:
 
 - Meta descriptions: Write 2-3 complete options, each 150-160 characters, including primary keyword, compelling for CTR.
 
+COMPETITOR REFERENCES (mandatory):
+Every action MUST include at least one competitor_reference in the micro_draft, citing a specific competitor URL and what they do that the user should learn from. Example: "mediterraneangardensociety.org covers seed germination with exact soil ratios and a 6-step process — use this as your benchmark for depth."
+
 TRAFFIC RECOVERY ESTIMATES:
 For each action, estimate the traffic impact:
 - "Fix this (~10 min effort) → potentially recover ~30 clicks/month"
