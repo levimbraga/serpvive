@@ -357,6 +357,15 @@ export async function POST(request: Request) {
           })
           .eq("id", profile.id);
 
+        getPostHogServer().capture({
+          distinctId: profile.id,
+          event: "payment_failed",
+          properties: {
+            failure_reason: invoice.last_finalization_error?.message ?? "unknown",
+            attempt_number: invoice.attempt_count ?? 1,
+          },
+        });
+
         console.log(`[stripe/webhook] invoice.payment_failed: user=${profile.id}`);
       }
       break;

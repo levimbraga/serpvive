@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Globe, Star } from "lucide-react";
 import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
+import posthog from "posthog-js";
 
 type GscProperty = {
   siteUrl: string;
@@ -34,6 +35,7 @@ export default function SelectSitePage() {
         }
 
         setProperties(data.data ?? []);
+        posthog.capture("onboarding_step_completed", { step: "gsc_connect", step_number: 1, sites_count: data.data?.length ?? 0 });
       } catch {
         setError("Network error. Please try again.");
       } finally {
@@ -68,6 +70,8 @@ export default function SelectSitePage() {
         setSubmitting(false);
         return;
       }
+
+      posthog.capture("onboarding_step_completed", { step: "site_selected", step_number: 2, domain: property.displayName, property_type: property.type });
 
       const importUrl = redirectTarget
         ? `/onboarding/importing?siteId=${data.data!.siteId}&redirect=${redirectTarget}`

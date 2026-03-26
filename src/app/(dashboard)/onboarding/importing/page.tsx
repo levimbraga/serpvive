@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
+import posthog from "posthog-js";
 
 type ImportStatus = {
   status: "importing" | "active" | "error";
@@ -18,6 +19,7 @@ export default function ImportingPage() {
   const router = useRouter();
   const [data, setData] = useState<ImportStatus | null>(null);
   const [error, setError] = useState("");
+  const trackedComplete = useRef(false);
 
   const pollStatus = useCallback(async () => {
     if (!siteId) return;
@@ -34,7 +36,9 @@ export default function ImportingPage() {
       if (json.data) {
         setData(json.data);
 
-        if (json.data.status === "active") {
+        if (json.data.status === "active" && !trackedComplete.current) {
+          trackedComplete.current = true;
+          posthog.capture("onboarding_step_completed", { step: "import_complete", step_number: 3, domain: json.data.domain, pages_count: json.data.pagesCount });
           // Import complete — redirect after a short delay
           const dest = redirectTarget === "settings" ? "/settings" : "/dashboard";
           setTimeout(() => router.push(dest), 2000);

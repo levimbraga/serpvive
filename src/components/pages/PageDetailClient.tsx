@@ -207,6 +207,24 @@ export default function PageDetailClient({
   const [expandedEvidence, setExpandedEvidence] = useState<Set<number>>(new Set());
   const [expandedPrevEvidence, setExpandedPrevEvidence] = useState<Set<string>>(new Set());
 
+  // Track first diagnosis viewed (fires once per user ever)
+  useEffect(() => {
+    if (!diagnosis) return;
+    const key = "serpvive_first_diagnosis_viewed";
+    if (typeof window !== "undefined" && !localStorage.getItem(key)) {
+      localStorage.setItem(key, "1");
+      posthog.capture("first_diagnosis_viewed", {
+        page_url: page.url,
+        causes_count: diagnosis.diagnosis.causes.length,
+      });
+    }
+    posthog.capture("viewed_diagnosis", {
+      page_url: page.url,
+      causes_count: diagnosis.diagnosis.causes.length,
+      has_brief: !!diagnosis.refresh_brief,
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Merge state
   const [mergedDismissed, setMergedDismissed] = useState(() => {
     if (typeof window === "undefined") return false;

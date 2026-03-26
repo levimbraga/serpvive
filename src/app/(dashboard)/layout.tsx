@@ -43,7 +43,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
-      <PostHogIdentify userId={user.id} email={user.email ?? ""} plan={plan} />
+      <PostHogIdentify userId={user.id} email={user.email ?? ""} plan={plan} sitesCount={sites.length} diagnosesUsed={diagnosesUsed} />
       <Sidebar
         diagnosesUsed={diagnosesUsed}
         diagnosesLimit={diagnosesLimit}
