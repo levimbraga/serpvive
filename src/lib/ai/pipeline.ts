@@ -118,16 +118,26 @@ export async function runDiagnosisPipeline(
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch content (user + top 3 competitors) via Firecrawl
-  console.log("[pipeline] Fetching content...");
+  // Step 2: Fetch content — user page FIRST (priority), then competitors in parallel
+  console.log("[pipeline] Fetching user page...");
   const competitorUrls = serpResults
     .filter((r) => !r.url.includes(new URL(page.url).hostname))
     .slice(0, 3);
 
-  const [userContent, competitorContents] = await Promise.all([
-    fetchPage(page.url, { forceRefresh: true }),
-    fetchCompetitors(competitorUrls.map((r) => r.url)),
-  ]);
+  // User page gets exclusive access to Firecrawl slots (30s timeout, fresh)
+  const userContent = await fetchPage(page.url, { forceRefresh: true, timeout: 30000 });
+  console.log(`[pipeline] User page: ${userContent?.wordCount ?? 0} words via ${userContent?.fetchMethod ?? "failed"}`);
+
+  // Competitors in parallel (15s timeout, cached)
+  console.log(`[pipeline] Fetching ${competitorUrls.length} competitors...`);
+  const competitorContents = await fetchCompetitors(competitorUrls.map((r) => r.url));
+
+  // Fetch summary for monitoring
+  const methods = [userContent?.fetchMethod ?? "failed", ...competitorContents.map((c) => c?.fetchMethod ?? "failed")];
+  const fc = methods.filter((m) => m === "firecrawl").length;
+  const ch = methods.filter((m) => m === "cheerio").length;
+  const fl = methods.filter((m) => m === "failed").length;
+  console.log(`[pipeline] Fetch summary: firecrawl=${fc}, cheerio=${ch}, failed=${fl}`);
 
   // Build comparison table + format content for prompt
   const comparisonTable = buildComparisonTable(
@@ -270,10 +280,10 @@ export async function runExternalPipeline(
     ? serpResults.map((r) => `#${r.position}: ${sanitizeForPrompt(r.title)}\n   ${r.url}\n   ${sanitizeForPrompt(r.snippet)}`).join("\n\n")
     : "No SERP data available";
 
-  // Step 2: Fetch user content (SSRF-protected via URL validation in caller)
-  console.log(`[DEMO ${elapsed()}] Starting fetch URL: ${url}`);
-  const userContent = await fetchPage(url, { ssrfProtection: true, forceRefresh: true });
-  console.log(`[DEMO ${elapsed()}] URL fetched, ${userContent?.wordCount ?? 0} words`);
+  // Step 2: Fetch user content FIRST (priority, 30s timeout, fresh)
+  console.log(`[DEMO ${elapsed()}] Fetching user page: ${url}`);
+  const userContent = await fetchPage(url, { ssrfProtection: true, forceRefresh: true, timeout: 30000 });
+  console.log(`[DEMO ${elapsed()}] User page: ${userContent?.wordCount ?? 0} words via ${userContent?.fetchMethod ?? "failed"}`);
 
   // Content quality check
   const contentError = validateContent(userContent?.wordCount ?? 0);
@@ -292,10 +302,16 @@ export async function runExternalPipeline(
     .filter((r) => !r.url.includes(userHostname))
     .slice(0, 3);
 
-  // Step 3: Fetch competitor content
-  console.log(`[DEMO ${elapsed()}] Starting competitor fetch (${competitorUrls.length} URLs)`);
+  // Step 3: Fetch competitors in parallel (15s timeout, cached)
+  console.log(`[DEMO ${elapsed()}] Fetching ${competitorUrls.length} competitors...`);
   const competitorContents = await fetchCompetitors(competitorUrls.map((r) => r.url));
-  console.log(`[DEMO ${elapsed()}] Competitors fetched`);
+
+  // Fetch summary for monitoring
+  const methods = [userContent?.fetchMethod ?? "failed", ...competitorContents.map((c) => c?.fetchMethod ?? "failed")];
+  const fcCount = methods.filter((m) => m === "firecrawl").length;
+  const chCount = methods.filter((m) => m === "cheerio").length;
+  const flCount = methods.filter((m) => m === "failed").length;
+  console.log(`[DEMO ${elapsed()}] Fetch summary: firecrawl=${fcCount}, cheerio=${chCount}, failed=${flCount}`);
 
   // Build comparison table + format content for prompt
   const comparisonTable = buildComparisonTable(

@@ -24,6 +24,20 @@ function getFirecrawl(): InstanceType<typeof Firecrawl> | null {
   return firecrawlClient;
 }
 
+// ── Timeout wrapper ──
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`[Timeout] ${label} exceeded ${ms}ms`)), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
 // ── Exclude tags: strip noise from main content area ──
 
 const EXCLUDE_TAGS = [
@@ -59,21 +73,23 @@ const EXCLUDE_TAGS = [
 
 export type FetchedPage = PageContent & {
   markdown: string;
+  fetchMethod: "firecrawl" | "cheerio";
 };
 
 export type FetchOptions = {
   ssrfProtection?: boolean;
   forceRefresh?: boolean;
+  timeout?: number;
 };
 
 // ── Single URL fetch ──
 
 /**
  * Fetch a single URL using Firecrawl (JS-rendered markdown).
- * Falls back to Cheerio if Firecrawl is unavailable or fails.
+ * Falls back to Cheerio if Firecrawl is unavailable, fails, or times out.
  *
- * @param options.forceRefresh  When true, bypass Firecrawl cache (maxAge: 0).
- *                              Use for user's own page. Omit for competitors (uses default 2-day cache).
+ * @param options.forceRefresh  Bypass Firecrawl cache (maxAge: 0). Use for user's own page.
+ * @param options.timeout       Firecrawl timeout in ms (default 30000). Use 15000 for competitors.
  */
 export async function fetchPage(
   url: string,
@@ -85,16 +101,22 @@ export async function fetchPage(
     return cheerioFallback(url, options);
   }
 
+  const scrapeTimeout = options?.timeout ?? 30000;
+
   try {
-    const result = await fc.scrape(url, {
-      formats: ["markdown", "links"],
-      onlyMainContent: true,
-      excludeTags: EXCLUDE_TAGS,
-      removeBase64Images: true,
-      blockAds: true,
-      timeout: 30000,
-      ...(options?.forceRefresh ? { maxAge: 0 } : {}),
-    });
+    const result = await withTimeout(
+      fc.scrape(url, {
+        formats: ["markdown", "links"],
+        onlyMainContent: true,
+        excludeTags: EXCLUDE_TAGS,
+        removeBase64Images: true,
+        blockAds: true,
+        timeout: scrapeTimeout,
+        ...(options?.forceRefresh ? { maxAge: 0 } : {}),
+      }),
+      scrapeTimeout + 5000, // 5s grace over Firecrawl's internal timeout
+      `Firecrawl ${url}`,
+    );
 
     const markdown = result.markdown;
     if (!markdown || markdown.trim().length < 200) {
@@ -127,6 +149,7 @@ export async function fetchPage(
       tables: tables.slice(0, 10),
       statusCode: metadata.statusCode,
       markdown,
+      fetchMethod: "firecrawl",
     };
   } catch (error) {
     console.error(`[firecrawl-fetcher] ${url} — Firecrawl error, falling back to Cheerio:`, error);
@@ -137,15 +160,15 @@ export async function fetchPage(
 // ── Parallel fetch (competitors) ──
 
 /**
- * Fetch multiple URLs in parallel using individual Firecrawl scrapes.
+ * Fetch multiple competitor URLs in parallel with shorter timeout.
  * Each URL is independent — if one fails, others still return.
- * Uses Firecrawl's default cache (2-day) for competitors.
+ * Uses Firecrawl's default cache (2-day) and 15s timeout.
  */
 export async function fetchCompetitors(urls: string[]): Promise<(FetchedPage | null)[]> {
   if (urls.length === 0) return [];
 
   const results = await Promise.allSettled(
-    urls.map((u) => fetchPage(u)),
+    urls.map((u) => fetchPage(u, { timeout: 15000 })),
   );
 
   return results.map((r, i) => {
@@ -257,5 +280,6 @@ async function cheerioFallback(
   return {
     ...result,
     markdown: result.bodyText,
+    fetchMethod: "cheerio",
   };
 }
