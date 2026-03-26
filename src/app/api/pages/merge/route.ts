@@ -120,6 +120,7 @@ export async function POST(request: Request) {
     event: "page_merged",
     properties: { old_page_id: oldPageId, new_page_id: newPageId, old_url: oldPage.url, new_url: newPage.url },
   });
+  await getPostHogServer().flush();
 
   return NextResponse.json({
     data: { success: true, oldPageId, newPageId, mergedAt },

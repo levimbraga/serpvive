@@ -349,6 +349,7 @@ async function runImport(
 
     console.log(`[gsc/import] Done! ${knownPages.size} pages, ${totalMetrics} metrics`);
     getPostHogServer().capture({ distinctId: userId, event: "site_imported", properties: { domain: siteUrl, pages_count: knownPages.size } });
+    await getPostHogServer().flush();
 
     // ── Run engine to calculate decay scores ──
     console.log("[gsc/import] Running decay engine...");
