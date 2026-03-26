@@ -162,6 +162,9 @@ export async function POST(request: Request) {
         .eq("id", page.site_id);
     }
 
+    // Flush PostHog before serverless function exits
+    await getPostHogServer().flush();
+
     return NextResponse.json({
       data: {
         diagnosisId: result.diagnosisId,
@@ -190,6 +193,7 @@ export async function POST(request: Request) {
       event: "diagnosis_failed",
       properties: { page_id: pageId, error: message },
     });
+    await getPostHogServer().flush();
 
     // Map internal errors to user-friendly messages
     const userMessage = getUserFriendlyError(message);

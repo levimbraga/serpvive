@@ -189,6 +189,7 @@ export async function POST(request: Request) {
       event: "external_analysis_completed",
       properties: { url, keyword, cost_usd: result.totalCostUsd, saved_to_page: savedToPage },
     });
+    await getPostHogServer().flush();
 
     return NextResponse.json({
       data: {
@@ -214,6 +215,7 @@ export async function POST(request: Request) {
       event: "external_analysis_failed",
       properties: { url, keyword, error: message },
     });
+    await getPostHogServer().flush();
 
     return NextResponse.json(
       { error: "Something went wrong during the analysis. Your diagnosis credit was not consumed — please try again." },

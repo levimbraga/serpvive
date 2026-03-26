@@ -6,6 +6,69 @@ import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
 import { sanitizeForPrompt, sanitizeQuery } from "./sanitize";
+import { getPostHogServer } from "@/lib/posthog/server";
+
+// ── PostHog diagnosis tracking ──
+
+function trackDiagnosis(params: {
+  userId: string;
+  url: string;
+  keyword: string;
+  isDemo: boolean;
+  userPageMethod: string;
+  competitorMethods: string[];
+  diagnosisModel: string;
+  briefModel: string;
+  causesCount: number;
+  topicCoveragePercent: number;
+  fetchDurationMs: number;
+  diagnosisDurationMs: number;
+  briefDurationMs: number;
+  totalDurationMs: number;
+}) {
+  try {
+    const posthog = getPostHogServer();
+
+    const allMethods = [params.userPageMethod, ...params.competitorMethods];
+    const firecrawlCount = allMethods.filter((m) => m === "firecrawl").length;
+    const cheerioCount = allMethods.filter((m) => m === "cheerio").length;
+    const failedCount = allMethods.filter((m) => m === "failed").length;
+    const total = firecrawlCount + cheerioCount + failedCount;
+
+    posthog.capture({
+      distinctId: params.userId,
+      event: "diagnosis_completed",
+      properties: {
+        is_demo: params.isDemo,
+        url: params.url,
+        keyword: params.keyword,
+        // Fetcher breakdown
+        user_page_method: params.userPageMethod,
+        competitor_1_method: params.competitorMethods[0] ?? "none",
+        competitor_2_method: params.competitorMethods[1] ?? "none",
+        competitor_3_method: params.competitorMethods[2] ?? "none",
+        firecrawl_count: firecrawlCount,
+        cheerio_count: cheerioCount,
+        failed_count: failedCount,
+        firecrawl_rate: total > 0 ? firecrawlCount / total : 0,
+        // AI model breakdown
+        diagnosis_model: params.diagnosisModel,
+        brief_model: params.briefModel,
+        used_primary_model: params.diagnosisModel.includes("opus"),
+        // Quality
+        causes_count: params.causesCount,
+        topic_coverage_percent: params.topicCoveragePercent,
+        // Performance
+        fetch_duration_ms: params.fetchDurationMs,
+        diagnosis_duration_ms: params.diagnosisDurationMs,
+        brief_duration_ms: params.briefDurationMs,
+        total_duration_ms: params.totalDurationMs,
+      },
+    });
+  } catch (err) {
+    console.error("[pipeline] PostHog tracking failed (non-blocking):", err);
+  }
+}
 
 // ── Comparison table for AI prompt ──
 
@@ -119,6 +182,7 @@ export async function runDiagnosisPipeline(
     : "No SERP data available";
 
   // Step 2: Fetch content — user page FIRST (priority), then competitors in parallel
+  const fetchStart = Date.now();
   console.log("[pipeline] Fetching user page...");
   const competitorUrls = serpResults
     .filter((r) => !r.url.includes(new URL(page.url).hostname))
@@ -131,13 +195,14 @@ export async function runDiagnosisPipeline(
   // Competitors in parallel (15s timeout, cached)
   console.log(`[pipeline] Fetching ${competitorUrls.length} competitors...`);
   const competitorContents = await fetchCompetitors(competitorUrls.map((r) => r.url));
+  const fetchDurationMs = Date.now() - fetchStart;
 
   // Fetch summary for monitoring
   const methods = [userContent?.fetchMethod ?? "failed", ...competitorContents.map((c) => c?.fetchMethod ?? "failed")];
-  const fc = methods.filter((m) => m === "firecrawl").length;
-  const ch = methods.filter((m) => m === "cheerio").length;
-  const fl = methods.filter((m) => m === "failed").length;
-  console.log(`[pipeline] Fetch summary: firecrawl=${fc}, cheerio=${ch}, failed=${fl}`);
+  const fcMethods = methods.filter((m) => m === "firecrawl").length;
+  const chMethods = methods.filter((m) => m === "cheerio").length;
+  const flMethods = methods.filter((m) => m === "failed").length;
+  console.log(`[pipeline] Fetch summary: firecrawl=${fcMethods}, cheerio=${chMethods}, failed=${flMethods} (${fetchDurationMs}ms)`);
 
   // Build comparison table + format content for prompt
   const comparisonTable = buildComparisonTable(
@@ -169,6 +234,7 @@ export async function runDiagnosisPipeline(
   }
 
   // Step 4: Run AI diagnosis
+  const diagStart = Date.now();
   console.log("[pipeline] Running AI diagnosis...");
   const diagResult = await runDiagnosis({
     isNewPage,
@@ -186,8 +252,10 @@ export async function runDiagnosisPipeline(
     userContent: userContentStr,
     queryData: queryDataStr,
   });
+  const diagDurationMs = Date.now() - diagStart;
 
   // Step 5: Run AI brief
+  const briefStart = Date.now();
   console.log("[pipeline] Generating refresh brief...");
   const briefResult = await generateBrief({
     url: page.url,
@@ -195,9 +263,28 @@ export async function runDiagnosisPipeline(
     userContent: userContentStr,
     competitors: competitorsStr,
   });
+  const briefDurationMs = Date.now() - briefStart;
 
   const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
   const processingTimeMs = Date.now() - startTime;
+
+  // Track in PostHog
+  trackDiagnosis({
+    userId,
+    url: page.url,
+    keyword,
+    isDemo: false,
+    userPageMethod: userContent?.fetchMethod ?? "failed",
+    competitorMethods: competitorContents.map((c) => c?.fetchMethod ?? "failed"),
+    diagnosisModel: diagResult.modelUsed,
+    briefModel: briefResult.modelUsed,
+    causesCount: diagResult.diagnosis.causes.length,
+    topicCoveragePercent: diagResult.diagnosis.topic_coverage.percentage,
+    fetchDurationMs,
+    diagnosisDurationMs: diagDurationMs,
+    briefDurationMs,
+    totalDurationMs: processingTimeMs,
+  });
 
   // Step 6: Save to DB
   console.log("[pipeline] Saving to database...");
@@ -281,6 +368,7 @@ export async function runExternalPipeline(
     : "No SERP data available";
 
   // Step 2: Fetch user content FIRST (priority, 30s timeout, fresh)
+  const fetchStart = Date.now();
   console.log(`[DEMO ${elapsed()}] Fetching user page: ${url}`);
   const userContent = await fetchPage(url, { ssrfProtection: true, forceRefresh: true, timeout: 30000 });
   console.log(`[DEMO ${elapsed()}] User page: ${userContent?.wordCount ?? 0} words via ${userContent?.fetchMethod ?? "failed"}`);
@@ -311,7 +399,8 @@ export async function runExternalPipeline(
   const fcCount = methods.filter((m) => m === "firecrawl").length;
   const chCount = methods.filter((m) => m === "cheerio").length;
   const flCount = methods.filter((m) => m === "failed").length;
-  console.log(`[DEMO ${elapsed()}] Fetch summary: firecrawl=${fcCount}, cheerio=${chCount}, failed=${flCount}`);
+  const fetchDurationMs = Date.now() - fetchStart;
+  console.log(`[DEMO ${elapsed()}] Fetch summary: firecrawl=${fcCount}, cheerio=${chCount}, failed=${flCount} (${fetchDurationMs}ms)`);
 
   // Build comparison table + format content for prompt
   const comparisonTable = buildComparisonTable(
@@ -336,6 +425,7 @@ When possible, estimate traffic impact per cause in clicks/month based on typica
 If the content was truncated during fetch, note it: 'Content may have been truncated during analysis.'`;
 
   // Step 4: AI diagnosis
+  const diagStart = Date.now();
   console.log(`[DEMO ${elapsed()}] Starting AI diagnosis`);
   const diagResult = await runDiagnosis({
     isNewPage: true,
@@ -348,10 +438,11 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     userContent: userContentStr,
     queryData: queryDataStr,
   });
-  console.log(`[DEMO ${elapsed()}] Diagnosis complete (model: ${diagResult.modelUsed})`);
+  const diagDurationMs = Date.now() - diagStart;
+  console.log(`[DEMO ${elapsed()}] Diagnosis complete (model: ${diagResult.modelUsed}, ${diagDurationMs}ms)`);
 
   // Step 5: AI brief — truncate content since diagnosis already analyzed it
-  // Brief needs structure (headings, meta) not full body text
+  const briefStart = Date.now();
   console.log(`[DEMO ${elapsed()}] Starting AI brief (userContent: ${userContentStr.length} chars → 5000, competitors: ${competitorsStr.length} chars → 3000)`);
   const briefResult = await generateBrief({
     url,
@@ -360,12 +451,31 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     competitors: competitorsStr.slice(0, 3000),
     noGscData: true,
   });
-  console.log(`[DEMO ${elapsed()}] Brief complete`);
+  const briefDurationMs = Date.now() - briefStart;
+  console.log(`[DEMO ${elapsed()}] Brief complete (${briefDurationMs}ms)`);
 
   const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
   const processingTimeMs = Date.now() - startTime;
   const tokensInput = diagResult.tokensInput + briefResult.tokensInput;
   const tokensOutput = diagResult.tokensOutput + briefResult.tokensOutput;
+
+  // Track in PostHog
+  trackDiagnosis({
+    userId: "demo",
+    url,
+    keyword,
+    isDemo: true,
+    userPageMethod: userContent?.fetchMethod ?? "failed",
+    competitorMethods: competitorContents.map((c) => c?.fetchMethod ?? "failed"),
+    diagnosisModel: diagResult.modelUsed,
+    briefModel: briefResult.modelUsed,
+    causesCount: diagResult.diagnosis.causes.length,
+    topicCoveragePercent: diagResult.diagnosis.topic_coverage.percentage,
+    fetchDurationMs,
+    diagnosisDurationMs: diagDurationMs,
+    briefDurationMs,
+    totalDurationMs: processingTimeMs,
+  });
 
   console.log(`[DEMO ${elapsed()}] Pipeline done. Cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}, tokens: ${tokensInput}in/${tokensOutput}out`);
 
