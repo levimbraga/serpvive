@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { searchGoogle } from "@/lib/serp/client";
-import { fetchPage, batchFetch, formatPageForPrompt } from "@/lib/firecrawl-fetcher";
+import { fetchPage, fetchCompetitors, formatPageForPrompt } from "@/lib/firecrawl-fetcher";
 import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";
 import { generateBrief, type RefreshBriefResult } from "./brief";
@@ -84,8 +84,8 @@ export async function runDiagnosisPipeline(
     .slice(0, 3);
 
   const [userContent, competitorContents] = await Promise.all([
-    fetchPage(page.url),
-    batchFetch(competitorUrls.map((r) => r.url)),
+    fetchPage(page.url, { forceRefresh: true }),
+    fetchCompetitors(competitorUrls.map((r) => r.url)),
   ]);
 
   const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, page.url));
@@ -223,7 +223,7 @@ export async function runExternalPipeline(
 
   // Step 2: Fetch user content (SSRF-protected via URL validation in caller)
   console.log(`[DEMO ${elapsed()}] Starting fetch URL: ${url}`);
-  const userContent = await fetchPage(url, { ssrfProtection: true });
+  const userContent = await fetchPage(url, { ssrfProtection: true, forceRefresh: true });
   console.log(`[DEMO ${elapsed()}] URL fetched, ${userContent?.wordCount ?? 0} words`);
 
   // Content quality check
@@ -245,7 +245,7 @@ export async function runExternalPipeline(
 
   // Step 3: Fetch competitor content
   console.log(`[DEMO ${elapsed()}] Starting competitor fetch (${competitorUrls.length} URLs)`);
-  const competitorContents = await batchFetch(competitorUrls.map((r) => r.url));
+  const competitorContents = await fetchCompetitors(competitorUrls.map((r) => r.url));
   console.log(`[DEMO ${elapsed()}] Competitors fetched`);
 
   const userContentStr = sanitizeForPrompt(formatPageForPrompt(userContent, url));

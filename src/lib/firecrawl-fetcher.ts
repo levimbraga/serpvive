@@ -24,10 +24,44 @@ function getFirecrawl(): InstanceType<typeof Firecrawl> | null {
   return firecrawlClient;
 }
 
+// ── Exclude tags: strip noise from main content area ──
+
+const EXCLUDE_TAGS = [
+  // Comments
+  ".comments", "#comments", ".comment-section", "#disqus_thread",
+  '[class*="comment"]',
+  // Related/recommended
+  ".related-posts", ".recommended", ".you-may-also-like",
+  '[class*="related"]', '[class*="recommended"]',
+  // Newsletter/popups
+  ".newsletter", ".subscribe", ".popup", ".modal", ".overlay",
+  '[class*="newsletter"]', '[class*="subscribe"]',
+  // Social
+  ".social-share", ".share-buttons", '[class*="social"]', '[class*="share"]',
+  // Author bio
+  ".author-bio", ".author-box", ".about-author",
+  // Navigation
+  ".breadcrumb", ".breadcrumbs", '[class*="breadcrumb"]',
+  // Ads
+  ".ad", ".ads", ".advertisement", ".sponsored",
+  '[class*="advert"]', '[class*="sponsor"]',
+  // Cookie/consent
+  ".cookie", ".consent", '[class*="cookie"]', '[class*="consent"]',
+  // TOC
+  ".toc", ".table-of-contents", '[class*="toc"]',
+  // Sidebar widgets
+  ".widget", ".sidebar-widget",
+];
+
 // ── Types ──
 
 export type FetchedPage = PageContent & {
   markdown: string;
+};
+
+export type FetchOptions = {
+  ssrfProtection?: boolean;
+  forceRefresh?: boolean;
 };
 
 // ── Single URL fetch ──
@@ -35,27 +69,29 @@ export type FetchedPage = PageContent & {
 /**
  * Fetch a single URL using Firecrawl (JS-rendered markdown).
  * Falls back to Cheerio if Firecrawl is unavailable or fails.
+ *
+ * @param options.forceRefresh  When true, bypass Firecrawl cache (maxAge: 0).
+ *                              Use for user's own page. Omit for competitors (uses default 2-day cache).
  */
 export async function fetchPage(
   url: string,
-  options?: { ssrfProtection?: boolean },
+  options?: FetchOptions,
 ): Promise<FetchedPage | null> {
   const fc = getFirecrawl();
 
-  // No Firecrawl: use Cheerio
   if (!fc) {
     return cheerioFallback(url, options);
   }
 
-  // Demo (SSRF-protected) URLs still go through Firecrawl —
-  // Firecrawl fetches from their servers, not ours, so SSRF is not a risk.
-  // The URL validation (format, HTTPS, no private IPs) is done by the caller.
-
   try {
     const result = await fc.scrape(url, {
-      formats: ["markdown"],
+      formats: ["markdown", "links"],
       onlyMainContent: true,
+      excludeTags: EXCLUDE_TAGS,
+      removeBase64Images: true,
+      blockAds: true,
       timeout: 30000,
+      ...(options?.forceRefresh ? { maxAge: 0 } : {}),
     });
 
     const markdown = result.markdown;
@@ -65,13 +101,15 @@ export async function fetchPage(
     }
 
     const metadata = result.metadata ?? {};
+    const nativeLinks = result.links ?? [];
     const headings = extractHeadingsFromMarkdown(markdown);
     const wordCount = markdown.split(/\s+/).filter(Boolean).length;
-    const links = extractLinksFromMarkdown(markdown, url);
+    const links = splitLinks(nativeLinks, url);
     const tables = extractTablesFromMarkdown(markdown);
     const images = extractImageAltsFromMarkdown(markdown);
 
-    console.log(`[firecrawl-fetcher] ${url} — Firecrawl: ${wordCount} words, ${headings.length} headings`);
+    const cacheHit = options?.forceRefresh ? "" : (metadata.cacheState === "hit" ? " (cache hit)" : "");
+    console.log(`[firecrawl-fetcher] ${url} — Firecrawl: ${wordCount} words, ${headings.length} headings, ${nativeLinks.length} links${cacheHit}`);
 
     return {
       title: metadata.title ?? "",
@@ -93,72 +131,25 @@ export async function fetchPage(
   }
 }
 
-// ── Batch fetch ──
+// ── Parallel fetch (competitors) ──
 
 /**
- * Fetch multiple URLs using Firecrawl batch scrape.
- * Falls back to individual Cheerio fetches if batch fails.
+ * Fetch multiple URLs in parallel using individual Firecrawl scrapes.
+ * Each URL is independent — if one fails, others still return.
+ * Uses Firecrawl's default cache (2-day) for competitors.
  */
-export async function batchFetch(urls: string[]): Promise<(FetchedPage | null)[]> {
+export async function fetchCompetitors(urls: string[]): Promise<(FetchedPage | null)[]> {
   if (urls.length === 0) return [];
 
-  const fc = getFirecrawl();
-  if (!fc) {
-    return Promise.all(urls.map((u) => cheerioFallback(u)));
-  }
+  const results = await Promise.allSettled(
+    urls.map((u) => fetchPage(u)),
+  );
 
-  try {
-    const job = await fc.batchScrape(urls, {
-      options: { formats: ["markdown"], onlyMainContent: true, timeout: 60000 },
-    });
-
-    if (!job.data || job.data.length === 0) {
-      console.warn("[firecrawl-fetcher] Batch scrape returned no data, falling back to Cheerio");
-      return Promise.all(urls.map((u) => cheerioFallback(u)));
-    }
-
-    // Map results back to the original URL order
-    const results: (FetchedPage | null)[] = [];
-    for (let i = 0; i < urls.length; i++) {
-      const docUrl = urls[i] as string;
-      const doc = job.data[i];
-      const markdown = doc?.markdown;
-
-      if (!markdown || markdown.trim().length < 200) {
-        console.warn(`[firecrawl-fetcher] ${docUrl} — batch: insufficient content, will use Cheerio`);
-        results.push(null);
-        continue;
-      }
-
-      const metadata = doc.metadata ?? {};
-      const headings = extractHeadingsFromMarkdown(markdown);
-      const wordCount = markdown.split(/\s+/).filter(Boolean).length;
-      const links = extractLinksFromMarkdown(markdown, docUrl);
-      const tables = extractTablesFromMarkdown(markdown);
-      const images = extractImageAltsFromMarkdown(markdown);
-
-      console.log(`[firecrawl-fetcher] ${docUrl} — Firecrawl batch: ${wordCount} words`);
-
-      results.push({
-        title: metadata.title ?? "",
-        metaDescription: metadata.description ?? "",
-        headings,
-        bodyText: markdown.slice(0, 15_000),
-        wordCount,
-        publishedDate: metadata.publishedTime ?? null,
-        lastModified: metadata.modifiedTime ?? null,
-        imageAltTexts: images.slice(0, 50),
-        internalLinks: links.internal.slice(0, 50),
-        externalLinks: links.external.slice(0, 50),
-        tables: tables.slice(0, 10),
-        markdown,
-      });
-    }
-    return results;
-  } catch (error) {
-    console.error("[firecrawl-fetcher] Batch scrape failed, falling back to Cheerio:", error);
-    return Promise.all(urls.map((u) => cheerioFallback(u)));
-  }
+  return results.map((r, i) => {
+    if (r.status === "fulfilled") return r.value;
+    console.error(`[firecrawl-fetcher] ${urls[i]} — competitor fetch rejected:`, r.reason);
+    return null;
+  });
 }
 
 // ── Format for AI prompt ──
@@ -170,6 +161,40 @@ export async function batchFetch(urls: string[]): Promise<(FetchedPage | null)[]
 export function formatPageForPrompt(page: FetchedPage | null, url: string): string {
   if (!page) return `[Failed to fetch content from ${url}]`;
   return formatCheerioContent(page, url);
+}
+
+// ── Link splitting from Firecrawl native links ──
+
+function splitLinks(
+  links: string[],
+  pageUrl: string,
+): { internal: { text: string; href: string }[]; external: { text: string; href: string }[] } {
+  const internal: { text: string; href: string }[] = [];
+  const external: { text: string; href: string }[] = [];
+
+  let pageDomain: string;
+  try {
+    pageDomain = new URL(pageUrl).hostname.replace("www.", "");
+  } catch {
+    pageDomain = "";
+  }
+
+  for (const link of links) {
+    try {
+      const linkUrl = new URL(link);
+      const linkDomain = linkUrl.hostname.replace("www.", "");
+      const entry = { text: "", href: linkUrl.href };
+      if (linkDomain === pageDomain) {
+        internal.push(entry);
+      } else {
+        external.push(entry);
+      }
+    } catch {
+      internal.push({ text: "", href: link });
+    }
+  }
+
+  return { internal, external };
 }
 
 // ── Markdown extraction helpers ──
@@ -184,39 +209,6 @@ function extractHeadingsFromMarkdown(markdown: string): { level: string; text: s
     headings.push({ level: `h${hashes.length}`, text: text.trim() });
   }
   return headings;
-}
-
-function extractLinksFromMarkdown(
-  markdown: string,
-  pageUrl: string,
-): { internal: { text: string; href: string }[]; external: { text: string; href: string }[] } {
-  const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  const internal: { text: string; href: string }[] = [];
-  const external: { text: string; href: string }[] = [];
-  let match;
-
-  let domain: string;
-  try {
-    domain = new URL(pageUrl).hostname;
-  } catch {
-    domain = "";
-  }
-
-  while ((match = linkRegex.exec(markdown)) !== null) {
-    const text = (match[1] ?? "").slice(0, 200);
-    const href = match[2] ?? "";
-    try {
-      const linkUrl = new URL(href, pageUrl);
-      if (linkUrl.hostname === domain) {
-        internal.push({ text, href: linkUrl.href });
-      } else {
-        external.push({ text, href: linkUrl.href });
-      }
-    } catch {
-      if (text) internal.push({ text, href });
-    }
-  }
-  return { internal, external };
 }
 
 function extractTablesFromMarkdown(markdown: string): { headers: string[]; rows: string[][] }[] {
@@ -254,10 +246,10 @@ function extractImageAltsFromMarkdown(markdown: string): string[] {
 
 async function cheerioFallback(
   url: string,
-  options?: { ssrfProtection?: boolean },
+  options?: FetchOptions,
 ): Promise<FetchedPage | null> {
   console.log(`[firecrawl-fetcher] ${url} — Cheerio fallback`);
-  const result = await fetchWithCheerio(url, options);
+  const result = await fetchWithCheerio(url, options?.ssrfProtection ? { ssrfProtection: true } : undefined);
   if (!result) return null;
   return {
     ...result,
