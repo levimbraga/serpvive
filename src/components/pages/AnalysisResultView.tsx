@@ -85,7 +85,7 @@ export default function AnalysisResultView({
 }: Props) {
   const diagnosis = rawDiag as DiagnosisData;
   const brief = rawBrief as BriefData | null;
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [expandedActions, setExpandedActions] = useState<Set<number>>(new Set());
   const [expandedEvidence, setExpandedEvidence] = useState<Set<number>>(new Set());
 
   return (
@@ -313,11 +313,11 @@ export default function AnalysisResultView({
           <div className="space-y-2">
             {brief.actions.map((action, i) => {
               const pri = PRIORITY_CONFIG[action.priority] ?? { textColor: "text-[#F59E0B]", bg: "bg-[rgba(245,158,11,0.1)]", label: "Important" };
-              const isExpanded = expandedIdx === i;
+              const isExpanded = expandedActions.has(i);
               return (
                 <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
                   <button
-                    onClick={() => setExpandedIdx(isExpanded ? null : i)}
+                    onClick={() => setExpandedActions(prev => { const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next; })}
                     className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
                   >
                     <span className={`text-[11px] font-medium ${pri.textColor} ${pri.bg} px-2 py-0.5 rounded-full flex-shrink-0`}>
