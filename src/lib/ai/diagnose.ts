@@ -163,11 +163,11 @@ SUMMARY (the most important field):
 The summary will be displayed prominently. It may be the only thing the user reads. Rules:
 1. Start with the PRIMARY strength — one specific thing this page does well ("Your comparison table with verified pricing is unique in this SERP")
 2. Then state the PRIMARY cause with specific evidence ("but you're losing ground because competitors have 2026 data while your pricing shows 2024")
-3. Use LOSS framing first, then recovery: "You're losing ~4 clicks/day while this remains unaddressed. Fixing it could recover ~120 clicks/month (~$180/month in ad-equivalent value)." Loss framing first, recovery second.
-4. Include ad-equivalent dollar value: projected clicks/month x estimated CPC. Use $1-3 for informational keywords, $3-10 for commercial keywords.
+3. Use LOSS framing first, then recovery: "You're losing ~4 clicks/day while this remains unaddressed. Fixing it could recover ~120 clicks/month." Loss framing first, recovery second.
+4. Do NOT include specific dollar amounts, CPC values, or "ad-equivalent value" — we don't have verified CPC data.
 5. Maximum 300 characters. Every word must earn its place.
 
-GOOD example: "Your step-by-step format is clearer than any competitor. But SERP #1 (hubspot.com) has 3,200 words vs your 1,400. You're losing ~7 clicks/day. Adding FAQ + comparison table could recover ~200 clicks/month (~$400/month in ad value)."
+GOOD example: "Your step-by-step format is clearer than any competitor. But SERP #1 (hubspot.com) has 3,200 words vs your 1,400. You're losing ~7 clicks/day. Adding FAQ + comparison table could recover ~200 clicks/month."
 BAD example: "Multiple factors appear to be contributing to the decline of this page, including competitive improvements and content freshness issues."
 
 STRENGTHS (1-5 items):
@@ -381,11 +381,11 @@ The summary will be displayed prominently. It may be the only thing the user rea
 1. MUST open with the most surprising competitive insight — something the user likely didn't know. Lead with what competitors lack or what the SERP reveals, NOT with a compliment. "SERP #1 has 1,515 words and zero headings — your 3,562-word guide with 34 headings is structurally dominant" is better than "Your content is comprehensive and well-structured."
 2. Then state the PRIMARY cause with specific evidence ("but you're missing a comparison table that SERP #2 added last month")
 3. MUST include at least one specific number comparison (e.g., "your 3,562 words vs #1's 1,515 words", "you cover 8 of 14 subtopics")
-4. Use LOSS framing alongside recovery: "Without these fixes, you're missing ~4 clicks/day. Adding FAQ + pricing table could capture ~120 clicks/month (~$240/month in ad-equivalent value)."
-5. Include ad-equivalent dollar value: projected clicks/month x estimated CPC. Use $1-3 for informational keywords, $3-10 for commercial keywords.
+4. Use LOSS framing alongside recovery: "Without these fixes, you're missing ~4 clicks/day. Adding FAQ + pricing table could capture ~120 clicks/month."
+5. Do NOT include specific dollar amounts, CPC values, or "ad-equivalent value" — we don't have verified CPC data.
 6. Maximum 300 characters. Every word must earn its place.
 
-GOOD example: "SERP #1 has only 1,515 words with no comparison table — your 3,562-word guide is the most comprehensive. But you're missing FAQ that #2 and #3 have. That's ~4 clicks/day left on the table. Fixing this could capture ~120 clicks/month (~$240/month in ad value)."
+GOOD example: "SERP #1 has only 1,515 words with no comparison table — your 3,562-word guide is the most comprehensive. But you're missing FAQ that #2 and #3 have. That's ~4 clicks/day left on the table. Fixing this could capture ~120 clicks/month."
 BAD example: "Your content is comprehensive and well-structured. Multiple factors appear to be contributing to limited visibility."
 
 STRENGTHS (1-5 items):

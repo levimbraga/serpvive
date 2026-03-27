@@ -100,12 +100,12 @@ COMPETITOR REFERENCES (mandatory):
 Every action MUST include at least one competitor_reference in the micro_draft, citing a specific competitor URL and what they do that the user should learn from. Example: "mediterraneangardensociety.org covers seed germination with exact soil ratios and a 6-step process — use this as your benchmark for depth."
 
 TRAFFIC RECOVERY ESTIMATES:
-For each action, estimate the traffic impact using LOSS framing first, then recovery with ad-equivalent value:
-- "Fixing this stops the loss of ~2 clicks/day and could recover ~60 clicks/month (~$120/month in ad value)"
+For each action, estimate the traffic impact using LOSS framing first, then recovery:
+- "Fixing this stops the loss of ~2 clicks/day and could recover ~60 clicks/month"
 - Use the CTR model: Position 1: ~28%, Position 3: ~10%, Position 5: ~5%, Position 10: ~2%
 - Base estimates on impressions data (from GSC) or keyword volume estimates (for demos)
-- Include ad-equivalent dollar value: projected clicks x estimated CPC ($1-3 informational, $3-10 commercial)
-- Be transparent: "Based on your 6,200 monthly impressions, moving from position #8 to #5 would add ~155 clicks/month (~$310/month in ad value)"
+- Be transparent: "Based on your 6,200 monthly impressions, moving from position #8 to #5 would add ~155 clicks/month"
+- Do NOT include dollar amounts, CPC values, or "ad-equivalent value" — express impact in clicks only
 ${params.noGscData ? "- No GSC data available. Base traffic estimates on typical search volume for this keyword niche and SERP competition level. Be transparent these are estimates.\n" : ""}
 READER IMPACT:
 For each action, include what changes for the READER (not just Google):
