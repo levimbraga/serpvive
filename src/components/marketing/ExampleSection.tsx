@@ -162,15 +162,15 @@ export default function ExampleSection() {
               })}
             </div>
 
-            {/* Brief preview */}
+            {/* Refresh Brief — all 4 actions visible */}
             <div className="px-6 sm:px-8 pb-5">
               <div className="rounded-lg border border-[#E5E7EB] overflow-hidden">
                 <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center gap-2" style={{ background: "#FAFBFC" }}>
                   <span className="text-[13px] font-semibold text-[#0F172A]">Refresh Brief</span>
-                  <span className="text-[11px] text-[#9CA3AF]">4 actions &middot; ~4h total</span>
+                  <span className="text-[11px] text-[#9CA3AF]">Est. 4h total effort</span>
                 </div>
                 <div className="px-4 py-3 space-y-2">
-                  {briefActions.slice(0, 2).map((a) => {
+                  {briefActions.map((a) => {
                     const pri = PRIORITY[a.priority];
                     return (
                       <div key={a.title} className="flex items-center gap-2.5">
@@ -182,14 +182,13 @@ export default function ExampleSection() {
                       </div>
                     );
                   })}
-                  <p className="text-[11px] text-[#9CA3AF] pl-1">+ 2 more actions</p>
                 </div>
               </div>
             </div>
 
             {/* Fade overlay + CTA */}
             <div className="relative">
-              <div className="absolute inset-x-0 -top-16 h-16 bg-gradient-to-b from-transparent to-white pointer-events-none" />
+              <div className="absolute inset-x-0 -top-20 h-20 bg-gradient-to-b from-transparent to-white pointer-events-none" />
               <div className="px-6 sm:px-8 pb-8 pt-4 text-center">
                 <p className="text-[14px] text-[#374151] mb-4 font-medium">
                   This is a real analysis. Get yours in 5 minutes.
