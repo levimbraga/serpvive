@@ -30,22 +30,15 @@ export async function GET(request: Request) {
 
   for (const site of sites) {
     try {
-      // Only run engine if sync happened after last engine run
-      if (site.last_engine_run_at && site.last_sync_at) {
-        const lastSync = new Date(site.last_sync_at).getTime();
-        const lastEngine = new Date(site.last_engine_run_at).getTime();
-        if (lastSync <= lastEngine) {
-          skipped++;
-          continue;
-        }
-      }
-
-      // No sync data at all — skip
+      // Skip only if site has never been synced at all
       if (!site.last_sync_at) {
+        console.log(`[cron/run-engine] Site ${site.id}: no sync data yet, skipping`);
         skipped++;
         continue;
       }
 
+      // Always run engine for synced sites — decay scores can change
+      // even without new sync data (thresholds, time-based decay)
       const result = await runEngine(admin, site.id);
       processed++;
       console.log(`[cron/run-engine] Site ${site.id}: health=${result.healthScore}, pages=${result.pagesCount}`);
