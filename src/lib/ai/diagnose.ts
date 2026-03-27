@@ -373,14 +373,14 @@ NOTE: No Google Search Console data is available for this page. Base your traffi
 
 SUMMARY (the most important field):
 The summary will be displayed prominently. It may be the only thing the user reads. Rules:
-1. Start with the PRIMARY strength — one specific thing this page does well ("Your comparison table with verified pricing is unique in this SERP")
-2. Then state the PRIMARY cause with specific evidence ("but you're losing ground because competitors have 2026 data while your pricing shows 2024")
+1. MUST open with the most surprising competitive insight — something the user likely didn't know. Lead with what competitors lack or what the SERP reveals, NOT with a compliment. "SERP #1 has 1,515 words and zero headings — your 3,562-word guide with 34 headings is structurally dominant" is better than "Your content is comprehensive and well-structured."
+2. Then state the PRIMARY cause with specific evidence ("but you're missing a comparison table that SERP #2 added last month")
 3. MUST include at least one specific number comparison (e.g., "your 3,562 words vs #1's 1,515 words", "you cover 8 of 14 subtopics")
 4. End with a concrete clicks/month projection (e.g., "could capture ~50-120 clicks/month targeting position #3-5")
 5. Maximum 300 characters. Every word must earn its place.
 
-GOOD example: "Your step-by-step format is clearer than any competitor. But SERP #1 (hubspot.com) has 3,200 words vs your 1,400, and you're missing FAQ + comparison table. Adding these could move you from #7 to top 3, recovering ~200 clicks/month."
-BAD example: "Multiple factors appear to be contributing to the decline of this page, including competitive improvements and content freshness issues."
+GOOD example: "SERP #1 has only 1,515 words with no comparison table — your 3,562-word guide with 34 headings is the most comprehensive. But you're missing FAQ + pricing table that #2 and #3 added. Adding these could push to top 3, worth ~200 clicks/month."
+BAD example: "Your content is comprehensive and well-structured. Multiple factors appear to be contributing to limited visibility."
 
 STRENGTHS (1-5 items):
 - Be SPECIFIC. Not "good content" but "Your per-tool pricing breakdown with verified 2026 data is more detailed than any competitor in positions #1-5"
