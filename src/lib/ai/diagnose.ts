@@ -163,10 +163,11 @@ SUMMARY (the most important field):
 The summary will be displayed prominently. It may be the only thing the user reads. Rules:
 1. Start with the PRIMARY strength — one specific thing this page does well ("Your comparison table with verified pricing is unique in this SERP")
 2. Then state the PRIMARY cause with specific evidence ("but you're losing ground because competitors have 2026 data while your pricing shows 2024")
-3. End with a concrete recovery statement ("Updating pricing + adding the 3 missing subtopics could recover ~150 clicks/month based on your 8,400 monthly impressions")
-4. Maximum 300 characters. Every word must earn its place.
+3. Use LOSS framing first, then recovery: "You're losing ~4 clicks/day while this remains unaddressed. Fixing it could recover ~120 clicks/month (~$180/month in ad-equivalent value)." Loss framing first, recovery second.
+4. Include ad-equivalent dollar value: projected clicks/month x estimated CPC. Use $1-3 for informational keywords, $3-10 for commercial keywords.
+5. Maximum 300 characters. Every word must earn its place.
 
-GOOD example: "Your step-by-step format is clearer than any competitor. But SERP #1 (hubspot.com) has 3,200 words vs your 1,400, and you're missing FAQ + comparison table. Adding these could move you from #7 to top 3, recovering ~200 clicks/month."
+GOOD example: "Your step-by-step format is clearer than any competitor. But SERP #1 (hubspot.com) has 3,200 words vs your 1,400. You're losing ~7 clicks/day. Adding FAQ + comparison table could recover ~200 clicks/month (~$400/month in ad value)."
 BAD example: "Multiple factors appear to be contributing to the decline of this page, including competitive improvements and content freshness issues."
 
 STRENGTHS (1-5 items):
@@ -205,9 +206,13 @@ REQUIRED WRITING STYLE:
 - Use SEO vocabulary naturally: search intent shift, SERP feature displacement, CTR erosion, E-E-A-T gap, QDF signal, content velocity, topical authority
 - When an analogy helps, use it: "Your title is like a pizza shop sign saying 'Food' when everyone searches 'Italian Pizza Near Me'"
 
-AI SEARCH VISIBILITY (mention ONLY when naturally relevant):
-- Well-structured content with FAQ sections and clear factual statements is more likely to be cited by ChatGPT, Perplexity, and Google AI Overviews
-- Don't make this the focus — it's a bonus mention when a recommendation also improves AI visibility
+AI SEARCH VISIBILITY (weave into existing analysis, do NOT add as a separate cause):
+- Pages updated within 30 days are 4x more likely to be cited by AI assistants (ChatGPT, Perplexity, Google AI Overviews)
+- FAQ sections with direct Q&A format are the #1 format cited by AI Overviews
+- Structured content (tables, numbered lists, clear H2/H3 hierarchy) is preferred by AI extraction
+- If the page has strong AI citation signals (FAQ, recent update, structured data), mention in strengths
+- If the page is stale (90+ days since update) or lacks structure, note it within a relevant cause (freshness, format gap)
+- Compare last-modified dates: does the user have an advantage or disadvantage vs competitors?
 
 ═══ JSON SCHEMA ═══
 Return ONLY valid JSON. No markdown fences. Start with { end with }.
@@ -376,10 +381,11 @@ The summary will be displayed prominently. It may be the only thing the user rea
 1. MUST open with the most surprising competitive insight — something the user likely didn't know. Lead with what competitors lack or what the SERP reveals, NOT with a compliment. "SERP #1 has 1,515 words and zero headings — your 3,562-word guide with 34 headings is structurally dominant" is better than "Your content is comprehensive and well-structured."
 2. Then state the PRIMARY cause with specific evidence ("but you're missing a comparison table that SERP #2 added last month")
 3. MUST include at least one specific number comparison (e.g., "your 3,562 words vs #1's 1,515 words", "you cover 8 of 14 subtopics")
-4. End with a concrete clicks/month projection (e.g., "could capture ~50-120 clicks/month targeting position #3-5")
-5. Maximum 300 characters. Every word must earn its place.
+4. Use LOSS framing alongside recovery: "Without these fixes, you're missing ~4 clicks/day. Adding FAQ + pricing table could capture ~120 clicks/month (~$240/month in ad-equivalent value)."
+5. Include ad-equivalent dollar value: projected clicks/month x estimated CPC. Use $1-3 for informational keywords, $3-10 for commercial keywords.
+6. Maximum 300 characters. Every word must earn its place.
 
-GOOD example: "SERP #1 has only 1,515 words with no comparison table — your 3,562-word guide with 34 headings is the most comprehensive. But you're missing FAQ + pricing table that #2 and #3 added. Adding these could push to top 3, worth ~200 clicks/month."
+GOOD example: "SERP #1 has only 1,515 words with no comparison table — your 3,562-word guide is the most comprehensive. But you're missing FAQ that #2 and #3 have. That's ~4 clicks/day left on the table. Fixing this could capture ~120 clicks/month (~$240/month in ad value)."
 BAD example: "Your content is comprehensive and well-structured. Multiple factors appear to be contributing to limited visibility."
 
 STRENGTHS (1-5 items):
@@ -418,9 +424,13 @@ REQUIRED WRITING STYLE:
 - Use SEO vocabulary naturally: search intent shift, SERP feature displacement, CTR erosion, E-E-A-T gap, QDF signal, content velocity, topical authority
 - When an analogy helps, use it: "Your title is like a pizza shop sign saying 'Food' when everyone searches 'Italian Pizza Near Me'"
 
-AI SEARCH VISIBILITY (mention ONLY when naturally relevant):
-- Well-structured content with FAQ sections and clear factual statements is more likely to be cited by ChatGPT, Perplexity, and Google AI Overviews
-- Don't make this the focus — it's a bonus mention when a recommendation also improves AI visibility
+AI SEARCH VISIBILITY (weave into existing analysis, do NOT add as a separate cause):
+- Pages updated within 30 days are 4x more likely to be cited by AI assistants (ChatGPT, Perplexity, Google AI Overviews)
+- FAQ sections with direct Q&A format are the #1 format cited by AI Overviews
+- Structured content (tables, numbered lists, clear H2/H3 hierarchy) is preferred by AI extraction
+- If the page has strong AI citation signals (FAQ, recent update, structured data), mention in strengths
+- If the page is stale (90+ days since update) or lacks structure, note it within a relevant cause (freshness, format gap)
+- Compare last-modified dates: does the user have an advantage or disadvantage vs competitors?
 
 ═══ JSON SCHEMA ═══
 Return ONLY valid JSON. No markdown fences. Start with { end with }.
