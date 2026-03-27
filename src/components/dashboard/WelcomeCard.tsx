@@ -224,7 +224,7 @@ export default function WelcomeCard({
       {diagStep === "running" && engineStep === "done" && (
         <div className="flex items-center gap-3 text-sm text-[#7C3AED]">
           <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />
-          Generating diagnosis... this takes 2–3 minutes
+          Generating diagnosis... this usually takes 3–5 minutes
         </div>
       )}
 

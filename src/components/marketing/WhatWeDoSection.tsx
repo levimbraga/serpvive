@@ -17,7 +17,7 @@ const BLOCKS = [
   {
     icon: Brain,
     title: "AI explains WHY and tells you WHAT to fix",
-    body: "Click \u2018Diagnose\u2019 and our AI does in 2\u20133 minutes what takes hours manually:",
+    body: "Click \u2018Diagnose\u2019 and our AI does in 3\u20135 minutes what takes hours manually:",
     bullets: [
       "Searches Google for your keyword",
       "Reads the top 3 competitors beating you",

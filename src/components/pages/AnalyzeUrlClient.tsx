@@ -196,7 +196,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
                 );
               })}
               <p className="text-xs text-[#9CA3AF] mt-4">
-                Usually takes 2-3 minutes. You can navigate away — the result will be saved.
+                Usually takes 3–5 minutes. You can navigate away — the result will be saved.
               </p>
             </div>
           ) : (
@@ -259,7 +259,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
               <div className="flex items-center gap-1.5 text-xs text-[#9CA3AF]">
                 <Info size={12} strokeWidth={1.5} />
                 <span>
-                  Uses 1 AI diagnosis ({remaining}/{diagnosesLimit} remaining). Takes 2-3 min.
+                  Uses 1 AI diagnosis ({remaining}/{diagnosesLimit} remaining). Takes 3–5 min.
                 </span>
               </div>
               <p className="text-[10px] text-[#D1D5DB] leading-relaxed">

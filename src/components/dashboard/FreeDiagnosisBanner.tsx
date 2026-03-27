@@ -80,7 +80,7 @@ export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProces
             AI is analyzing your top page...
           </p>
           <p className="text-xs text-[#7C3AED] mt-0.5">
-            This takes 2–3 minutes. Your free first diagnosis will appear here.
+            This usually takes 3–5 minutes. Your free first diagnosis will appear here.
           </p>
         </div>
       </div>

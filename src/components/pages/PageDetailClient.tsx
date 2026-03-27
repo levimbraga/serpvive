@@ -851,7 +851,7 @@ export default function PageDetailClient({
           </div>
 
           <p className="text-xs text-[#9CA3AF] mt-4">
-            Usually takes 2–3 minutes. You can navigate away — the result will be saved automatically.
+            Usually takes 3–5 minutes. You can navigate away — the result will be saved automatically.
           </p>
         </div>
       )}
