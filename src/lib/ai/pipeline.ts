@@ -113,7 +113,7 @@ function buildComparisonTable(
 export type PipelineResult = {
   diagnosisId: string;
   diagnosis: DiagnosisResult;
-  brief: RefreshBriefResult;
+  brief: RefreshBriefResult | null;
   totalCostUsd: number;
   processingTimeMs: number;
   modelUsed: string;
@@ -254,57 +254,23 @@ export async function runDiagnosisPipeline(
   });
   const diagDurationMs = Date.now() - diagStart;
 
-  // Step 5: Run AI brief
-  const briefStart = Date.now();
-  console.log("[pipeline] Generating refresh brief...");
-  const briefResult = await generateBrief({
-    url: page.url,
-    diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
-    userContent: userContentStr,
-    competitors: competitorsStr,
-  });
-  const briefDurationMs = Date.now() - briefStart;
-
-  const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
-  const processingTimeMs = Date.now() - startTime;
-
-  // Track in PostHog
-  trackDiagnosis({
-    userId,
-    url: page.url,
-    keyword,
-    isDemo: false,
-    userPageMethod: userContent?.fetchMethod ?? "failed",
-    competitorMethods: competitorContents.map((c) => c?.fetchMethod ?? "failed"),
-    diagnosisModel: diagResult.modelUsed,
-    briefModel: briefResult.modelUsed,
-    causesCount: diagResult.diagnosis.causes.length,
-    topicCoveragePercent: diagResult.diagnosis.topic_coverage.percentage,
-    fetchDurationMs,
-    diagnosisDurationMs: diagDurationMs,
-    briefDurationMs,
-    totalDurationMs: processingTimeMs,
-  });
-
-  // Step 6: Save to DB
-  console.log("[pipeline] Saving to database...");
+  // Step 5: Save diagnosis to DB IMMEDIATELY (before brief)
+  // If the brief times out, the user still gets their diagnosis
+  console.log("[pipeline] Saving diagnosis to database...");
+  const serpSnapshot = { keyword, results: serpResults, fetched_at: new Date().toISOString() };
   const { data: diagnosisRecord, error: insertErr } = await admin
     .from("diagnoses")
     .insert({
       page_id: pageId,
       user_id: userId,
       diagnosis: diagResult.diagnosis,
-      refresh_brief: briefResult.brief,
-      serp_snapshot: {
-        keyword,
-        results: serpResults,
-        fetched_at: new Date().toISOString(),
-      },
+      refresh_brief: null,
+      serp_snapshot: serpSnapshot,
       model_used: diagResult.modelUsed,
-      tokens_input: diagResult.tokensInput + briefResult.tokensInput,
-      tokens_output: diagResult.tokensOutput + briefResult.tokensOutput,
-      cost_usd: totalCostUsd,
-      processing_time_ms: processingTimeMs,
+      tokens_input: diagResult.tokensInput,
+      tokens_output: diagResult.tokensOutput,
+      cost_usd: diagResult.costUsd,
+      processing_time_ms: Date.now() - startTime,
       triggered_by: triggeredBy,
       keyword_used: keyword,
       keyword_source: keywordSource,
@@ -325,12 +291,62 @@ export async function runDiagnosisPipeline(
     })
     .eq("id", pageId);
 
+  // Step 6: Generate brief (Sonnet) — if this fails, diagnosis is already saved
+  let briefResult: Awaited<ReturnType<typeof generateBrief>> | null = null;
+  let briefDurationMs = 0;
+  try {
+    const briefStart = Date.now();
+    console.log("[pipeline] Generating refresh brief...");
+    briefResult = await generateBrief({
+      url: page.url,
+      diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
+      userContent: userContentStr,
+      competitors: competitorsStr,
+    });
+    briefDurationMs = Date.now() - briefStart;
+
+    // Update diagnosis record with brief
+    await admin
+      .from("diagnoses")
+      .update({
+        refresh_brief: briefResult.brief,
+        tokens_input: diagResult.tokensInput + briefResult.tokensInput,
+        tokens_output: diagResult.tokensOutput + briefResult.tokensOutput,
+        cost_usd: diagResult.costUsd + briefResult.costUsd,
+        processing_time_ms: Date.now() - startTime,
+      })
+      .eq("id", diagnosisRecord.id);
+  } catch (briefErr) {
+    console.error("[pipeline] Brief generation failed (diagnosis already saved):", briefErr);
+  }
+
+  const totalCostUsd = diagResult.costUsd + (briefResult?.costUsd ?? 0);
+  const processingTimeMs = Date.now() - startTime;
+
+  // Track in PostHog
+  trackDiagnosis({
+    userId,
+    url: page.url,
+    keyword,
+    isDemo: false,
+    userPageMethod: userContent?.fetchMethod ?? "failed",
+    competitorMethods: competitorContents.map((c) => c?.fetchMethod ?? "failed"),
+    diagnosisModel: diagResult.modelUsed,
+    briefModel: briefResult?.modelUsed ?? "failed",
+    causesCount: diagResult.diagnosis.causes.length,
+    topicCoveragePercent: diagResult.diagnosis.topic_coverage.percentage,
+    fetchDurationMs,
+    diagnosisDurationMs: diagDurationMs,
+    briefDurationMs,
+    totalDurationMs: processingTimeMs,
+  });
+
   console.log(`[pipeline] Done in ${(processingTimeMs / 1000).toFixed(1)}s, cost: $${totalCostUsd.toFixed(4)}, model: ${diagResult.modelUsed}`);
 
   return {
     diagnosisId: diagnosisRecord.id,
     diagnosis: diagResult.diagnosis,
-    brief: briefResult.brief,
+    brief: briefResult?.brief ?? null,
     totalCostUsd,
     processingTimeMs,
     modelUsed: diagResult.modelUsed,
