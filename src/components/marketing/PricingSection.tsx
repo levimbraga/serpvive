@@ -346,28 +346,36 @@ export default function PricingSection() {
 
 const FAQ_ITEMS = [
   {
+    q: "What access does SerpVive need?",
+    a: "Read-only Google Search Console. We never modify your site or data. You can disconnect anytime from Settings.",
+  },
+  {
+    q: "How is this different from Ahrefs or Semrush?",
+    a: "They show you data. We tell you WHY your post is declining and exactly WHAT to update, with ready-to-use drafts. No spreadsheets, no guesswork.",
+  },
+  {
+    q: "How accurate is the AI diagnosis?",
+    a: "Powered by Claude Opus 4.6. Analyzes live SERP results + 3 competitor pages + your content. Every cause includes specific evidence with SERP positions, word counts, and competitor URLs.",
+  },
+  {
+    q: "Can I use this for client blogs?",
+    a: "Yes. Pro supports 3 sites, Agency supports 10. Each site gets its own dashboard, Health Score, and diagnosis history.",
+  },
+  {
+    q: "What if my blog has no decaying posts?",
+    a: "Great! Your Health Score will reflect that. You\u2019ll still get daily monitoring so you catch decline early \u2014 before it costs you traffic.",
+  },
+  {
+    q: "How does the free plan work?",
+    a: "Connect Google Search Console, see your Health Score, and get 1 AI diagnosis for free. Upgrade anytime for more diagnoses and daily monitoring.",
+  },
+  {
     q: "What happens if I cancel?",
     a: "You keep access to your dashboard with weekly data syncs. Your data is preserved. Upgrade again anytime to resume daily monitoring and AI diagnoses.",
   },
   {
-    q: "My site is new. Can I still use SerpVive?",
-    a: "Yes! Decay monitoring needs a few months of traffic history, but you can run AI analysis on any page from day one. The diagnosis compares your content against current SERP competitors regardless of your traffic history.",
-  },
-  {
-    q: "How is this different from Surfer SEO or Ahrefs?",
-    a: "Surfer helps you create content. Ahrefs tracks rankings. SerpVive protects what you already have \u2014 we diagnose WHY posts are declining and tell you exactly WHAT to fix, with evidence from your real competitors.",
-  },
-  {
-    q: "What does the AI diagnosis include?",
-    a: "Specific causes of decline with evidence from your real SERP competitors, topic coverage score, ready-to-copy title suggestions, corrected data (outdated prices, stats), missing topics with competitor references, and time estimates for each fix.",
-  },
-  {
     q: "Can I analyze pages that aren\u2019t mine?",
     a: "Yes. Paste any URL + keyword and get a full AI diagnosis. Great for analyzing competitor content or auditing a prospect\u2019s blog before closing a deal.",
-  },
-  {
-    q: "How long until I see results?",
-    a: "You can run a new diagnosis immediately after making changes to see your updated competitive position. Automatic before/after measurement happens after 28 days.",
   },
 ];
 
