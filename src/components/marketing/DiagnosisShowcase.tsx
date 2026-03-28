@@ -164,19 +164,32 @@ export function DiagnosisShowcase() {
                 <div className="px-4 py-3">
                   <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">The current title tag is too long and care-focused, which may not align with the mixed intent of the &apos;jade succulent&apos; query. Shortening and refocusing the title can improve CTR and stop the loss of ~2 clicks/day, potentially recovering ~60 clicks/month.</p>
 
-                  {/* Micro-draft box */}
-                  <div className="bg-slate-900 dark:bg-slate-950 rounded-lg p-4 mb-2">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-medium uppercase tracking-wide text-amber-400">Micro-draft: Title suggestions</span>
-                      <span className="text-xs text-slate-500 cursor-default">📋 Copy</span>
+                  {/* Micro-draft box — matches real product UI */}
+                  <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-medium text-[#16A34A] uppercase tracking-wider">Micro-draft: title suggestions</p>
+                      <span className="p-1.5 rounded-md text-[#16A34A]">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                      </span>
                     </div>
-                    <div className="space-y-1.5 font-mono text-sm text-slate-200">
-                      <p>→ Jade Succulent: Complete Care Guide (8 Varieties)</p>
-                      <p>→ Jade Succulent Care: 8 Varieties &amp; Fixes</p>
-                      <p>→ Jade Plant Care Guide 2026: Varieties &amp; Solutions</p>
+                    <ul className="space-y-3 font-mono">
+                      <li className="text-sm text-[#111827] flex gap-2">
+                        <span className="text-[#16A34A] flex-shrink-0 mt-0.5">→</span>
+                        <span>Jade Succulent: Complete Care Guide (8 Varieties)</span>
+                      </li>
+                      <li className="text-sm text-[#111827] flex gap-2">
+                        <span className="text-[#16A34A] flex-shrink-0 mt-0.5">→</span>
+                        <span>Jade Succulent Care: 8 Varieties &amp; Fixes</span>
+                      </li>
+                      <li className="text-sm text-[#111827] flex gap-2">
+                        <span className="text-[#16A34A] flex-shrink-0 mt-0.5">→</span>
+                        <span>Jade Plant Care Guide 2026: Varieties &amp; Solutions</span>
+                      </li>
+                    </ul>
+                    <div className="mt-3 pt-2 border-t border-[#BBF7D0]">
+                      <p className="text-xs text-[#6B7280]">References: joyusgarden.com uses a concise title that front-loads the primary keyword, improving CTR.</p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400 italic">References: joyusgarden.com uses a concise title that front-loads the primary keyword, improving CTR.</p>
                 </div>
               </div>
 
