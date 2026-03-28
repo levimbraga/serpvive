@@ -11,6 +11,7 @@ import ExampleSection from "@/components/marketing/ExampleSection";
 import PersonasSection from "@/components/marketing/PersonasSection";
 import FeaturesGrid from "@/components/marketing/FeaturesGrid";
 import PricingSection from "@/components/marketing/PricingSection";
+import FAQSection from "@/components/marketing/FAQSection";
 import FinalCTA from "@/components/marketing/FinalCTA";
 import Footer from "@/components/marketing/Footer";
 import RevealObserver from "@/components/marketing/RevealObserver";
@@ -83,6 +84,7 @@ export default function MarketingPage() {
       <PersonasSection />
       <FeaturesGrid />
       <PricingSection />
+      <FAQSection />
       <FinalCTA />
       <Footer />
       <RevealObserver />
