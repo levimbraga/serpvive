@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import DemoResultClient from "./DemoResultClient";
 import DemoFeedback from "./DemoFeedback";
@@ -21,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single();
 
   if (!demo) {
-    return { title: "Analysis Expired — SerpVive" };
+    return { title: "Analysis Not Available — SerpVive" };
   }
 
   const diag = demo.diagnosis as { summary?: string } | null;
@@ -49,8 +48,10 @@ export default async function DemoPage({ params }: Props) {
     .eq("id", id)
     .single();
 
-  // Demo not found or expired
-  if (!demo || new Date(demo.expires_at) < new Date()) {
+  const isExpired = demo ? new Date(demo.expires_at) < new Date() : false;
+
+  // Demo not found (hard-deleted after 90 days or invalid ID)
+  if (!demo) {
     return (
       <div className="min-h-screen bg-[#F5F7FA]">
         <header className="border-b border-[#1E293B] bg-[#0F172A]">
@@ -64,10 +65,10 @@ export default async function DemoPage({ params }: Props) {
         </header>
         <main className="max-w-lg mx-auto px-6 py-20 text-center">
           <h1 className="text-2xl font-semibold text-[#111827] mb-3">
-            This analysis has expired
+            This analysis is no longer available
           </h1>
           <p className="text-[#6B7280] mb-8">
-            Demo analyses are available for 21 days. Want your own AI-powered content analysis?
+            This demo analysis has been removed. Want your own AI-powered content analysis?
           </p>
           <Link
             href="/signup"
@@ -80,12 +81,18 @@ export default async function DemoPage({ params }: Props) {
     );
   }
 
-  // Increment view counter (fire-and-forget)
-  admin
-    .from("demo_analyses")
-    .update({ views: (demo.views ?? 0) + 1 })
-    .eq("id", id)
-    .then(() => {});
+  // Increment view counter only for non-expired demos (fire-and-forget)
+  if (!isExpired) {
+    admin
+      .from("demo_analyses")
+      .update({ views: (demo.views ?? 0) + 1 })
+      .eq("id", id)
+      .then(() => {});
+  }
+
+  const analysisDate = new Date(demo.created_at).toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
@@ -112,13 +119,33 @@ export default async function DemoPage({ params }: Props) {
             <p className="text-xs text-[#64748B]">
               Keyword: <span className="text-[#94A3B8]">{demo.keyword}</span>
               {" "}&middot;{" "}
-              {new Date(demo.created_at).toLocaleDateString("en-US", {
-                month: "long", day: "numeric", year: "numeric",
-              })}
+              {analysisDate}
             </p>
           </div>
         </div>
       </header>
+
+      {/* Expired demo banner */}
+      {isExpired && (
+        <div className="bg-[#FFFBEB] border-b border-[#FDE68A]">
+          <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-[#92400E]">
+                This analysis was generated on {analysisDate}. The data may be outdated.
+              </p>
+              <p className="text-xs text-[#A16207] mt-0.5">
+                Search rankings and competitor content change frequently.
+              </p>
+            </div>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center h-9 px-5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors whitespace-nowrap shrink-0"
+            >
+              Run a new analysis &rarr;
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Analysis content */}
       <main className="max-w-4xl mx-auto px-6 py-8">
@@ -132,17 +159,39 @@ export default async function DemoPage({ params }: Props) {
         />
       </main>
 
-      {/* Feedback Section */}
-      <section className="max-w-xl mx-auto px-6 pb-8">
-        <DemoFeedback
-          demoAnalysisId={id}
-          pageUrl={demo.url}
-          keyword={demo.keyword}
-        />
-      </section>
+      {/* Feedback & CTA only for non-expired demos */}
+      {!isExpired && (
+        <>
+          <section className="max-w-xl mx-auto px-6 pb-8">
+            <DemoFeedback
+              demoAnalysisId={id}
+              pageUrl={demo.url}
+              keyword={demo.keyword}
+            />
+          </section>
+          <DemoBottomCTA demoId={id} />
+        </>
+      )}
 
-      {/* CTA Section */}
-      <DemoBottomCTA demoId={id} />
+      {/* Expired demo bottom CTA */}
+      {isExpired && (
+        <section className="border-t border-[#E5E7EB] bg-white">
+          <div className="max-w-lg mx-auto px-6 py-12 text-center">
+            <h2 className="text-xl font-semibold text-[#111827] mb-2">
+              Want a fresh analysis?
+            </h2>
+            <p className="text-sm text-[#6B7280] mb-6">
+              SerpVive monitors your entire blog automatically, detecting decline and telling you exactly what to fix.
+            </p>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+            >
+              Get Started Free &rarr;
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-[#E5E7EB] bg-[#F9FAFB]">

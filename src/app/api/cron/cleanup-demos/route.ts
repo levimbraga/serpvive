@@ -10,10 +10,13 @@ export async function GET(request: Request) {
 
   const admin = getSupabaseAdmin();
 
+  // Hard-delete demos older than 90 days (expired demos are kept for conversion)
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+
   const { data, error } = await admin
     .from("demo_analyses")
     .delete()
-    .lt("expires_at", new Date().toISOString())
+    .lt("created_at", ninetyDaysAgo)
     .select("id");
 
   const deletedCount = data?.length ?? 0;
@@ -23,6 +26,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  console.log(`[cron/cleanup-demos] Deleted ${deletedCount} expired demos`);
+  console.log(`[cron/cleanup-demos] Deleted ${deletedCount} demos older than 90 days`);
   return NextResponse.json({ data: { deleted: deletedCount } });
 }
