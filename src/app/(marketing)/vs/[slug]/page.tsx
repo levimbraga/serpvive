@@ -163,6 +163,15 @@ export default async function ComparisonPage({ params }: Props) {
         },
       })),
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://serpvive.com" },
+        { "@type": "ListItem", position: 2, name: "Comparisons", item: "https://serpvive.com/vs" },
+        { "@type": "ListItem", position: 3, name: `${data.competitorName} vs SerpVive`, item: `https://serpvive.com/vs/${slug}` },
+      ],
+    },
   ];
 
   return (

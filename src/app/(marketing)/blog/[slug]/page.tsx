@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${post.title} | SerpVive Blog`,
     description: post.description,
     alternates: { canonical: `https://serpvive.com/blog/${slug}` },
+    robots: { index: true, follow: true },
     openGraph: {
       title: post.title,
       description: post.description,
@@ -87,6 +88,16 @@ export default async function BlogPostPage({ params }: Props) {
     mainEntityOfPage: `https://serpvive.com/blog/${slug}`,
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://serpvive.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://serpvive.com/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: `https://serpvive.com/blog/${slug}` },
+    ],
+  };
+
   return (
     <>
       <Navbar />
@@ -112,6 +123,12 @@ export default async function BlogPostPage({ params }: Props) {
           }) }}
         />
       )}
+
+      {/* Breadcrumb JSON-LD: safe - data comes from our own trusted MDX frontmatter */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       {/* Header */}
       <header
