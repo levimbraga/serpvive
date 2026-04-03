@@ -53,7 +53,7 @@ function getCompetitorSummaries(): CompetitorSummary[] {
 const SERPVIVE_VALUES: Record<string, string> = {
   "Starting price": "Free ($0)",
   "Decay detection": "Automatic, daily",
-  "AI diagnosis": "Yes (Claude Opus)",
+  "AI diagnosis": "Yes (advanced AI)",
   "Micro-drafts": "Yes",
   "Result tracking": "Yes (28 days)",
   "Health Score": "Yes (0-100)",

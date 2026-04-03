@@ -26,7 +26,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: "AI Diagnosis",
-    desc: "Claude Opus 4.6 analyzes your content vs top 10 SERP",
+    desc: "AI analyzes your content vs top 10 SERP competitors",
     accent: "purple" as const,
   },
   {

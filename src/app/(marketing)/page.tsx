@@ -18,7 +18,7 @@ import RevealObserver from "@/components/marketing/RevealObserver";
 export const metadata: Metadata = {
   title: "SerpVive | Your Blog Is Losing Traffic. We Tell You Why.",
   description:
-    "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings. Free plan available. Powered by Claude Opus 4.6.",
+    "SerpVive monitors your blog, detects posts losing traffic, and tells you exactly what to fix to recover rankings. Free plan available. AI-powered diagnosis.",
   keywords: ["content decay", "SEO monitoring", "blog traffic", "content refresh", "SEO tool", "SerpVive"],
   alternates: {
     canonical: "https://serpvive.com",

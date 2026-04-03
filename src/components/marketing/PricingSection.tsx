@@ -355,7 +355,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How accurate is the AI diagnosis?",
-    a: "Powered by Claude Opus 4.6. Analyzes live SERP results + 3 competitor pages + your content. Every cause includes specific evidence with SERP positions, word counts, and competitor URLs.",
+    a: "Powered by advanced AI. Analyzes live SERP results + 3 competitor pages + your content. Every cause includes specific evidence with SERP positions, word counts, and competitor URLs.",
   },
   {
     q: "Can I use this for client blogs?",

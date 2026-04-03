@@ -101,7 +101,7 @@ export default function AIDiagnosisSection() {
         <Reveal>
           <div className="text-center mb-16">
             <span className="inline-block text-[12px] font-bold uppercase tracking-wider text-white bg-[#7C3AED] px-4 py-1.5 rounded-full mb-4">
-              Powered by Claude Opus 4.6
+              AI-Powered Diagnosis
             </span>
             <p className="text-[14px] sm:text-[15px] text-[#94A3B8] leading-[1.7] max-w-[620px] mx-auto">
               Every diagnosis includes: causes with evidence, topic coverage score, competitor references, ready-to-use title suggestions, and time estimates for each fix.

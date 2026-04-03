@@ -141,7 +141,7 @@ export default function AboutPage() {
               <Brain size={16} strokeWidth={1.5} className="text-[#7C3AED]" />
             </div>
             <p className="text-[14px] text-[#374151] leading-relaxed">
-              Our diagnosis engine uses Claude Opus to read the live
+              Our diagnosis engine uses AI to read the live
               SERP, analyze competitor content, and compare it against yours.
               The result is a diagnosis that reads like it came from a senior
               SEO consultant, not a generic AI chatbot.

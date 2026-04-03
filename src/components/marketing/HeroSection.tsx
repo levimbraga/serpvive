@@ -74,7 +74,7 @@ export default function HeroSection() {
 
       {/* Trust badge */}
       <p className="relative text-[#475569] mt-6 animate-[fadeInUp_0.6s_ease_0.4s_both]" style={{ fontSize: "clamp(12px, 1vw, 14px)" }}>
-        Powered by Claude Opus 4.6 &middot; Read-only access &middot; No credit card required
+        Powered by AI &middot; Read-only access &middot; No credit card required
       </p>
 
       {/* Product screenshot */}

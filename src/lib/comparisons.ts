@@ -91,7 +91,7 @@ const comparisons: Record<string, ComparisonData> = {
     features: [
       { feature: "Starting price", competitor: "$139.95/mo", serpvive: "Free ($0)", winner: "serpvive" },
       { feature: "Content decay detection", competitor: "Yes (manual setup)", serpvive: "Yes (automatic, daily)", winner: "serpvive" },
-      { feature: "AI diagnosis with evidence", competitor: "No", serpvive: "Yes (Claude Opus)", winner: "serpvive" },
+      { feature: "AI diagnosis with evidence", competitor: "No", serpvive: "Yes (advanced AI)", winner: "serpvive" },
       { feature: "Micro-drafts for fixes", competitor: "No", serpvive: "Yes", winner: "serpvive" },
       { feature: "Before/after result tracking", competitor: "No", serpvive: "Yes (automatic, 28 days)", winner: "serpvive" },
       { feature: "Health Score (0-100)", competitor: "No", serpvive: "Yes", winner: "serpvive" },
@@ -126,7 +126,7 @@ For teams that need keyword research, backlinks, PPC intelligence, AND content t
 
 Semrush's Content Audit tool can identify pages losing traffic. But it stops there. You get a list of declining URLs and a recommendation to "update" them. It doesn't tell you what changed in the SERP, what competitors added, or what specific edits to make.
 
-**AI diagnosis with evidence.** SerpVive reads your page, fetches the top-ranking competitors, and uses Claude Opus to analyze exactly why your content is losing ground. You get specific causes like "Competitor #2 added a comparison table you don't have" or "Your pricing data is from 2024."
+**AI diagnosis with evidence.** SerpVive reads your page, fetches the top-ranking competitors, and uses AI to analyze exactly why your content is losing ground. You get specific causes like "Competitor #2 added a comparison table you don't have" or "Your pricing data is from 2024."
 
 **Micro-drafts.** Beyond diagnosis, SerpVive generates actionable refresh briefs with draft content you can use immediately. Not vague advice, but actual text you can paste.
 
@@ -287,7 +287,7 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content 
       { feature: "NLP keyword suggestions", competitor: "Yes", serpvive: "No", winner: "competitor" },
       { feature: "Content Score", competitor: "Yes (0-100)", serpvive: "No (Health Score is different)", winner: "competitor" },
       { feature: "Content decay detection", competitor: "Limited (Content Audit)", serpvive: "Yes (automatic, daily)", winner: "serpvive" },
-      { feature: "AI diagnosis with evidence", competitor: "No", serpvive: "Yes (Claude Opus)", winner: "serpvive" },
+      { feature: "AI diagnosis with evidence", competitor: "No", serpvive: "Yes (advanced AI)", winner: "serpvive" },
       { feature: "Micro-drafts for fixes", competitor: "No", serpvive: "Yes", winner: "serpvive" },
       { feature: "Result tracking post-refresh", competitor: "No", serpvive: "Yes (automatic, 28 days)", winner: "serpvive" },
       { feature: "SERP Analyzer", competitor: "Yes", serpvive: "Limited (competitor comparison)", winner: "competitor" },
@@ -353,7 +353,7 @@ These are complementary, not competing functions.
 
 **Surfer:** AI generates and optimizes content. The AI Writer creates draft articles. The Content Editor provides real-time optimization suggestions. AI is used for content creation.
 
-**SerpVive:** AI diagnoses content decline. Claude Opus reads your page, reads competitors, and provides specific diagnostic analysis. AI is used for content analysis and repair guidance.
+**SerpVive:** AI diagnoses content decline. Our engine reads your page, reads competitors, and provides specific diagnostic analysis. AI is used for content analysis and repair guidance.
 
 ### Pricing Value
 
@@ -477,7 +477,7 @@ Cost: Surfer Standard ($119) + SerpVive Starter ($29) = $148/month. Less than Su
     features: [
       { feature: "Starting price", competitor: "$49/mo (Starter)", serpvive: "Free ($0)", winner: "serpvive" },
       { feature: "Content decay detection", competitor: "Yes (Content Opportunities)", serpvive: "Yes (automatic, daily)", winner: "tie" },
-      { feature: "AI diagnosis with evidence", competitor: "No (flags only)", serpvive: "Yes (Claude Opus)", winner: "serpvive" },
+      { feature: "AI diagnosis with evidence", competitor: "No (flags only)", serpvive: "Yes (advanced AI)", winner: "serpvive" },
       { feature: "Micro-drafts for fixes", competitor: "No", serpvive: "Yes", winner: "serpvive" },
       { feature: "Result tracking post-refresh", competitor: "No", serpvive: "Yes (automatic, 28 days)", winner: "serpvive" },
       { feature: "Health Score (0-100)", competitor: "No", serpvive: "Yes", winner: "serpvive" },

@@ -77,11 +77,11 @@ export default function DemoResultClient({ url, keyword, diagnosis, brief, creat
         </summary>
         <div className="px-4 pb-4 text-sm text-[#6B7280] space-y-2">
           <p>1. Searched Google for &ldquo;<strong>{keyword}</strong>&rdquo; and retrieved the top 10 organic results</p>
-          <p>2. Extracted full content from your page and the top 3 competitors using Firecrawl (JavaScript rendering enabled)</p>
+          <p>2. Extracted full content from your page and the top 3 competitors (JavaScript rendering enabled)</p>
           <p>3. Compared word count, heading structure, internal/external links, publication dates, and topic coverage</p>
           <p>4. AI analyzed the competitive landscape, identified content gaps, and diagnosed ranking barriers</p>
           <p>5. Generated prioritized actions with specific micro-drafts based on what top competitors do differently</p>
-          <p className="text-xs pt-2 border-t border-[#E5E7EB]">Analysis model: Claude Opus 4.6 &middot; SERP data: Serper.dev &middot; Content extraction: Firecrawl</p>
+          <p className="text-xs pt-2 border-t border-[#E5E7EB]">Analysis powered by AI &middot; Real-time SERP data &middot; Full content extraction</p>
         </div>
       </details>
     </div>
