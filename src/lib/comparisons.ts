@@ -64,7 +64,7 @@ const comparisons: Record<string, ComparisonData> = {
     competitorName: "Semrush",
     competitorUrl: "https://www.semrush.com",
     publishedAt: "2026-03-23",
-    updatedAt: "2026-03-23",
+    updatedAt: "2026-04-07",
 
     title: "SerpVive vs Semrush [2026]: Content Monitoring Alternative",
     metaDescription:
@@ -100,6 +100,7 @@ const comparisons: Record<string, ComparisonData> = {
       { feature: "Rank tracking", competitor: "Yes (500+ keywords)", serpvive: "Limited (GSC data)", winner: "competitor" },
       { feature: "PPC / Ads research", competitor: "Yes", serpvive: "No", winner: "competitor" },
       { feature: "Site audit (technical SEO)", competitor: "Yes", serpvive: "No", winner: "competitor" },
+      { feature: "AI search visibility tracking", competitor: "Yes (AI Visibility Toolkit)", serpvive: "No", winner: "competitor" },
       { feature: "Free plan", competitor: "No (7-day trial)", serpvive: "Yes (forever free)", winner: "serpvive" },
     ],
 
@@ -111,6 +112,8 @@ const comparisons: Record<string, ComparisonData> = {
     ],
 
     competitorStrengths: `**Semrush is the Swiss Army knife of SEO.** There's a reason it has 10M+ users.
+
+**Semrush One**, launched in early 2026, unifies their SEO suite with a new AI Visibility Toolkit that tracks how your brand appears in AI search engines like ChatGPT and Google AI Mode. This is a meaningful addition that no other all-in-one suite offers yet.
 
 **Keyword research** is where Semrush truly excels. Its database covers 26 billion keywords across 142 countries. The Keyword Magic Tool, keyword gap analysis, and SERP analysis are best-in-class. If you're building a content strategy from scratch, Semrush's keyword data is hard to beat.
 
@@ -258,7 +261,7 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content 
     competitorName: "Surfer SEO",
     competitorUrl: "https://surferseo.com",
     publishedAt: "2026-03-23",
-    updatedAt: "2026-03-23",
+    updatedAt: "2026-04-07",
 
     title: "Surfer SEO Alternative for Content Decay Monitoring (2026)",
     metaDescription:
@@ -293,6 +296,8 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content 
       { feature: "SERP Analyzer", competitor: "Yes", serpvive: "Limited (competitor comparison)", winner: "competitor" },
       { feature: "Keyword research", competitor: "Yes (basic)", serpvive: "No", winner: "competitor" },
       { feature: "Grow Flow (AI tasks)", competitor: "Yes", serpvive: "No", winner: "competitor" },
+      { feature: "AI search visibility tracking", competitor: "Yes (tracks AI prompts weekly)", serpvive: "No", winner: "competitor" },
+      { feature: "Brand Knowledge", competitor: "Yes", serpvive: "No", winner: "competitor" },
       { feature: "Free plan", competitor: "No", serpvive: "Yes (forever free)", winner: "serpvive" },
     ],
 
@@ -304,6 +309,10 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content 
     ],
 
     competitorStrengths: `**Surfer SEO is the gold standard for content optimization.**
+
+**AI Visibility tracking** is a recent addition. Surfer now tracks how your content appears in AI search results and monitors 25 AI prompts weekly on the Standard plan. This is a forward-looking feature that addresses the growing importance of AI-generated search.
+
+**Brand Knowledge** lets you upload your brand guidelines, tone of voice, and product details so Surfer's AI writer generates content that sounds like your brand, not generic SEO filler.
 
 **The Content Editor** is where Surfer shines brightest. Paste your draft, select your target keyword, and Surfer analyzes the top-ranking pages to give you real-time NLP suggestions. Word count targets, heading structure, keyword density, related terms to include. Writers love it because it turns vague SEO advice into concrete, checkable items.
 
@@ -451,7 +460,7 @@ Cost: Surfer Standard ($119) + SerpVive Starter ($29) = $148/month. Less than Su
     competitorName: "Frase",
     competitorUrl: "https://www.frase.io",
     publishedAt: "2026-03-23",
-    updatedAt: "2026-03-23",
+    updatedAt: "2026-04-07",
 
     title: "Frase Alternative: AI Content Decay Diagnosis (2026)",
     metaDescription:
@@ -486,7 +495,9 @@ Cost: Surfer Standard ($119) + SerpVive Starter ($29) = $148/month. Less than Su
       { feature: "Content Editor", competitor: "Yes (with optimization)", serpvive: "No", winner: "competitor" },
       { feature: "GSC integration", competitor: "Yes", serpvive: "Yes", winner: "tie" },
       { feature: "Competitive content analysis", competitor: "Yes (SERP overview)", serpvive: "Yes (in diagnosis)", winner: "tie" },
-      { feature: "Free plan", competitor: "No", serpvive: "Yes (forever free)", winner: "serpvive" },
+      { feature: "AI search visibility tracking", competitor: "Yes (2-5 platforms by plan)", serpvive: "No", winner: "competitor" },
+      { feature: "GEO optimization", competitor: "Yes", serpvive: "No", winner: "competitor" },
+      { feature: "Free plan", competitor: "No (7-day trial)", serpvive: "Yes (forever free)", winner: "serpvive" },
     ],
 
     pricing: [
@@ -496,19 +507,23 @@ Cost: Surfer Standard ($119) + SerpVive Starter ($29) = $148/month. Less than Su
       { plan: "Top", competitor: "Scale: $299/mo", serpvive: "Agency: $129/mo" },
     ],
 
-    competitorStrengths: `**Frase is a capable all-in-one content tool with a unique position in the market.**
+    competitorStrengths: `**Frase has evolved into an agentic SEO and GEO platform with serious capabilities.**
+
+**Frase Agent** is their newest addition: an AI agent with 80+ specialized skills accessible via natural language. It handles research, optimization, writing, and analysis in one interface. This positions Frase as more than a content tool, it's becoming an AI-first workflow platform.
 
 **Content Research** is fast and thorough. Enter a keyword and Frase pulls the top SERP results, extracts key topics, questions, and statistics, and presents them in a research brief. Writers can go from keyword to research in minutes.
 
-**AI Writer** produces solid drafts. It's not the best AI writer available (that's a moving target), but its integration with the research tool means generated content is topically relevant from the start.
+**AI Visibility Tracking** monitors how your brand appears across AI search platforms (ChatGPT, Perplexity, and others). Starter includes 2 platforms, Professional includes 3, and Scale includes 5. This is a forward-looking feature that most content tools lack.
 
-**Content Editor** provides real-time optimization feedback, similar to Surfer SEO but at a significantly lower price point. For budget-conscious teams, Frase delivers 80% of Surfer's editor at 40% of the cost.
+**GEO Optimization** (Generative Engine Optimization) helps optimize content for AI citations, not just traditional search rankings. This is increasingly relevant as AI search grows.
 
-**Content Opportunities** (launched October 2025) is Frase's answer to content decay. It connects to Google Search Console and flags pages that are losing traffic. This puts Frase in direct competition with SerpVive for the monitoring use case.
+**Content Editor** provides real-time optimization with both SEO and GEO scoring, similar to Surfer SEO but at a lower price point and with the added GEO dimension.
 
-**Pricing** is competitive. The Starter plan at $49/month includes AI writing and research. The Professional plan at $129/month (which includes Content Opportunities) is priced between Surfer and Semrush.
+**Content Opportunities** connects to Google Search Console and flags pages losing traffic with a Fix/Boost/Fill action framework. As of 2026, Content Opportunities is available on all plans, including Starter ($49/month) with 1 domain and 50 audit pages per month.
 
-For small teams that need content research, writing, optimization, AND basic content monitoring in one affordable tool, Frase offers surprising value.`,
+**Pricing** is competitive. The Starter plan at $49/month now includes the full AI Agent, Content Opportunities (1 domain), and AI Visibility tracking (2 platforms). The Professional plan at $129/month scales to 5 domains, 250 audit pages, and 3 AI platforms.
+
+For teams that need content research, writing, optimization, AND content monitoring in one tool, Frase offers strong value.`,
 
     serpviveWins: `**The gap between Frase and SerpVive is in the depth of diagnosis.**
 
@@ -531,11 +546,11 @@ This is the difference between a smoke alarm and a fire investigator. Both detec
 
     featureBreakdown: `### Content Decay Detection
 
-**Frase Content Opportunities:** Connects to GSC, analyzes traffic trends, flags pages with significant declines. Requires the Professional plan ($129/month). Shows the decline but doesn't analyze why.
+**Frase Content Opportunities:** Connects to GSC, analyzes traffic trends, flags pages with significant declines using a Fix/Boost/Fill framework. Available on all plans: Starter ($49/month) includes 1 domain and 50 audit pages, Professional ($129/month) includes 5 domains and 250 audit pages. Shows the decline and categorizes the action needed but doesn't analyze why.
 
 **SerpVive:** Connects to GSC, runs daily decay scoring that accounts for velocity (how fast the decline), seasonality (is this a normal seasonal dip?), and page importance (higher-traffic pages get prioritized). Available on all plans including free.
 
-**Verdict:** Both detect decay. SerpVive's scoring is more nuanced and available at lower price points.
+**Verdict:** Both detect decay. Frase's detection is now more accessible (starting at $49/month). SerpVive's scoring is more nuanced and the free plan has no cost barrier.
 
 ### What Happens After Detection
 
@@ -557,17 +572,17 @@ The difference: Frase gives you tools. SerpVive gives you answers.
 
 ### Pricing for the Decay Feature
 
-**Frase:** Content Opportunities requires the Professional plan at $129/month. The cheaper Starter ($49) plan doesn't include it.
+**Frase:** Content Opportunities is now available on all plans. Starter ($49/month) includes 1 domain and 50 audit pages. Professional ($129/month) scales to 5 domains and 250 audit pages.
 
-**SerpVive:** Decay monitoring is available on every plan, including the free tier. AI diagnosis starts at $29/month (Starter).
+**SerpVive:** Decay monitoring is available on every plan, including the free tier. AI diagnosis starts at $29/month (Starter). Free plan monitors 1 site with 100 pages.
 
-If content decay monitoring is your primary need, SerpVive's free plan gives you monitoring, and $29/month adds AI diagnosis. To get comparable detection in Frase, you need the $129/month plan.`,
+If content decay monitoring is your primary need, SerpVive's free plan gives you monitoring at zero cost. Frase Starter ($49/month) gives you monitoring + content creation tools. Where SerpVive adds unique value is the AI diagnosis depth and micro-drafts, which Frase does not offer at any price.`,
 
-    pricingAnalysis: `Frase has aggressive pricing for its content creation tools, but the decay monitoring feature is locked behind the Professional tier:
+    pricingAnalysis: `Frase has competitive pricing with Content Opportunities now available on all plans:
 
-- **Starter ($49/mo):** AI writer, research, content briefs. No Content Opportunities.
-- **Professional ($129/mo):** Content Opportunities, advanced analytics. This is the tier you need for decay detection.
-- **Scale ($299/mo):** Unlimited articles, team features, priority support.
+- **Starter ($49/mo):** Full AI Agent (80+ skills), 10 AI-optimized articles, Content Opportunities (1 domain, 50 audit pages), AI Visibility tracking (2 platforms).
+- **Professional ($129/mo):** 40 articles, Content Opportunities (5 domains, 250 audit pages), AI Visibility tracking (3 platforms), 3 seats.
+- **Scale ($299/mo):** 100 articles, 10 domains, 1,000 audit pages, AI Visibility tracking (5 platforms), 5 seats.
 
 SerpVive's pricing is focused entirely on monitoring:
 - **Free:** 1 site, 100 pages, weekly monitoring, Health Score
@@ -575,11 +590,11 @@ SerpVive's pricing is focused entirely on monitoring:
 - **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses/month
 
-**For content creation:** Frase Starter ($49/mo) is solid value. SerpVive doesn't compete here.
+**For content creation:** Frase Starter ($49/mo) is solid value with the full AI Agent included. SerpVive doesn't compete here.
 
-**For content monitoring:** SerpVive Free or Starter ($29/mo) beats Frase Professional ($129/mo) for the monitoring use case specifically.
+**For content monitoring:** SerpVive Free gives you monitoring at zero cost. Frase Starter ($49/mo) includes basic monitoring with 1 domain. Where SerpVive justifies its cost is the AI diagnosis depth, micro-drafts, and result tracking that Frase does not offer.
 
-**For both:** Frase Professional ($129) gives you creation + basic monitoring. But if you want deep AI diagnosis, you'd need Frase Professional ($129) + SerpVive Starter ($29) = $158/month. Or just SerpVive Pro ($69) for monitoring and use a cheaper tool for creation.`,
+**For both:** Frase Starter ($49) gives you creation + basic monitoring in one tool. Adding SerpVive Starter ($29) on top gives you deep AI diagnosis. Total: $78/month for creation + monitoring + diagnosis.`,
 
     whoShouldChooseCompetitor: `Choose Frase if you:
 
