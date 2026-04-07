@@ -2,7 +2,7 @@
 title: "What is Content Decay? Why Blog Posts Lose Traffic Over Time"
 description: "Content decay is the gradual loss of organic traffic on blog posts over time. Learn why it happens, how to detect it, and what to do about it."
 publishedAt: "2026-03-31"
-updatedAt: "2026-03-31"
+updatedAt: "2026-04-07"
 author:
   name: "Levi Maia Braga"
   role: "Founder, SerpVive"
@@ -23,6 +23,20 @@ The term describes a natural lifecycle pattern: most content has a peak traffic 
 What makes content decay dangerous is that it's invisible until it's severe. Most site owners check their top-performing posts, celebrate the ones that are growing, and ignore the rest. Meanwhile, dozens of posts are slowly losing ground, and the cumulative traffic loss can be massive.
 
 If you manage a blog with 50+ posts, statistically, some of them are decaying right now. The question is whether you'll catch it at 10% loss or 60% loss.
+
+## Content Decay vs Seasonal Drops vs Technical Issues
+
+When you see traffic drop on a page, the first step is figuring out what type of drop it is. Not every decline is content decay, and misdiagnosing the cause leads to wasted effort.
+
+**Content decay** is gradual. It happens over weeks and months. A page that got 500 clicks/month slowly drops to 400, then 300. The cause is usually external: competitors improved their content, your information went stale, or search intent shifted. The fix is a content refresh.
+
+**Seasonal drops** are cyclical. They happen at the same time every year. A post about "best sunscreen" naturally loses traffic in winter. The way to rule this out: check [Google Trends](https://trends.google.com/) for your target keyword. If overall search interest dropped, it's seasonal, not decay. Your content didn't get worse. People just stopped searching for that topic temporarily. No action needed.
+
+**Technical issues** are sudden. Traffic drops overnight or within days, not gradually over months. Common culprits: the page got deindexed (check GSC's "Pages" report), a redirect broke, the canonical tag changed, or the page's load time spiked. The way to rule this out: check GSC for crawl errors, index status, and Core Web Vitals on that specific URL. If the page isn't indexed, it's a technical problem, not content decay.
+
+**Tracking errors** are the silent trap. Your content might be performing fine, but your analytics are misconfigured. Duplicate Google Analytics tags, missing tracking code on specific pages, or a broken tag after a site update can all make it look like traffic dropped when it didn't. The way to rule this out: compare GSC data (which doesn't depend on your analytics setup) with GA4 data. If GSC shows stable clicks but GA4 shows a traffic drop, it's a tracking issue.
+
+The diagnostic order should be: rule out tracking errors first (takes 5 minutes), then technical issues (check GSC index status), then seasonal patterns (Google Trends). If none of those explain the decline, it's content decay.
 
 ## Why Does Content Decay Happen?
 
@@ -48,9 +62,13 @@ Core updates reshape rankings. The [December 2025 Core Update caused 20-70% visi
 
 More content is being published than ever before. According to [DemandSage (2026)](https://www.demandsage.com/ai-marketing-statistics/), 89% of marketers now use AI for content creation. The barrier to producing a 2,000-word blog post has dropped to near zero. That means more articles competing for the same keywords, which dilutes your share of voice even if your content quality hasn't changed. Keywords that had 50 competing pages in 2023 might have 200 in 2026.
 
-### SERP Features Change
+### SERP Features and AI Overviews Change
 
-Google's results page is not static. Video carousels appear where they didn't exist before. Featured snippets shift to different sources. AI Overviews now answer queries directly in the SERP, reducing click-through rates for all organic results below them. A page that ranked #1 might still rank #1 but get half the clicks because a new SERP feature absorbed the traffic.
+Google's results page is not static. Video carousels appear where they didn't exist before. Featured snippets shift to different sources. And increasingly, AI Overviews answer queries directly in the SERP, reducing click-through rates for all organic results below them. A page that ranked #1 might still rank #1 but get half the clicks because a new SERP feature absorbed the traffic.
+
+AI Overviews deserve special attention because they represent a structural shift, not just another SERP feature. When Google's AI generates a direct answer at the top of the results page, users get what they need without clicking any result. Gartner predicts [search query volume will drop by 25% by 2026](https://www.gartner.com/en/newsroom/press-releases/2024-02-19-gartner-predicts-search-engine-volume-will-drop-25-percent-by-2026-due-to-ai-chatbots-and-other-virtual-agents) as more users turn to AI assistants and conversational platforms. This means even content that ranks well can see declining clicks.
+
+The practical impact: informational queries ("what is X", "how does Y work") are most affected because AI Overviews handle them well. Comparison queries ("X vs Y"), experience-based queries ("best X for Y"), and queries with commercial intent are less affected because users still want to click through and evaluate options themselves. If your blog is heavy on definitional content, expect accelerated decay from AI Overviews on top of the traditional causes.
 
 ## How Fast Does Content Decay Happen?
 

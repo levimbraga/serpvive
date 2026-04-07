@@ -2,7 +2,7 @@
 title: "How to Use Google Search Console for SEO: The Complete 2026 Guide"
 description: "Learn how to use Google Search Console to find keyword rankings, detect content decay, and audit your site. Step-by-step GSC guide for SEO professionals."
 publishedAt: "2026-03-23"
-updatedAt: "2026-03-23"
+updatedAt: "2026-04-07"
 author:
   name: "Levi"
   role: "Founder, SerpVive"
@@ -78,6 +78,28 @@ The real power of GSC is in filters. You can slice data by:
 - **Date range**: Any period within the last 16 months
 
 Combine filters to answer specific questions. For example: "What queries drive mobile traffic to my pricing page?" Filter by Page = /pricing, Device = Mobile, then look at Queries.
+
+## GSC vs Google Analytics 4: When to Use Which
+
+GSC and GA4 both measure website performance, but they answer different questions. Using the wrong tool for the wrong question leads to bad decisions.
+
+| Question | Use GSC | Use GA4 |
+|----------|---------|---------|
+| What queries do I rank for? | Yes | No |
+| How many clicks from Google? | Yes (exact) | Yes (sampled) |
+| What's my average ranking position? | Yes | No |
+| What happens after users click through? | No | Yes |
+| What's my bounce rate / engagement rate? | No | Yes |
+| Which pages aren't indexed? | Yes | No |
+| Where do conversions come from? | No | Yes |
+| Core Web Vitals performance? | Yes | No |
+| Non-Google traffic sources? | No | Yes |
+
+**The practical rule:** Use GSC to understand how Google sees your site and how users find you in search. Use GA4 to understand what users do after they arrive.
+
+For content decay detection specifically, GSC is the primary tool. GA4 can confirm traffic drops but doesn't show impression data, position changes, or query-level detail. If a page lost 40% of organic traffic, GSC tells you it dropped from position 4 to position 12 for the query "best project management tools." GA4 just tells you that page got fewer sessions.
+
+**When you need both together:** A page has high impressions and good rankings in GSC but low engagement time in GA4. This signals a content quality problem, not a ranking problem. Users find you, click through, but leave quickly because the content doesn't match what they expected. The fix is improving content, not optimizing for search.
 
 ## How to Find Content Decay in GSC
 
@@ -174,6 +196,84 @@ Check the "Pages" report in the Indexing section. Look for:
 
 These represent content investment that isn't generating any return. Either improve the content quality, add internal links to help Google find them, or consider whether they should be consolidated with other pages.
 
+## How to Use the URL Inspection Tool
+
+The URL Inspection tool is one of GSC's most underused features. It shows you exactly how Google sees a specific page on your site.
+
+To use it, paste any URL from your property into the search bar at the top of GSC. You'll see:
+
+- **Index status**: Whether the page is indexed, and if not, why
+- **Last crawl date**: When Googlebot last visited the page
+- **Crawl method**: Whether Google rendered the page with JavaScript
+- **Canonical URL**: Which URL Google considers the canonical version
+- **Mobile usability**: Whether the page passes mobile-friendly checks
+- **Rich results**: Whether structured data was detected and if it's valid
+
+**Practical use cases:**
+
+**Published a new post and it's not ranking?** Inspect the URL. If it says "URL is not on Google," click "Request Indexing." Google typically processes the request within 24-48 hours. This is faster than waiting for the next natural crawl.
+
+**Updated a page and want Google to re-crawl it?** Same process. Inspect the URL, then request indexing. This tells Google the content changed and triggers a fresh crawl.
+
+**Seeing unexpected ranking drops?** Inspect the URL to check if Google is selecting a different canonical than you intended. If Google chose a different canonical URL, your page might be competing with itself. Fix this with a proper canonical tag.
+
+**Debugging JavaScript rendering issues?** The URL Inspection tool shows a screenshot of how Google renders the page. If critical content is missing from the rendered version, Google isn't seeing it, which means it can't rank for it.
+
+## How to Use the Links Report
+
+The Links report in GSC shows your site's internal and external link structure. Most SEO professionals ignore this report, but it's valuable for content auditing.
+
+### External Links
+
+The "Top linked pages" report shows which pages on your site have the most backlinks. Cross-reference this with the Performance report:
+
+- **High backlinks + declining traffic**: The page has authority but the content needs refreshing. This is your highest-ROI refresh target because the backlink equity is already there.
+- **High backlinks + low traffic**: The page might be targeting the wrong keyword, or the content doesn't match current search intent.
+- **High traffic + low backlinks**: The page ranks on content quality alone. Adding internal links from high-authority pages can strengthen it further.
+
+The "Top linking sites" report shows which external sites link to you most. These are potential partners for outreach, guest posting, or link reclamation if links break.
+
+### Internal Links
+
+The "Internal links" report shows how your own site links between pages. Pages with very few internal links are harder for Google to discover and rank. If a high-value page has fewer than 5 internal links pointing to it, add more from related content.
+
+This report also reveals orphan pages, content that exists on your site but has almost no internal links. These pages often underperform because Google can't easily find or understand their context within your site.
+
+## Advanced GSC Techniques
+
+Once you're comfortable with the basics, these techniques extract deeper insights from the same data.
+
+### Regex Filters for Query Analysis
+
+GSC supports regex (regular expression) filtering in the Performance report. Click the "+" filter button, select "Query," then switch the filter type from "Queries containing" to "Custom (regex)."
+
+Useful regex patterns:
+
+- `^how` matches all queries starting with "how" (how-to intent, usually informational)
+- `^best|^top|vs` matches comparison queries (commercial intent, high value)
+- `\d{4}` matches queries containing a year (users looking for current information, your content may need date updates)
+- `^what is|^what are` matches definitional queries (most vulnerable to AI Overviews)
+
+This lets you segment your traffic by search intent at scale. If your "what is" queries are declining while "best X for Y" queries are stable, that's an AI Overview signal, not a content quality signal.
+
+### Page Groups for Section-Level Analysis
+
+If your blog follows a URL structure like `/blog/category/post-slug`, you can filter by URL pattern to analyze entire content categories. Filter Page by "URLs containing /blog/seo/" to see performance across all SEO-related posts vs "/blog/marketing/" for marketing posts.
+
+This reveals which content categories are growing and which are decaying as a group, not just individual pages.
+
+### Export and Track Over Time
+
+GSC only retains 16 months of data. If you want to track year-over-year trends beyond that window, export your data monthly. Use the "Export" button on the Performance report and store the CSV in a spreadsheet.
+
+A simple monthly export routine:
+1. Export full query data (last 28 days) on the 1st of each month
+2. Export full page data (last 28 days)
+3. Append to a running spreadsheet with a date column
+4. After 12 months, you have a dataset that lets you compare any two periods, regardless of GSC's retention limit
+
+This is manual work. Tools like [SerpVive](/) automate this by pulling GSC data daily and retaining it indefinitely, so you never lose historical context.
+
 ## GSC Limitations (and What Tools Fill the Gaps)
 
 GSC is powerful but incomplete. Here's what it can't do:
@@ -226,5 +326,17 @@ Indirectly. If you see a sudden, site-wide traffic drop on a specific date, cros
 ### Is Google Search Console enough for SEO?
 
 For monitoring your own site's search performance, yes. For competitive analysis, keyword research, and content optimization, you need additional tools. GSC is essential but not sufficient as your only SEO tool.
+
+### What's the difference between GSC and Google Analytics?
+
+GSC shows how your site performs in Google Search (queries, rankings, impressions, index status). Google Analytics shows what users do on your site after arriving (engagement, conversions, bounce rate, traffic from all sources). GSC is search-specific. GA4 is site-wide. You need both for a complete picture.
+
+### How long does it take for GSC to show data for a new site?
+
+GSC starts collecting data as soon as you verify your property, but meaningful data typically takes 2-4 weeks to accumulate. For reliable trend analysis and date comparisons, you need at least 3 months of data. GSC retains a maximum of 16 months of historical data, so if you need longer trends, export your data regularly.
+
+### Can I use GSC to monitor multiple sites?
+
+Yes. You can add up to 1,000 properties to a single Google account. Each property is managed independently with its own data and settings. For agencies or freelancers managing multiple client sites, this is sufficient, but you need the client to grant you access as a "Full" user through GSC's user management settings.
 
 <BlogCTA heading="Turn GSC data into action" description="SerpVive reads your Google Search Console data, detects content decay automatically, and uses AI to diagnose why your posts are losing traffic." buttonText="Connect Your GSC Free" />
