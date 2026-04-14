@@ -1,5 +1,7 @@
 // Last verified: March 2026. Verify competitor pricing quarterly.
 
+import { COMPARISON_NAV_ITEMS } from "./comparison-nav";
+
 export type FeatureRow = {
   feature: string;
   competitor: string;
@@ -875,6 +877,27 @@ The honest take: if you are a solo blogger on a strict zero-budget plan, just us
     relatedSlugs: ["frase", "semrush", "surfer-seo"],
   },
 };
+
+// Build-time drift check: nav items and comparison data must stay in sync.
+// Thrown errors surface during `next build` so drift cannot ship.
+{
+  const dataSlugs = new Set(Object.keys(comparisons));
+  const navSlugs = new Set(COMPARISON_NAV_ITEMS.map((i) => i.slug));
+  for (const slug of navSlugs) {
+    if (!dataSlugs.has(slug)) {
+      throw new Error(
+        `comparison-nav.ts lists "${slug}" but no matching entry exists in comparisons.ts`,
+      );
+    }
+  }
+  for (const slug of dataSlugs) {
+    if (!navSlugs.has(slug)) {
+      throw new Error(
+        `comparisons.ts defines "${slug}" but it is missing from comparison-nav.ts (the nav source of truth)`,
+      );
+    }
+  }
+}
 
 export function getComparisonSlugs(): string[] {
   return Object.keys(comparisons);

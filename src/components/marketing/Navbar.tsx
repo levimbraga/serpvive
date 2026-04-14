@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
+import { COMPARISON_NAV_ITEMS } from "@/lib/comparison-nav";
 
 type ResourceLink = {
   label: string;
@@ -13,17 +14,17 @@ type ResourceLink = {
 type ResourceSection = {
   title: string;
   items: ResourceLink[];
+  footerLink?: ResourceLink;
 };
 
 const RESOURCE_SECTIONS: ResourceSection[] = [
   {
     title: "Compare",
-    items: [
-      { label: "vs Semrush", href: "/vs/semrush" },
-      { label: "vs Surfer SEO", href: "/vs/surfer-seo" },
-      { label: "vs Frase", href: "/vs/frase" },
-      { label: "vs Animalz Revive", href: "/vs/animalz-revive" },
-    ],
+    items: COMPARISON_NAV_ITEMS.map((c) => ({
+      label: `vs ${c.name}`,
+      href: `/vs/${c.slug}`,
+    })),
+    footerLink: { label: "All comparisons", href: "/vs" },
   },
   {
     title: "Tools",
@@ -201,6 +202,16 @@ export default function Navbar() {
                           {item.label}
                         </Link>
                       ))}
+                      {section.footerLink && (
+                        <Link
+                          href={section.footerLink.href}
+                          onClick={closeAll}
+                          className="mt-2 pt-3 border-t border-[#1E293B] inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#3B82F6] hover:text-[#60A5FA] no-underline transition-colors whitespace-nowrap"
+                        >
+                          {section.footerLink.label}
+                          <ArrowRight size={13} strokeWidth={2} />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -307,6 +318,16 @@ export default function Navbar() {
                     {item.label}
                   </Link>
                 ))}
+                {section.footerLink && (
+                  <Link
+                    href={section.footerLink.href}
+                    onClick={closeAll}
+                    className="flex items-center gap-1.5 py-3 px-3 text-[14px] font-semibold text-[#3B82F6] hover:bg-[#1E293B]/50 rounded-lg no-underline transition-colors"
+                  >
+                    {section.footerLink.label}
+                    <ArrowRight size={13} strokeWidth={2} />
+                  </Link>
+                )}
               </div>
             ))}
 

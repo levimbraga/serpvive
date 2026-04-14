@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMPARISON_NAV_ITEMS } from "@/lib/comparison-nav";
 
 const LINKS = {
   Product: [
@@ -12,9 +13,10 @@ const LINKS = {
     { label: "Refresh Checklist", href: "/resources/content-decay-checklist" },
   ],
   Compare: [
-    { label: "vs Semrush", href: "/vs/semrush" },
-    { label: "vs Surfer SEO", href: "/vs/surfer-seo" },
-    { label: "vs Frase", href: "/vs/frase" },
+    ...COMPARISON_NAV_ITEMS.map((c) => ({
+      label: `vs ${c.name}`,
+      href: `/vs/${c.slug}`,
+    })),
     { label: "All Comparisons", href: "/vs" },
   ],
   Company: [
