@@ -1,30 +1,44 @@
-import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\s/g, "");
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!.replace(/\s/g, "");
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type");
-  const next = searchParams.get("next"); // explicit redirect takes priority
+  const next = searchParams.get("next");
 
-  const cookieStore = await cookies();
+  // Buffer cookie mutations so we can attach them to whatever redirect we
+  // ultimately return. Writing through cookies() from next/headers is not
+  // reliable in Next.js 15+ route handlers that return an explicit redirect —
+  // the fresh NextResponse doesn't always inherit those mutations, which
+  // dropped the session cookies and caused Google login to fail on the first
+  // attempt.
+  const pendingCookies: Array<{ name: string; value: string; options: CookieOptions }> = [];
+
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        for (const { name, value, options } of cookiesToSet) {
-          cookieStore.set(name, value, options);
+        for (const c of cookiesToSet) {
+          pendingCookies.push(c);
         }
       },
     },
   });
+
+  const redirect = (path: string) => {
+    const res = NextResponse.redirect(`${origin}${path}`);
+    for (const { name, value, options } of pendingCookies) {
+      res.cookies.set(name, value, options);
+    }
+    return res;
+  };
 
   let authenticated = false;
 
@@ -44,15 +58,13 @@ export async function GET(request: Request) {
   }
 
   if (!authenticated) {
-    return NextResponse.redirect(`${origin}/login?error=auth`);
+    return redirect("/login?error=auth");
   }
 
-  // If caller specified an explicit redirect, use it
   if (next) {
-    return NextResponse.redirect(`${origin}${next}`);
+    return redirect(next);
   }
 
-  // Otherwise, check if user has any sites to decide where to go
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
     const { data: site } = await supabase
@@ -63,9 +75,9 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (!site) {
-      return NextResponse.redirect(`${origin}/onboarding/choose`);
+      return redirect("/onboarding/choose");
     }
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`);
+  return redirect("/dashboard");
 }
