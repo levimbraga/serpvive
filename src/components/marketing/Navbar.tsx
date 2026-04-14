@@ -22,6 +22,7 @@ const RESOURCE_SECTIONS: ResourceSection[] = [
       { label: "vs Semrush", href: "/vs/semrush" },
       { label: "vs Surfer SEO", href: "/vs/surfer-seo" },
       { label: "vs Frase", href: "/vs/frase" },
+      { label: "vs Animalz Revive", href: "/vs/animalz-revive" },
     ],
   },
   {
