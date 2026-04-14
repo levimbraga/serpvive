@@ -36,15 +36,16 @@ function getCompetitorSummaries(): CompetitorSummary[] {
   return all.map((c) => {
     const vals: Record<string, string> = {};
     for (const f of c.features) {
-      if (f.feature === "Starting price") vals["Starting price"] = f.competitor;
-      if (f.feature.includes("decay detection")) vals["Decay detection"] = f.competitor;
-      if (f.feature.includes("AI diagnosis")) vals["AI diagnosis"] = f.competitor;
-      if (f.feature.includes("Micro-drafts")) vals["Micro-drafts"] = f.competitor;
-      if (f.feature.includes("Result tracking") || f.feature.includes("result tracking")) vals["Result tracking"] = f.competitor;
-      if (f.feature.includes("Health Score")) vals["Health Score"] = f.competitor;
-      if (f.feature.includes("Keyword research")) vals["Keyword research"] = f.competitor;
-      if (f.feature.includes("Content Editor") || f.feature.includes("Content editor")) vals["Content editor"] = f.competitor;
-      if (f.feature.includes("Free plan")) vals["Free plan"] = f.competitor;
+      const fname = f.feature.toLowerCase();
+      if (fname === "starting price") vals["Starting price"] = f.competitor;
+      if (fname.includes("decay detection")) vals["Decay detection"] = f.competitor;
+      if (fname.includes("ai diagnosis")) vals["AI diagnosis"] = f.competitor;
+      if (fname.includes("micro-draft")) vals["Micro-drafts"] = f.competitor;
+      if (fname.includes("result tracking")) vals["Result tracking"] = f.competitor;
+      if (fname.includes("health score")) vals["Health Score"] = f.competitor;
+      if (fname.includes("keyword research")) vals["Keyword research"] = f.competitor;
+      if (fname.includes("content editor")) vals["Content editor"] = f.competitor;
+      if (fname.includes("free plan")) vals["Free plan"] = f.competitor;
     }
     return { name: c.competitorName, slug: c.slug, values: vals };
   });
