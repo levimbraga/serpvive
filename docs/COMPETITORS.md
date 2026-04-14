@@ -42,6 +42,20 @@
 - No free plan or trial
 - Note: Essentials price dropped from $189/mo to $129/mo.
 
+## Animalz Revive
+- Tool URL: https://revive.animalz.co/
+- Launch post: https://www.animalz.co/blog/content-refresh-tool (Nov 21, 2024)
+- **Free** (entire product, no paid tiers)
+- Launched: 2019; Revive 2.0 launched November 21, 2024 (39K+ users)
+- Access gated by email + Animalz weekly newsletter signup
+- Data source: GA4 organic search traffic (filtered to organic channel)
+- Requires minimum 12 months of GA history to run
+- Detection algorithm: 3+ consecutive months of sustained decline, filters out seasonal variations and algorithm updates
+- Three sort modes: traffic loss, peak difference, percentage loss
+- Features: instant reports, CSV export, Share link button, mobile-optimized
+- Post-detection guidance: generic best practices + upsell to Animalz agency consulting call
+- Missing: no continuous monitoring, no AI diagnosis, no per-post briefs, no micro-drafts, no result tracking, no cannibalization detection, no Health Score
+
 ## SEOTesting
 - Source: https://seotesting.com/pricing
 - **Single Site:** $50/mo (1 site, 25 credits)
@@ -61,3 +75,5 @@
 **vs Clearscope:** Both start at $129/mo for paid tiers, but SerpVive has a free plan with real monitoring. Clearscope measures optimization quality; SerpVive measures actual traffic performance.
 
 **vs SEOTesting:** Testing tool ($50+) vs monitoring + diagnosis tool (free). Complementary: SerpVive finds and diagnoses, SEOTesting measures statistical significance of changes.
+
+**vs Animalz Revive:** Revive detects decay for free via GA4 scans. SerpVive adds the "why is this happening?" layer with AI diagnosis, refresh briefs with micro-drafts, continuous GSC monitoring, and automatic result tracking. Complementary: Revive for quick free scans, SerpVive for ongoing diagnosis and refresh execution.
