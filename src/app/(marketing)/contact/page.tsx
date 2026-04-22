@@ -61,7 +61,7 @@ export default function ContactPage() {
 
             <div className="flex flex-col gap-4">
               <a
-                href="mailto:serpvive@gmail.com"
+                href="mailto:levi@serpvive.com"
                 className="flex items-center gap-3 rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 no-underline group hover:border-[#2563EB]/30 transition-colors"
               >
                 <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
@@ -72,7 +72,7 @@ export default function ContactPage() {
                     Email
                   </p>
                   <p className="text-[13px] text-[#6B7280]">
-                    serpvive@gmail.com
+                    levi@serpvive.com
                   </p>
                 </div>
               </a>

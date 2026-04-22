@@ -30,7 +30,7 @@ const LINKS = {
   ],
   Connect: [
     { label: "Twitter/X", href: "https://x.com/levimbraga" },
-    { label: "Email", href: "mailto:serpvive@gmail.com" },
+    { label: "Email", href: "mailto:levi@serpvive.com" },
   ],
 };
 
