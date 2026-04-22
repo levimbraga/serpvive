@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { resend, FROM_EMAIL } from "@/lib/email";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "levi@serpvive.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
 
 const contactSchema = z.object({
   name: z.string().max(100).optional(),
