@@ -85,7 +85,7 @@ export default function CookiePolicyPage() {
       <H2 id="contact">Contact</H2>
       <P>
         For questions about our cookie usage, contact us at:<br />
-        <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>
+        <A href="mailto:levi@serpvive.com">levi@serpvive.com</A>
       </P>
     </LegalPage>
   );

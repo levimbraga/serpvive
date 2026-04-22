@@ -65,7 +65,7 @@ export default function TermsOfServicePage() {
         <LI>After cancellation, you retain access to paid features until the end of your current billing period.</LI>
         <LI>After the billing period ends, your account reverts to the Free plan. Your data is preserved.</LI>
         <LI>We do not offer pro-rata refunds for partial billing periods.</LI>
-        <LI>If you believe you were charged in error, contact <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A> within 7 days.</LI>
+        <LI>If you believe you were charged in error, contact <A href="mailto:levi@serpvive.com">levi@serpvive.com</A> within 7 days.</LI>
       </UL>
 
       <H2 id="acceptable-use">Acceptable Use</H2>
@@ -139,7 +139,7 @@ export default function TermsOfServicePage() {
       <H2 id="contact">Contact</H2>
       <P>
         For questions about these Terms, contact us at:<br />
-        <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>
+        <A href="mailto:levi@serpvive.com">levi@serpvive.com</A>
       </P>
     </LegalPage>
   );

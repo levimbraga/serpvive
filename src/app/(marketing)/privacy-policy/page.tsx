@@ -168,7 +168,7 @@ export default function PrivacyPolicyPage() {
       </UL>
       <P>
         After account deletion, we retain no Google user data. To request data deletion without
-        deleting your account, contact us at <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>.
+        deleting your account, contact us at <A href="mailto:levi@serpvive.com">levi@serpvive.com</A>.
       </P>
 
       {/* ── Google API Services Compliance ── */}
@@ -226,14 +226,14 @@ export default function PrivacyPolicyPage() {
       </UL>
       <P>
         You can delete your account directly from Settings &gt; Danger Zone. For data export or other requests,
-        email us at <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>.
+        email us at <A href="mailto:levi@serpvive.com">levi@serpvive.com</A>.
       </P>
 
       {/* ── Contact ── */}
       <H2 id="contact">Contact</H2>
       <P>
         For any privacy-related questions or requests, contact us at:<br />
-        <A href="mailto:serpvive@gmail.com">serpvive@gmail.com</A>
+        <A href="mailto:levi@serpvive.com">levi@serpvive.com</A>
       </P>
       <P>
         Levi Braga<br />
