@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link2, Check } from "lucide-react";
 import posthog from "posthog-js";
 import AnalysisResultView from "@/components/pages/AnalysisResultView";
+import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 
 type DiagnosisData = {
   summary?: string;
@@ -51,13 +52,14 @@ export default function DemoResultClient({ url, keyword, diagnosis, brief, creat
       <div className="border-l-2 border-[#3B82F6]/30 pl-4 my-6 text-sm text-[#6B7280]">
         This is one page. SerpVive monitors your entire blog automatically —
         detecting decline, diagnosing why, and telling you exactly what to fix.
-        <a
-          href="/signup"
+        <WaitlistCTA
+          source="demo_inline"
+          as="span"
           onClick={() => posthog.capture("demo_inline_cta_clicked", { demo_id: demoId })}
-          className="text-[#3B82F6] hover:underline ml-1 font-medium"
+          className="text-[#3B82F6] hover:underline ml-1 font-medium cursor-pointer"
         >
-          Start free &rarr;
-        </a>
+          Join the waitlist &rarr;
+        </WaitlistCTA>
       </div>
 
       {/* Share buttons */}

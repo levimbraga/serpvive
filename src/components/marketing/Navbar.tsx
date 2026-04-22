@@ -5,6 +5,7 @@ import Link from "next/link";
 import posthog from "posthog-js";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { COMPARISON_NAV_ITEMS } from "@/lib/comparison-nav";
+import WaitlistCTA from "./WaitlistCTA";
 
 type ResourceLink = {
   label: string;
@@ -105,13 +106,13 @@ export default function Navbar() {
             AI diagnosis now includes competitor micro-drafts
           </span>
           <span className="sm:hidden text-xs">AI micro-drafts now available</span>
-          <Link
-            href="/signup"
-            className="font-semibold hover:opacity-80 transition-opacity"
+          <WaitlistCTA
+            source="announcement"
+            className="font-semibold hover:opacity-80 transition-opacity cursor-pointer"
             onClick={() => posthog.capture("cta_clicked", { location: "announcement" })}
           >
-            Try free &rarr;
-          </Link>
+            Join waitlist &rarr;
+          </WaitlistCTA>
           <button
             onClick={() => setBannerVisible(false)}
             className="absolute right-3 text-white/60 hover:text-white text-lg leading-none transition-colors"
@@ -237,14 +238,14 @@ export default function Navbar() {
           >
             Log in
           </Link>
-          <Link
-            href="/signup"
-            className="hidden lg:inline-flex items-center rounded-lg bg-[#2563EB] !text-white font-semibold px-6 py-2.5 text-[15px] hover:bg-[#1D4ED8] transition-all no-underline hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
+          <WaitlistCTA
+            source="nav"
+            className="hidden lg:inline-flex items-center rounded-lg bg-[#2563EB] !text-white font-semibold px-6 py-2.5 text-[15px] hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)] cursor-pointer"
             onClick={() => posthog.capture("cta_clicked", { location: "nav" })}
           >
-            <span className="hidden xl:inline">Get Started Free</span>
-            <span className="xl:hidden">Start Free</span>
-          </Link>
+            <span className="hidden xl:inline">Join waitlist</span>
+            <span className="xl:hidden">Waitlist</span>
+          </WaitlistCTA>
 
           {/* Hamburger (mobile + tablet) */}
           <button
@@ -340,16 +341,16 @@ export default function Navbar() {
               >
                 Log in
               </Link>
-              <Link
-                href="/signup"
+              <WaitlistCTA
+                source="mobile_nav"
                 onClick={() => {
                   closeAll();
                   posthog.capture("cta_clicked", { location: "mobile_nav" });
                 }}
-                className="flex items-center justify-center rounded-lg bg-[#2563EB] !text-white font-semibold py-3 px-6 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all"
+                className="flex items-center justify-center rounded-lg bg-[#2563EB] !text-white font-semibold py-3 px-6 text-[15px] hover:bg-[#1D4ED8] transition-all cursor-pointer"
               >
-                Get Started Free
-              </Link>
+                Join waitlist
+              </WaitlistCTA>
             </div>
           </div>
         </div>

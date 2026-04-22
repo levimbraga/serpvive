@@ -1,4 +1,5 @@
 import { Reveal } from "@/hooks/useReveal";
+import WaitlistCTA from "./WaitlistCTA";
 
 const STEPS = [
   {
@@ -128,14 +129,14 @@ export default function StepsSection() {
         {/* CTA */}
         <Reveal>
           <div className="mt-12">
-            <a
-              href="/signup"
-              className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5"
-              style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(12px, 1.3vw, 18px) clamp(24px, 2.5vw, 40px)" }}
+            <WaitlistCTA
+              source="steps"
+              className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.15)] hover:-translate-y-0.5 cursor-pointer"
+              style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(12px, 1.3vw, 18px) clamp(24px, 2.5vw, 40px)" } as React.CSSProperties}
             >
-              Get Started Free
+              Join the waitlist
               <span style={{ fontSize: "clamp(16px, 1.3vw, 22px)" }}>&rarr;</span>
-            </a>
+            </WaitlistCTA>
           </div>
         </Reveal>
       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import posthog from "posthog-js";
 import { Reveal } from "@/hooks/useReveal";
+import WaitlistCTA from "./WaitlistCTA";
 
 const PLANS = [
   {
@@ -103,7 +104,7 @@ export default function PricingSection() {
         </Reveal>
         <Reveal>
           <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[520px] mx-auto mb-4">
-            Get started free. No credit card required. Cancel anytime.
+            Launching in H2 2026. Join the waitlist for priority access and an early-member discount.
           </p>
         </Reveal>
         <Reveal>
@@ -233,8 +234,8 @@ export default function PricingSection() {
                   <div className="flex-1" />
 
                   {/* CTA */}
-                  <a
-                    href={plan.href}
+                  <WaitlistCTA
+                    source={`pricing_${plan.key}`}
                     onClick={() =>
                       posthog.capture("cta_clicked", {
                         location: "pricing",
@@ -242,7 +243,7 @@ export default function PricingSection() {
                         interval: isAnnual ? "annual" : "monthly",
                       })
                     }
-                    className={`block w-full text-center py-3 rounded-lg text-[14px] font-semibold no-underline transition-all duration-200 mt-auto ${
+                    className={`block w-full text-center py-3 rounded-lg text-[14px] font-semibold transition-all duration-200 mt-auto cursor-pointer ${
                       plan.outline
                         ? "text-[#94A3B8] border border-[#334155] hover:border-[#3B82F6] hover:text-[#3B82F6]"
                         : plan.popular
@@ -250,8 +251,8 @@ export default function PricingSection() {
                         : "bg-[#1E293B] text-[#F1F5F9] hover:bg-[#334155]"
                     }`}
                   >
-                    {plan.cta}
-                  </a>
+                    Join waitlist
+                  </WaitlistCTA>
                 </div>
               </Reveal>
             );

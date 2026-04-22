@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import posthog from "posthog-js";
+import WaitlistCTA from "../WaitlistCTA";
 import {
   ArrowRight,
   TrendingDown,
@@ -222,16 +222,16 @@ export default function DecayCalculator() {
           identifies exactly which posts are losing traffic, why, and how to
           fix them.
         </p>
-        <Link
-          href="/signup"
-          className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#2563EB] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
+        <WaitlistCTA
+          source="decay_calculator"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] text-white font-semibold px-6 py-3 text-[15px] hover:bg-[#2563EB] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] cursor-pointer"
           onClick={() =>
             posthog.capture("cta_clicked", { location: "decay_calculator" })
           }
         >
-          Get Started Free
+          Join the waitlist
           <ArrowRight size={16} strokeWidth={1.5} />
-        </Link>
+        </WaitlistCTA>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import WaitlistCTA from "./WaitlistCTA";
+
 export function DiagnosisShowcase() {
   return (
     <div className="mx-auto max-w-[740px] relative">
@@ -223,9 +225,9 @@ export function DiagnosisShowcase() {
           <div className="bg-white dark:bg-slate-900 px-6 py-8 text-center border-t border-slate-200 dark:border-slate-700">
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">This is a real analysis of a live blog post — not a mockup.</p>
             <div className="flex gap-3 justify-center">
-              <a href="/signup" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors">
-                Get Started Free →
-              </a>
+              <WaitlistCTA source="diagnosis_showcase" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors cursor-pointer">
+                Join waitlist →
+              </WaitlistCTA>
               <a href="/pricing" className="inline-flex items-center gap-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                 See Pricing
               </a>

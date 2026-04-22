@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin();
     const { error } = await supabase
-      .from("waitlist")
+      .from("waitlist_serpvive")
       .insert({ email, source });
 
     if (error) {

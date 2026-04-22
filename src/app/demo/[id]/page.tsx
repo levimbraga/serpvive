@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import DemoResultClient from "./DemoResultClient";
 import DemoFeedback from "./DemoFeedback";
 import DemoBottomCTA from "./DemoBottomCTA";
+import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -70,12 +71,12 @@ export default async function DemoPage({ params }: Props) {
           <p className="text-[#6B7280] mb-8">
             This demo analysis has been removed. Want your own AI-powered content analysis?
           </p>
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+          <WaitlistCTA
+            source="demo_expired_top"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors cursor-pointer"
           >
-            Get Started Free &rarr;
-          </Link>
+            Join the waitlist &rarr;
+          </WaitlistCTA>
         </main>
       </div>
     );
@@ -137,12 +138,12 @@ export default async function DemoPage({ params }: Props) {
                 Search rankings and competitor content change frequently.
               </p>
             </div>
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center h-9 px-5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors whitespace-nowrap shrink-0"
+            <WaitlistCTA
+              source="demo_expired_banner"
+              className="inline-flex items-center justify-center h-9 px-5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
-              Run a new analysis &rarr;
-            </Link>
+              Join the waitlist &rarr;
+            </WaitlistCTA>
           </div>
         </div>
       )}
@@ -183,12 +184,12 @@ export default async function DemoPage({ params }: Props) {
             <p className="text-sm text-[#6B7280] mb-6">
               SerpVive monitors your entire blog automatically, detecting decline and telling you exactly what to fix.
             </p>
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
+            <WaitlistCTA
+              source="demo_expired_bottom"
+              className="inline-flex items-center justify-center h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors cursor-pointer"
             >
-              Get Started Free &rarr;
-            </Link>
+              Join the waitlist &rarr;
+            </WaitlistCTA>
           </div>
         </section>
       )}

@@ -7,6 +7,7 @@ import {
 } from "@/lib/comparisons";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
+import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 import ComparisonTable from "@/components/marketing/vs/ComparisonTable";
 import PricingTable from "@/components/marketing/vs/PricingTable";
 import FAQSection from "@/components/marketing/vs/FAQSection";
@@ -346,13 +347,13 @@ export default async function ComparisonPage({ params }: Props) {
               No credit card required. Connect your Google Search Console, see
               your Health Score, and get your first AI diagnosis in minutes.
             </p>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-7 py-3.5 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
+            <WaitlistCTA
+              source="vs_slug"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-7 py-3.5 text-[15px] hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)] cursor-pointer"
             >
-              Get Started Free
+              Join the waitlist
               <ArrowRight size={16} strokeWidth={1.5} />
-            </Link>
+            </WaitlistCTA>
           </div>
 
           {/* Related Comparisons */}
