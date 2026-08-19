@@ -7,7 +7,20 @@ import { sendCancelFeedbackEmail } from "@/lib/email/send";
 import { resend, FROM_EMAIL } from "@/lib/email/resend";
 import type Stripe from "stripe";
 
+// PAYMENTS DISABLED — public version. See src/app/api/stripe/checkout/route.ts
+// for the full rationale. Returning 503 (not 200) is deliberate: if a Stripe
+// endpoint were still configured by mistake, failed deliveries surface in the
+// Stripe dashboard instead of being silently acknowledged.
+const PAYMENTS_DISABLED: boolean = true;
+
 export async function POST(request: Request) {
+  if (PAYMENTS_DISABLED) {
+    return NextResponse.json(
+      { error: "Payments are not enabled in this public version." },
+      { status: 503 },
+    );
+  }
+
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
 
@@ -382,7 +395,11 @@ export async function POST(request: Request) {
         ? await admin.from("profiles").select("email, full_name").eq("stripe_customer_id", customerId).single()
         : { data: null };
 
-      const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (!adminEmail) {
+        console.error("[stripe/webhook] ADMIN_EMAIL not configured — dispute alert NOT sent");
+        break;
+      }
 
       await resend.emails.send({
         from: FROM_EMAIL,
@@ -411,7 +428,11 @@ https://dashboard.stripe.com/disputes/${dispute.id}`,
       const dispute = event.data.object as Stripe.Dispute;
       if (dispute.status === "won" || dispute.status === "lost") {
         const amount = (dispute.amount / 100).toFixed(2);
-        const adminEmail = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (!adminEmail) {
+          console.error("[stripe/webhook] ADMIN_EMAIL not configured — dispute-resolution alert NOT sent");
+          break;
+        }
 
         await resend.emails.send({
           from: FROM_EMAIL,

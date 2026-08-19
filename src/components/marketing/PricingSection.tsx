@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import posthog from "posthog-js";
 import { Reveal } from "@/hooks/useReveal";
-import WaitlistCTA from "./WaitlistCTA";
 
 const PLANS = [
   {
@@ -17,7 +17,7 @@ const PLANS = [
     features: [
       "1 site",
       "100 pages monitored",
-      "1 free AI diagnosis",
+      "3 AI diagnoses (lifetime cap)",
       "Weekly monitoring",
       "Health Score + decay detection",
     ],
@@ -104,7 +104,7 @@ export default function PricingSection() {
         </Reveal>
         <Reveal>
           <p className="text-[16px] sm:text-[18px] text-[#94A3B8] leading-relaxed max-w-[520px] mx-auto mb-4">
-            Launching in H2 2026. Join the waitlist for priority access and an early-member discount.
+            Planned pricing. Payments are not enabled in this public version — every account gets the free tier.
           </p>
         </Reveal>
         <Reveal>
@@ -233,26 +233,34 @@ export default function PricingSection() {
                   {/* Spacer to push CTA to bottom */}
                   <div className="flex-1" />
 
-                  {/* CTA */}
-                  <WaitlistCTA
-                    source={`pricing_${plan.key}`}
-                    onClick={() =>
-                      posthog.capture("cta_clicked", {
-                        location: "pricing",
-                        plan: plan.key,
-                        interval: isAnnual ? "annual" : "monthly",
-                      })
-                    }
-                    className={`block w-full text-center py-3 rounded-lg text-[14px] font-semibold transition-all duration-200 mt-auto cursor-pointer ${
-                      plan.outline
-                        ? "text-[#94A3B8] border border-[#334155] hover:border-[#3B82F6] hover:text-[#3B82F6]"
-                        : plan.popular
-                        ? "bg-[#3B82F6] text-white hover:bg-[#2563EB] hover:shadow-[0_8px_30px_rgba(59,130,246,0.2)]"
-                        : "bg-[#1E293B] text-[#F1F5F9] hover:bg-[#334155]"
-                    }`}
-                  >
-                    Join waitlist
-                  </WaitlistCTA>
+                  {/* CTA — only the free tier is purchasable in this public
+                      version; paid tiers show planned pricing with a disabled
+                      button instead of a checkout that doesn't exist. */}
+                  {plan.key === "free" ? (
+                    <Link
+                      href="/signup"
+                      onClick={() =>
+                        posthog.capture("cta_clicked", {
+                          location: "pricing",
+                          plan: plan.key,
+                          interval: isAnnual ? "annual" : "monthly",
+                        })
+                      }
+                      className="block w-full text-center py-3 rounded-lg text-[14px] font-semibold no-underline transition-all duration-200 mt-auto bg-[#3B82F6] text-white hover:bg-[#2563EB] hover:shadow-[0_8px_30px_rgba(59,130,246,0.2)]"
+                    >
+                      {plan.cta}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-disabled="true"
+                      title="Payments are not enabled in this public version"
+                      className="block w-full text-center py-3 rounded-lg text-[13px] font-semibold mt-auto border border-[#334155] text-[#64748B] cursor-not-allowed"
+                    >
+                      Planned — not enabled
+                    </button>
+                  )}
                 </div>
               </Reveal>
             );
@@ -316,7 +324,7 @@ export default function PricingSection() {
         {/* Reassurance */}
         <Reveal>
           <p className="mt-8 text-[14px] text-[#94A3B8] max-w-[520px] mx-auto">
-            Free plan available. No credit card required. No setup fees. Cancel anytime.
+            This public version is free. No credit card required — payments are intentionally disabled.
           </p>
         </Reveal>
 
@@ -368,11 +376,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: "Connect Google Search Console, see your Health Score, and get 1 AI diagnosis for free. Upgrade anytime for more diagnoses and daily monitoring.",
+    a: "Connect Google Search Console, see your Health Score, and get 3 AI diagnoses (lifetime cap). In this public version every account runs on the free tier \u2014 payments are intentionally disabled.",
   },
   {
     q: "What happens if I cancel?",
-    a: "You keep access to your dashboard with weekly data syncs. Your data is preserved. Upgrade again anytime to resume daily monitoring and AI diagnoses.",
+    a: "You keep access to your dashboard with weekly data syncs, and your data is preserved. There is no subscription to cancel in this public version.",
   },
   {
     q: "Can I analyze pages that aren\u2019t mine?",

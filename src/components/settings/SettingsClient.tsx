@@ -7,7 +7,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/client";
 import {
   CreditCard, ExternalLink, Loader2, AlertTriangle,
   CheckCircle2, Crown, Zap, Globe, FileText, BarChart3,
-  Unlink, Plus, ArrowUpRight, Key, Trash2, Clock, Calendar, Mail,
+  Unlink, Plus, Key, Trash2, Clock, Calendar, Mail,
   Eye, EyeOff,
 } from "lucide-react";
 import {
@@ -137,6 +137,11 @@ export default function SettingsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabaseBrowser();
+
+  // PAYMENTS DISABLED — public version. Billing UI is hidden (not deleted):
+  // the upgrade section, portal buttons, and plan-change flows stay in the
+  // codebase but never render.
+  const PAYMENTS_DISABLED: boolean = true;
   const checkoutStatus = searchParams.get("checkout");
   const upgradeStatus = searchParams.get("upgrade");
 
@@ -176,12 +181,6 @@ export default function SettingsClient({
   const [currentTimezone, setCurrentTimezone] = useState(timezone);
   const [currentDigestDay, setCurrentDigestDay] = useState(digestDay);
   const [emailOff, setEmailOff] = useState(emailUnsubscribed);
-
-  // Change email state
-  const [showEmailChange, setShowEmailChange] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
-  const [savingEmail, setSavingEmail] = useState(false);
-  const [emailChangeSuccess, setEmailChangeSuccess] = useState(false);
 
   // Delete account state
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -280,23 +279,6 @@ export default function SettingsClient({
 
     if (err) setError("Failed to update digest day");
     else flash("Digest day updated");
-  }
-
-  async function handleChangeEmail() {
-    if (!newEmail.trim() || newEmail.trim() === email) return;
-    setSavingEmail(true);
-    setError("");
-
-    const { error: err } = await supabase.auth.updateUser({ email: newEmail.trim() });
-
-    setSavingEmail(false);
-
-    if (err) {
-      setError(err.message);
-      return;
-    }
-
-    setEmailChangeSuccess(true);
   }
 
   async function handleEmailToggle() {
@@ -534,16 +516,7 @@ export default function SettingsClient({
                 </button>
               ) : (
                 <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
-                  <span>Site limit reached ({sitesLimit}/{sitesLimit}).</span>
-                  {upgradePlans.length > 0 && (
-                    <button
-                      onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
-                      className="text-[#3B82F6] hover:underline inline-flex items-center gap-0.5"
-                    >
-                      Upgrade to add more
-                      <ArrowUpRight size={10} strokeWidth={1.5} />
-                    </button>
-                  )}
+                  <span>Site limit reached ({sitesLimit}/{sitesLimit}) — this public version has a free usage cap.</span>
                 </div>
               )}
             </div>
@@ -775,7 +748,7 @@ export default function SettingsClient({
               AI Diagnoses
             </span>
             <span className="text-[#111827] tabular-nums">
-              {plan === "free" ? "Upgrade to unlock" : `${diagnosesUsed} / ${diagnosesLimit}`}
+              {plan === "free" ? "3 per account (lifetime cap)" : `${diagnosesUsed} / ${diagnosesLimit}`}
             </span>
           </div>
           {plan !== "free" && (
@@ -826,19 +799,15 @@ export default function SettingsClient({
 
         {!hasStripeCustomer && plan === "free" && (
           <div className="mt-5 pt-4 border-t border-[#F3F4F6]">
-            <button
-              onClick={() => document.getElementById("upgrade-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors"
-            >
-              <Zap size={14} strokeWidth={1.5} />
-              Choose a Plan
-            </button>
+            <p className="text-xs text-[#9CA3AF] text-center">
+              This public version has a free usage cap. Paid plans are not enabled.
+            </p>
           </div>
         )}
       </div>
 
-      {/* ── Upgrade ── */}
-      {upgradePlans.length > 0 && (
+      {/* ── Upgrade ── (hidden: payments disabled in public version) */}
+      {!PAYMENTS_DISABLED && upgradePlans.length > 0 && (
         <div id="upgrade-section" className="bg-white rounded-lg border border-[#E5E7EB] p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#111827]">

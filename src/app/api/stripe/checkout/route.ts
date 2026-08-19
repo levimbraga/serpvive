@@ -9,7 +9,24 @@ const CheckoutInputSchema = z.object({
   interval: z.enum(["monthly", "annual"]).default("monthly"),
 });
 
+// ─────────────────────────────────────────────────────────────────────────
+// PAYMENTS DISABLED — public version.
+// Monetization is designed and integrated (Stripe checkout, portal,
+// webhooks, plan sync), but deliberately switched off: every account runs
+// on the free tier with usage caps instead of paywalls. The code below is
+// kept intact so the billing design remains reviewable; this early return
+// is the only change needed to re-enable it.
+// ─────────────────────────────────────────────────────────────────────────
+const PAYMENTS_DISABLED: boolean = true;
+
 export async function POST(request: Request) {
+
+  if (PAYMENTS_DISABLED) {
+    return NextResponse.json(
+      { error: "Payments are not enabled in this public version." },
+      { status: 503 },
+    );
+  }
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
 

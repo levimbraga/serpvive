@@ -8,10 +8,19 @@ import { getStripe, resolveIntervalFromPriceId } from "@/lib/stripe";
  * Runs every hour. Checks profiles where plan_changes_at <= now()
  * and applies the pending_plan.
  */
+// PAYMENTS DISABLED — public version. This cron only exists to apply
+// deferred Stripe downgrades/cancellations; with payments off it has no
+// work to do. Also removed from vercel.json's cron schedule.
+const PAYMENTS_DISABLED: boolean = true;
+
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (PAYMENTS_DISABLED) {
+    return NextResponse.json({ data: { skipped: "payments disabled in public version" } });
   }
 
   const admin = getSupabaseAdmin();

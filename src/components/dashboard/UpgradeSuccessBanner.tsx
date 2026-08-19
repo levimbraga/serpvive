@@ -1,22 +1,24 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CheckCircle2, X } from "lucide-react";
 
 export default function UpgradeSuccessBanner() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get("upgraded") === "true") {
+    if (searchParams.get("upgraded") !== "true") return;
+    // Next tick: avoids a synchronous setState inside the effect body
+    const t = setTimeout(() => {
       setShow(true);
       // Clean URL
       const url = new URL(window.location.href);
       url.searchParams.delete("upgraded");
       window.history.replaceState({}, "", url.toString());
-    }
+    }, 0);
+    return () => clearTimeout(t);
   }, [searchParams]);
 
   if (!show) return null;

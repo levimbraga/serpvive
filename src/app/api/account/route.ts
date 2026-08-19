@@ -20,8 +20,10 @@ export async function DELETE() {
     .eq("id", user.id)
     .single();
 
-  // Cancel Stripe subscription + scrub PII from customer (keep customer for tax/dispute compliance)
-  if (profile?.stripe_customer_id) {
+  // Cancel Stripe subscription + scrub PII from customer (keep customer for tax/dispute compliance).
+  // Guarded on STRIPE_SECRET_KEY so account deletion keeps working with
+  // payments disabled — Stripe cleanup is best-effort, deletion is not.
+  if (profile?.stripe_customer_id && process.env.STRIPE_SECRET_KEY) {
     try {
       const stripe = getStripe();
 

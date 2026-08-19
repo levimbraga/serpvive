@@ -26,15 +26,15 @@ export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC
               Your monitoring is paused
             </p>
             <p className="text-xs text-[#DC2626] mt-0.5">
-              Data was last updated on {lastSyncDate}. Upgrade to resume real-time monitoring.
+              Data was last updated on {lastSyncDate}.
             </p>
           </div>
         </div>
         <Link
-          href="/settings#upgrade-section"
+          href="/settings"
           className="flex items-center gap-1 h-9 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-medium transition-colors whitespace-nowrap"
         >
-          Upgrade Now
+          Settings
         </Link>
       </div>
     );
@@ -49,15 +49,15 @@ export default function FreePlanBanner({ siteStatus, lastSyncAt, timeZone = "UTC
             You&apos;re on the free plan
           </p>
           <p className="text-xs text-[#B45309] mt-0.5">
-            Your data syncs weekly instead of daily. Upgrade for real-time monitoring + AI diagnoses.
+            Your data syncs weekly. This public version runs on the free tier with usage caps.
           </p>
         </div>
       </div>
       <Link
-        href="/settings#upgrade-section"
+        href="/settings"
         className="flex items-center gap-1.5 text-sm font-medium text-[#92400E] hover:text-[#78350F] whitespace-nowrap"
       >
-        Upgrade
+        Plan details
         <ArrowUpRight size={16} strokeWidth={1.5} />
       </Link>
     </div>

@@ -1,9 +1,5 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
-import posthog from "posthog-js";
-
 type UpgradeBannerProps = {
   totalContentPages: number;
   monitoredPages: number;
@@ -26,14 +22,9 @@ export default function UpgradeBanner({ totalContentPages, monitoredPages, plan,
           Currently monitoring {monitoredPages.toLocaleString()} of {totalContentPages.toLocaleString()} pages (sorted by traffic).
         </p>
       </div>
-      <Link
-        href="/settings"
-        onClick={() => posthog.capture("upgrade_clicked", { from: "dashboard_banner", current_plan: plan })}
-        className="flex items-center gap-1 text-sm font-medium text-[#92400E] hover:text-[#78350F] whitespace-nowrap"
-      >
-        Upgrade
-        <ArrowUpRight size={16} strokeWidth={1.5} />
-      </Link>
+      <span className="text-xs text-[#B45309] whitespace-nowrap">
+        Free usage cap
+      </span>
     </div>
   );
 }
