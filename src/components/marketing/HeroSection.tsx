@@ -1,7 +1,6 @@
 "use client";
 
 import posthog from "posthog-js";
-import WaitlistCTA from "./WaitlistCTA";
 
 export default function HeroSection() {
   return (
@@ -54,18 +53,15 @@ export default function HeroSection() {
 
       {/* CTAs */}
       <div className="relative flex flex-col items-center gap-4 animate-[fadeInUp_0.6s_ease_0.3s_both]">
-        <WaitlistCTA
-          source="hero"
+        <a
+          href="/signup"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "primary" })}
-          className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-bold transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 cursor-pointer"
-          style={{ fontSize: "clamp(1.05rem, 1.3vw, 1.25rem)", padding: "clamp(16px, 1.5vw, 22px) clamp(32px, 3.5vw, 56px)" } as React.CSSProperties}
+          className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-bold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5"
+          style={{ fontSize: "clamp(1.05rem, 1.3vw, 1.25rem)", padding: "clamp(16px, 1.5vw, 22px) clamp(32px, 3.5vw, 56px)" }}
         >
-          Join the waitlist
+          Get started free
           <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
-        </WaitlistCTA>
-        <p className="text-[#64748B] text-xs mt-1" style={{ fontSize: "clamp(0.8rem, 1vw, 0.9rem)" }}>
-          Launching H2 2026 · Early members get priority access
-        </p>
+        </a>
         <a
           href="#features"
           onClick={() => posthog.capture("cta_clicked", { location: "hero", type: "secondary" })}

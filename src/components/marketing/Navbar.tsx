@@ -5,7 +5,6 @@ import Link from "next/link";
 import posthog from "posthog-js";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { COMPARISON_NAV_ITEMS } from "@/lib/comparison-nav";
-import WaitlistCTA from "./WaitlistCTA";
 
 type ResourceLink = {
   label: string;
@@ -106,13 +105,13 @@ export default function Navbar() {
             AI diagnosis now includes competitor micro-drafts
           </span>
           <span className="sm:hidden text-xs">AI micro-drafts now available</span>
-          <WaitlistCTA
-            source="announcement"
-            className="font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+          <Link
+            href="/signup"
+            className="font-semibold hover:opacity-80 transition-opacity"
             onClick={() => posthog.capture("cta_clicked", { location: "announcement" })}
           >
-            Join waitlist &rarr;
-          </WaitlistCTA>
+            Try free &rarr;
+          </Link>
           <button
             onClick={() => setBannerVisible(false)}
             className="absolute right-3 text-white/60 hover:text-white text-lg leading-none transition-colors"
@@ -143,20 +142,20 @@ export default function Navbar() {
 
         {/* ── Desktop Links ── */}
         <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-          <a
+          <Link
             href="/#features"
             className="text-[16px] font-medium text-[#CBD5E1] hover:text-white transition-colors no-underline"
             style={{ letterSpacing: "0.01em" }}
           >
             Features
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#pricing"
             className="text-[16px] font-medium text-[#CBD5E1] hover:text-white transition-colors no-underline"
             style={{ letterSpacing: "0.01em" }}
           >
             Pricing
-          </a>
+          </Link>
 
           {/* Resources Dropdown (hover on desktop) */}
           <div
@@ -238,14 +237,14 @@ export default function Navbar() {
           >
             Log in
           </Link>
-          <WaitlistCTA
-            source="nav"
-            className="hidden lg:inline-flex items-center rounded-lg bg-[#2563EB] !text-white font-semibold px-6 py-2.5 text-[15px] hover:bg-[#1D4ED8] transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.15)] cursor-pointer"
+          <Link
+            href="/signup"
+            className="hidden lg:inline-flex items-center rounded-lg bg-[#2563EB] !text-white font-semibold px-6 py-2.5 text-[15px] hover:bg-[#1D4ED8] transition-all no-underline hover:shadow-[0_0_30px_rgba(37,99,235,0.15)]"
             onClick={() => posthog.capture("cta_clicked", { location: "nav" })}
           >
-            <span className="hidden xl:inline">Join waitlist</span>
-            <span className="xl:hidden">Waitlist</span>
-          </WaitlistCTA>
+            <span className="hidden xl:inline">Get Started Free</span>
+            <span className="xl:hidden">Start Free</span>
+          </Link>
 
           {/* Hamburger (mobile + tablet) */}
           <button
@@ -281,20 +280,20 @@ export default function Navbar() {
         >
           <div className="flex flex-col p-6 gap-1">
             {/* Main links */}
-            <a
+            <Link
               href="/#features"
               onClick={closeAll}
               className="py-3 px-3 text-[15px] font-medium text-[#E2E8F0] hover:bg-[#1E293B]/50 rounded-lg no-underline transition-colors"
             >
               Features
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#pricing"
               onClick={closeAll}
               className="py-3 px-3 text-[15px] font-medium text-[#E2E8F0] hover:bg-[#1E293B]/50 rounded-lg no-underline transition-colors"
             >
               Pricing
-            </a>
+            </Link>
             <Link
               href="/blog"
               onClick={closeAll}
@@ -341,16 +340,16 @@ export default function Navbar() {
               >
                 Log in
               </Link>
-              <WaitlistCTA
-                source="mobile_nav"
+              <Link
+                href="/signup"
                 onClick={() => {
                   closeAll();
                   posthog.capture("cta_clicked", { location: "mobile_nav" });
                 }}
-                className="flex items-center justify-center rounded-lg bg-[#2563EB] !text-white font-semibold py-3 px-6 text-[15px] hover:bg-[#1D4ED8] transition-all cursor-pointer"
+                className="flex items-center justify-center rounded-lg bg-[#2563EB] !text-white font-semibold py-3 px-6 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all"
               >
-                Join waitlist
-              </WaitlistCTA>
+                Get Started Free
+              </Link>
             </div>
           </div>
         </div>

@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
-import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 import {
   CheckCircle2,
   Search,
@@ -284,13 +283,13 @@ export default function ContentDecayChecklist() {
               SerpVive automates steps 1-6 and generates AI-powered refresh
               briefs for steps 7-13. Monitor, diagnose, and fix in one place.
             </p>
-            <WaitlistCTA
-              source="resources_checklist"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] text-white font-semibold px-6 py-3 text-[15px] hover:bg-[#2563EB] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] cursor-pointer"
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#2563EB] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]"
             >
-              Join the waitlist
+              Get Started Free
               <ArrowRight size={16} strokeWidth={1.5} />
-            </WaitlistCTA>
+            </Link>
           </div>
         </div>
       </section>

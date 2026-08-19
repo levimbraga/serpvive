@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import SignupForm from "./_signup-form";
 
 export const metadata: Metadata = {
-  title: "SerpVive",
-  robots: { index: false, follow: false },
+  title: "Sign Up Free — SerpVive",
+  description: "Create your free SerpVive account. Monitor content decay, get AI-powered diagnosis, and protect your blog traffic.",
+  alternates: { canonical: "https://serpvive.com/signup" },
 };
 
-// Public signups are disabled during the pre-launch waitlist phase.
-// Anyone hitting /signup is redirected to the landing page, where the
-// waitlist modal lives. Accounts are created manually via Supabase for now.
 export default function SignupPage() {
-  redirect("/");
+  return <SignupForm />;
 }

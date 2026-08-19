@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
-import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 import {
   ArrowRight,
   Shield,
@@ -158,13 +157,13 @@ export default function AboutPage() {
               Connect your Google Search Console, see your Health Score, and get
               your first AI diagnosis in minutes.
             </p>
-            <WaitlistCTA
-              source="about"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-6 py-3 text-[15px] hover:bg-[#1D4ED8] transition-all cursor-pointer"
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all"
             >
-              Join the waitlist
+              Get Started Free
               <ArrowRight size={16} strokeWidth={1.5} />
-            </WaitlistCTA>
+            </Link>
           </div>
         </div>
       </section>

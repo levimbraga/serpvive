@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getAllPosts, type BlogPostMeta } from "@/lib/blog";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
-import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 import { Calendar, Clock, ArrowRight, BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -209,13 +208,13 @@ export default function BlogIndex() {
               SerpVive monitors your blog, detects decay, and tells you exactly
               what to fix. Free plan available.
             </p>
-            <WaitlistCTA
-              source="blog_index"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-6 py-3 text-[15px] hover:bg-[#1D4ED8] transition-all cursor-pointer"
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] text-white font-semibold px-6 py-3 text-[15px] no-underline hover:bg-[#1D4ED8] transition-all"
             >
-              Join the waitlist
+              Get Started Free
               <ArrowRight size={16} strokeWidth={1.5} />
-            </WaitlistCTA>
+            </Link>
           </div>
         </div>
       </section>

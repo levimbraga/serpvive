@@ -3,7 +3,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { PostHogProvider } from "@/lib/posthog/provider";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
-import { WaitlistProvider } from "@/components/marketing/WaitlistProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -47,9 +46,7 @@ export default function RootLayout({
       <body className="antialiased">
         <GoogleAnalytics />
         <PostHogProvider>
-          <WaitlistProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-          </WaitlistProvider>
+          <TooltipProvider>{children}</TooltipProvider>
         </PostHogProvider>
         <CookieConsentBanner />
       </body>

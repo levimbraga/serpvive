@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -37,24 +37,22 @@ export default function SignupForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [country, setCountry] = useState("");
+  // Auto-detect country from timezone via lazy initializer (runs once on the
+  // client; SSR-safe because Intl exists in Node). Avoids a setState-in-effect.
+  const [country, setCountry] = useState(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return TZ_COUNTRY_MAP[tz] ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = getSupabaseBrowser();
-
-  // Auto-detect country from timezone
-  useEffect(() => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const detected = TZ_COUNTRY_MAP[tz];
-      if (detected) setCountry(detected);
-    } catch {
-      // ignore
-    }
-  }, []);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();

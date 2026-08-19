@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import posthog from "posthog-js";
-import WaitlistCTA from "@/components/marketing/WaitlistCTA";
 
 export default function DemoBottomCTA({ demoId }: { demoId: string }) {
   return (
@@ -33,13 +32,13 @@ export default function DemoBottomCTA({ demoId }: { demoId: string }) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-            <WaitlistCTA
-              source="demo_bottom"
-              onClick={() => posthog.capture("demo_bottom_cta_clicked", { demo_id: demoId, cta: "waitlist" })}
-              className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors cursor-pointer"
+            <Link
+              href="/signup"
+              onClick={() => posthog.capture("demo_bottom_cta_clicked", { demo_id: demoId, cta: "signup" })}
+              className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
             >
-              Join the waitlist &rarr;
-            </WaitlistCTA>
+              Get Started Free &rarr;
+            </Link>
             <Link
               href="/#pricing"
               onClick={() => posthog.capture("demo_bottom_cta_clicked", { demo_id: demoId, cta: "pricing" })}
@@ -48,7 +47,7 @@ export default function DemoBottomCTA({ demoId }: { demoId: string }) {
               See Pricing
             </Link>
           </div>
-          <p className="text-xs text-[#9CA3AF]">Launching H2 2026 &middot; Early members get priority access</p>
+          <p className="text-xs text-[#9CA3AF]">No credit card required &middot; Free plan available</p>
         </div>
       </div>
     </section>

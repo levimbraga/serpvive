@@ -2,7 +2,6 @@
 
 import posthog from "posthog-js";
 import { Reveal } from "@/hooks/useReveal";
-import WaitlistCTA from "./WaitlistCTA";
 
 export default function FinalCTA() {
   return (
@@ -41,26 +40,26 @@ export default function FinalCTA() {
         </Reveal>
 
         <Reveal>
-          <WaitlistCTA
-            source="final"
+          <a
+            href="/signup"
             onClick={() => posthog.capture("cta_clicked", { location: "final" })}
-            className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 cursor-pointer"
-            style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" } as React.CSSProperties}
+            className="inline-flex items-center gap-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold no-underline transition-all duration-200 hover:bg-[#2563EB] hover:shadow-[0_8px_50px_rgba(59,130,246,0.2)] hover:-translate-y-0.5"
+            style={{ fontSize: "clamp(1rem, 1.2vw, 1.25rem)", padding: "clamp(14px, 1.5vw, 20px) clamp(28px, 3vw, 48px)" }}
           >
-            Join the waitlist
+            Get Started Free
             <span style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}>&rarr;</span>
-          </WaitlistCTA>
+          </a>
         </Reveal>
 
         <Reveal>
           <p className="text-[14px] sm:text-[16px] text-[#64748B] leading-relaxed mt-6 mb-7">
-            Launching in H2 2026 — early members get priority access and a launch discount.
+            Analyze any page for free — no Google Search Console required.
           </p>
         </Reveal>
 
         <Reveal>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            {["No spam", "Unsubscribe anytime", "Launch discount for early members"].map((text) => (
+            {["No credit card required", "Cancel anytime", "First AI diagnosis included"].map((text) => (
               <span key={text} className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
                 <span className="text-[#3B82F6] font-bold text-[12px]">&#x2713;</span>
                 {text}
