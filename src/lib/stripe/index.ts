@@ -48,45 +48,10 @@ export const STRIPE_PLANS = {
 export type StripePlanKey = keyof typeof STRIPE_PLANS;
 
 /**
- * Hardcoded price ID → plan mapping.
- * This is the bulletproof fallback when env vars are missing or wrong.
- * Includes both current and legacy prices from the Stripe Dashboard.
- */
-const KNOWN_PRICE_IDS: Record<string, string> = {
-  // ── Live ──
-  "price_1TDYIJLxIzb11hGR1wKDkbU2": "starter",  // monthly $29
-  "price_1TDYIKLxIzb11hGR1jxF4TgD": "starter",  // annual $288
-  "price_1TDYILLxIzb11hGRmiFtgvx7": "pro",      // monthly $69
-  "price_1TDYILLxIzb11hGReYalPvFE": "pro",      // annual $696
-  "price_1TDYIMLxIzb11hGRK1Rzg3jm": "agency",   // monthly $129
-  "price_1TDYINLxIzb11hGRSOq8BFsZ": "agency",   // annual $1,296
-
-  // ── Test (dev local) ──
-  "price_1T97lJLxIzb11hGRTsBlc6sW": "starter",  // monthly $29
-  "price_1TABV3LxIzb11hGRQ8bbW8xK": "starter",  // annual $290
-  "price_1T9BehLxIzb11hGRt4JMmdPd": "pro",      // monthly $69
-  "price_1TABV4LxIzb11hGRlFGdOl27": "pro",      // annual $690
-  "price_1T97lKLxIzb11hGRnhv01Z4E": "pro",      // legacy monthly $59
-  "price_1T9BeiLxIzb11hGRk7Whmltb": "agency",   // monthly $129
-  "price_1TABV4LxIzb11hGRW10lkSuU": "agency",   // annual $1290
-  "price_1T97lKLxIzb11hGRFU6644Ux": "agency",   // legacy monthly $99
-};
-
-/** Known annual price IDs — used to resolve billing interval without Stripe API call */
-const KNOWN_ANNUAL_PRICE_IDS = new Set([
-  // Live
-  "price_1TDYIKLxIzb11hGR1jxF4TgD",  // Starter annual $288
-  "price_1TDYILLxIzb11hGReYalPvFE",  // Pro annual $696
-  "price_1TDYINLxIzb11hGRSOq8BFsZ",  // Agency annual $1,296
-  // Test (dev local)
-  "price_1TABV3LxIzb11hGRQ8bbW8xK",  // Starter annual $290
-  "price_1TABV4LxIzb11hGRlFGdOl27",  // Pro annual $690
-  "price_1TABV4LxIzb11hGRW10lkSuU",  // Agency annual $1290
-]);
-
-/**
  * Resolve Stripe price_id → billing interval ("monthly" | "annual").
- * Checks: 1) env vars, 2) hardcoded set, 3) Stripe API fallback.
+ * Checks: 1) env vars (STRIPE_PRICE_* / *_ANNUAL), 2) Stripe API fallback.
+ * Price IDs are intentionally NOT hardcoded — they identify account products
+ * and belong in environment configuration, not in a public repository.
  */
 export async function resolveIntervalFromPriceId(priceId: string): Promise<"monthly" | "annual"> {
   // 1. Check env var match (annualPriceId fields)
@@ -95,13 +60,7 @@ export async function resolveIntervalFromPriceId(priceId: string): Promise<"mont
     if (config.priceId === priceId) return "monthly";
   }
 
-  // 2. Check hardcoded annual set
-  if (KNOWN_ANNUAL_PRICE_IDS.has(priceId)) return "annual";
-
-  // 3. If in KNOWN_PRICE_IDS but not annual → monthly
-  if (KNOWN_PRICE_IDS[priceId]) return "monthly";
-
-  // 4. Fallback: ask Stripe API
+  // 2. Fallback: ask Stripe API
   try {
     const stripe = getStripe();
     const price = await stripe.prices.retrieve(priceId);
@@ -122,7 +81,7 @@ const PRODUCT_NAME_TO_PLAN: Record<string, string> = {
 
 /**
  * Resolve Stripe price_id → plan name.
- * Checks: 1) env vars, 2) hardcoded map, 3) Stripe API fallback.
+ * Checks: 1) env vars, 2) Stripe API fallback (product metadata, then name).
  */
 export async function resolvePlanFromPriceId(priceId: string): Promise<string> {
   // 1. Try env var match
@@ -133,15 +92,8 @@ export async function resolvePlanFromPriceId(priceId: string): Promise<string> {
     }
   }
 
-  // 2. Try hardcoded map (bulletproof — works even with no env vars)
-  const hardcoded = KNOWN_PRICE_IDS[priceId];
-  if (hardcoded) {
-    console.log(`[stripe] Resolved price_id=${priceId} → plan="${hardcoded}" via hardcoded map`);
-    return hardcoded;
-  }
-
-  // 3. Fallback: ask Stripe API for the product behind this price
-  console.warn(`[stripe] price_id=${priceId} not in env vars or hardcoded map — querying Stripe API`);
+  // 2. Fallback: ask Stripe API for the product behind this price
+  console.warn(`[stripe] price_id=${priceId} not in env vars — querying Stripe API`);
   try {
     const stripe = getStripe();
     const price = await stripe.prices.retrieve(priceId);

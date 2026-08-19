@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { resend, FROM_EMAIL } from "@/lib/email";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "levimaiabraga@gmail.com";
+// No hardcoded fallback: if ADMIN_EMAIL is unset, the route refuses instead
+// of silently delivering to a default inbox.
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 const contactSchema = z.object({
   name: z.string().max(100).optional(),
@@ -47,6 +49,14 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Too many messages. Please try again later." },
         { status: 429 }
+      );
+    }
+
+    if (!ADMIN_EMAIL) {
+      console.error("[contact] ADMIN_EMAIL not configured — refusing to send");
+      return NextResponse.json(
+        { error: "Contact form is not configured." },
+        { status: 503 }
       );
     }
 

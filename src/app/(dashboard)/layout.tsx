@@ -4,7 +4,7 @@ import { getActiveSiteId } from "@/lib/active-site";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
 import { PostHogIdentify } from "@/lib/posthog/identify";
-import { PLAN_LIMITS, type PlanName, getAdminEmail, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
 
 export default async function DashboardLayout({
   children,
@@ -50,7 +50,7 @@ export default async function DashboardLayout({
         plan={plan}
         sites={sites}
         activeSiteId={activeSiteId}
-        isAdmin={user.email === getAdminEmail()}
+        isAdmin={isAdmin(user.email)}
         hasFreeDiagnosis={hasFreeDiagnosis}
         hasGsc={hasGsc}
         autoDiagStatus={(activeSite as { auto_diagnosis_status?: string } | undefined)?.auto_diagnosis_status ?? "pending"}

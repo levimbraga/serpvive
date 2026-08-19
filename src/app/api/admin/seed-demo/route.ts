@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getAdminEmail } from "@/lib/constants";
+import { isAdmin } from "@/lib/constants";
 import { seedDemo } from "@/scripts/seed-demo";
 import { runEngine } from "@/lib/engine/run-engine";
 
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || user.email !== getAdminEmail()) {
+  if (!user || !isAdmin(user.email)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

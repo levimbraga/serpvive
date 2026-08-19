@@ -8,7 +8,8 @@ import { nanoid } from "nanoid";
 
 export const maxDuration = 300; // 5 minutes
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+// Deny-by-default: unset ADMIN_EMAIL means no one passes the guard below.
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const PIPELINE_TIMEOUT_MS = 270 * 1000; // 4.5 min — leaves 30s buffer before Vercel's 300s maxDuration
 const STALE_MS = 6 * 60 * 1000; // 6 minutes — must exceed PIPELINE_TIMEOUT + overhead
 
@@ -21,7 +22,7 @@ async function getAdminUser() {
   const supabase = await getSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAIL || !user || user.email !== ADMIN_EMAIL) {
     return null;
   }
   return user;
