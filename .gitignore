@@ -22,7 +22,21 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.log
+.eslintcache
+
+# local data / dumps (never commit user data)
+*.dump
+*.sql.gz
+*.sqlite
+/data/
+
+# local-only reports (session artifacts, not part of the codebase)
+SECURITY-AUDIT-REPORT.txt
+posthog-setup-report.md
+docs/design-references/
 
 # debug
 npm-debug.log*
