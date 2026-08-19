@@ -21,8 +21,11 @@ export function CookieConsentBanner() {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      setVisible(true);
-      return;
+      // Defer to the next tick: the banner must stay hidden during SSR/
+      // hydration (localStorage is client-only), so a lazy initializer can't
+      // do this — and deferring keeps setState out of the sync effect body.
+      const t = setTimeout(() => setVisible(true), 0);
+      return () => clearTimeout(t);
     }
     // Re-apply stored consent on every page load
     if (stored === "granted") {

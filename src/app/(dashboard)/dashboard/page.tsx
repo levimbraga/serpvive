@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PLAN_LIMITS, isAdmin } from "@/lib/constants";
@@ -76,7 +77,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a
+          <Link
             href="/pages/analyze"
             className="bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-sm"
           >
@@ -87,9 +88,9 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#4B5563]">
               Paste any URL + keyword and get an AI diagnosis with actionable recommendations.
             </p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/onboarding"
             className="bg-white rounded-lg border-2 border-[#E5E7EB] hover:border-[#3B82F6] p-6 transition-all hover:shadow-sm"
           >
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#4B5563]">
               Unlock automatic monitoring, Health Score, decay alerts, and more.
             </p>
-          </a>
+          </Link>
         </div>
 
         <ExternalAnalysesList userId={user.id} timeZone={tz} />
@@ -204,7 +205,10 @@ export default async function DashboardPage() {
   // Detect "all new" site — all pages are "new" status
   const allPagesNew = hasEngineRun && pages.length > 0 && pages.every((p) => p.status === "new");
 
-  // Show GSC info banner for sites less than 3 months old
+  // Show GSC info banner for sites less than 3 months old.
+  // Server component rendered per request — Date.now() here is a request
+  // timestamp, not client-render state; the purity rule doesn't apply.
+  // eslint-disable-next-line react-hooks/purity
   const siteAgeMs = site.created_at ? Date.now() - new Date(site.created_at).getTime() : Infinity;
   const isRecentSite = siteAgeMs < 90 * 24 * 60 * 60 * 1000; // < 3 months
 

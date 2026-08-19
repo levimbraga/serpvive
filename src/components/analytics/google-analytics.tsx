@@ -7,6 +7,11 @@ export function GoogleAnalytics() {
 
   return (
     <>
+      {/* Consent default MUST execute before the GA loader (Consent Mode v2).
+          This component renders only in the root layout, where
+          beforeInteractive is valid in the App Router — the rule can't see
+          through the indirection. */}
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
       <Script id="google-consent" strategy="beforeInteractive">
         {`
           window.dataLayer = window.dataLayer || [];

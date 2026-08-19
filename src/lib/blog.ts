@@ -64,8 +64,9 @@ export function getAllPosts(): BlogPostMeta[] {
     .map((slug) => {
       const post = getPostBySlug(slug);
       if (!post) return null;
-      const { content: _, ...meta } = post;
-      return meta;
+      const meta = { ...post } as Partial<typeof post>;
+      delete meta.content;
+      return meta as Omit<typeof post, "content">;
     })
     .filter((p): p is BlogPostMeta => p !== null)
     .sort(

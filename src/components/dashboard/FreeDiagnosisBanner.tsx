@@ -19,7 +19,8 @@ const POLL_INTERVAL_MS = 15_000; // 15 seconds
 export default function FreeDiagnosisBanner({ siteId, pageId, pagePath, isProcessing, dismissed: initialDismissed }: FreeDiagnosisBannerProps) {
   const router = useRouter();
   const triggered = useRef(false);
-  const startTime = useRef(Date.now());
+  // Set in the effect below (render must stay pure — no Date.now() here)
+  const startTime = useRef(0);
   const [timedOut, setTimedOut] = useState(false);
   const [dismissed, setDismissed] = useState(initialDismissed);
 

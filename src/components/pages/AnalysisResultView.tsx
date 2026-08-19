@@ -238,7 +238,7 @@ export default function AnalysisResultView({
                     <button
                       onClick={() => setExpandedEvidence(prev => {
                         const next = new Set(prev);
-                        next.has(i) ? next.delete(i) : next.add(i);
+                        if (next.has(i)) next.delete(i); else next.add(i);
                         return next;
                       })}
                       className="flex items-center gap-1 mt-2 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
@@ -317,7 +317,7 @@ export default function AnalysisResultView({
               return (
                 <div key={i} className="border border-[#E5E7EB] rounded-lg overflow-hidden">
                   <button
-                    onClick={() => setExpandedActions(prev => { const next = new Set(prev); next.has(i) ? next.delete(i) : next.add(i); return next; })}
+                    onClick={() => setExpandedActions(prev => { const next = new Set(prev); if (next.has(i)) next.delete(i); else next.add(i); return next; })}
                     className="w-full flex items-center gap-3 p-4 text-left hover:bg-[#F9FAFB] transition-colors"
                   >
                     <span className={`text-[11px] font-medium ${pri.textColor} ${pri.bg} px-2 py-0.5 rounded-full flex-shrink-0`}>

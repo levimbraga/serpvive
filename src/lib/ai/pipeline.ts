@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { searchGoogle } from "@/lib/serp/client";
-import { fetchPage, fetchCompetitors, formatPageForPrompt, type FetchedPage } from "@/lib/firecrawl-fetcher";
+import { fetchPage, fetchCompetitors, formatPageForPrompt } from "@/lib/firecrawl-fetcher";
 import type { PageContent } from "@/lib/serp/fetcher";
 import { validateContent } from "@/lib/url-validator";
 import { runDiagnosis, type DiagnosisResult } from "./diagnose";

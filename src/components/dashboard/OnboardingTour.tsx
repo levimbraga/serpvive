@@ -53,7 +53,10 @@ export default function OnboardingTour() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Next tick: keeps SSR/hydration output stable without a synchronous
+    // setState inside the effect body
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   // Auto-start on first visit

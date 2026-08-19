@@ -631,7 +631,8 @@ export async function runDiagnosis(params: DiagnoseParams): Promise<DiagnoseResu
   }
 
   // Strip reasoning (internal scratchpad, not shown to user)
-  const { reasoning: _reasoning, ...diagnosisWithoutReasoning } = parsed.data;
+  const diagnosisWithoutReasoning: Omit<z.infer<typeof DiagnosisSchema>, "reasoning"> & { reasoning?: unknown } = { ...parsed.data };
+  delete diagnosisWithoutReasoning.reasoning;
 
   // Sanitize AI output to remove potential XSS vectors before saving
   const sanitizedDiagnosis = sanitizeAiOutput(diagnosisWithoutReasoning) as DiagnosisResult;

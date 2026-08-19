@@ -47,7 +47,7 @@ export default function ImportingPage() {
     } catch {
       setError("Network error");
     }
-  }, [siteId, router]);
+  }, [siteId, router, redirectTarget]);
 
   useEffect(() => {
     if (!siteId) {
@@ -55,15 +55,19 @@ export default function ImportingPage() {
       return;
     }
 
-    // Initial poll
-    void pollStatus();
-
-    // Poll every 3 seconds
+    // Initial poll on the next tick (async — setState never fires
+    // synchronously inside the effect body), then every 3 seconds
+    const initial = setTimeout(() => {
+      void pollStatus();
+    }, 0);
     const interval = setInterval(() => {
       void pollStatus();
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(interval);
+    };
   }, [siteId, pollStatus, router]);
 
   const isComplete = data?.status === "active";

@@ -424,7 +424,6 @@ export default function PagesTable({ pages, timeZone = "UTC", siteId, siteDomain
             </thead>
             <tbody>
               {paginatedRows.map((page) => {
-                const cfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
                 const isExcluded = page.status === "excluded";
                 const isSelected = selectedIds.has(page.id);
 

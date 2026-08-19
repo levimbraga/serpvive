@@ -205,7 +205,7 @@ export async function runEngine(
 
 /** Clean a page title into a usable keyword. */
 function extractKeywordFromTitle(title: string): string | null {
-  let cleaned = title
+  const cleaned = title
     .replace(/\s*[|–—-]\s*[^|–—-]*$/, "")  // Remove "| Site Name", "— Blog", etc.
     .replace(/\s*\([^)]*\)\s*$/, "")          // Remove trailing "(anything)"
     .trim()

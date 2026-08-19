@@ -76,6 +76,10 @@ export default function DashboardHeader({
 
   function handleSiteChange(siteId: string) {
     if (siteId === activeSiteId) return;
+    // Writing document.cookie inside a user-event handler is intentional
+    // (site switch persists via cookie, then hard-navigates). The compiler's
+    // immutability rule can't see that this is an event handler side effect.
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `active_site_id=${siteId};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
     // Hard navigate to dashboard to ensure fresh data for the new site
     window.location.assign("/dashboard");
