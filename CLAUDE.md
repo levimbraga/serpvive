@@ -2,7 +2,7 @@
 
 ## O que é este projeto
 SerpVive (serpvive.com) é um AI-powered content decay monitor.
-Detecta posts perdendo tráfego, diagnostica POR QUE com Claude Opus 4.6, gera Refresh Brief com micro-drafts, e mede resultados automaticamente.
+Detecta posts perdendo tráfego, diagnostica POR QUE com Claude Opus 5, gera Refresh Brief com micro-drafts, e mede resultados automaticamente.
 
 ## Tech Stack (NÃO sugerir alternativas sem pedir)
 - **Framework:** Next.js 14+ (App Router) com TypeScript strict
@@ -10,7 +10,7 @@ Detecta posts perdendo tráfego, diagnostica POR QUE com Claude Opus 4.6, gera R
 - **Components:** shadcn/ui (usar SEMPRE que existir componente equivalente)
 - **Charts:** Recharts
 - **Database:** Supabase (PostgreSQL + Auth + RLS)
-- **AI:** Anthropic Claude Opus 4.6 (via SDK @anthropic-ai/sdk)
+- **AI:** Anthropic Claude Opus 5 (via SDK @anthropic-ai/sdk)
 - **SERP:** Serper.dev
 - **HTML Parse:** Cheerio
 - **Email:** Resend + React Email
@@ -106,7 +106,7 @@ src/
 - Logs estruturados pra debug
 
 ### AI / Anthropic
-- Model: `claude-opus-4-6` pra diagnósticos
+- Model: `claude-opus-5` pra diagnósticos (cadeia: Opus 5 → Sonnet 5 → Gemini 3.7 Flash → GPT-5.6 Terra)
 - Prompts de produção finalizados em `src/lib/ai/diagnose.ts` e `src/lib/ai/brief.ts`
 - NÃO existe mais sistema de teste de prompts (v1-v5 removidos)
 - Pipeline: SERP → fetch content → diagnosis → brief (~2-3 min, ~$0.12)

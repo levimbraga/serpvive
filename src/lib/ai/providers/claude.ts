@@ -1,9 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { AIProvider, AIMessage, AICallOptions, AICallResult } from "../providers";
 
+// USD per 1M tokens — source: Anthropic pricing docs, verified 2026-08-19.
+// Note: Sonnet 5 has introductory pricing ($2/$10) through 2026-08-31; the
+// standard rate below is used so cost_usd stays correct from Sep 2026 on
+// (it slightly over-reports during the intro window).
 const PRICING: Record<string, { input: number; output: number }> = {
-  "claude-opus-4-6": { input: 5, output: 25 },
-  "claude-sonnet-4-6": { input: 3, output: 15 },
+  "claude-opus-5": { input: 5, output: 25 },
+  "claude-sonnet-5": { input: 3, output: 15 },
 };
 
 // Reuse a single client per model to avoid re-creating on every call

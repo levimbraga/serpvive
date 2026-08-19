@@ -12,7 +12,7 @@
 | Database | PostgreSQL via Supabase | Managed relational DB |
 | Auth | Supabase Auth + custom Google OAuth | Email + GSC OAuth |
 | Security | Row Level Security (RLS) | Data isolation per user |
-| AI | Claude Opus 4.6 ($5/$25 per M tokens) | Diagnosis + Briefs + Micro-Drafts |
+| AI | Claude Opus 5 ($5/$25 per M tokens) | Diagnosis + Briefs + Micro-Drafts |
 | SERP | Serper.dev ($1/1K queries) | Google SERP data |
 | HTML Parse | Cheerio | Extract content from competitor pages |
 | Deploy | Vercel | Auto-deploy, cron jobs |
@@ -143,7 +143,7 @@ CREATE TABLE public.diagnoses (
   diagnosis JSONB NOT NULL,
   refresh_brief JSONB,
   serp_snapshot JSONB,
-  model_used TEXT DEFAULT 'claude-opus-4-6',
+  model_used TEXT DEFAULT 'claude-opus-5',
   tokens_input INT,
   tokens_output INT,
   cost_usd DECIMAL(6,4),

@@ -883,7 +883,7 @@ export async function seedDemo(admin: SupabaseClient, userId: string): Promise<{
       })),
       fetched_at: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
     },
-    model_used: "claude-opus-4-6",
+    model_used: "claude-opus-5",
     tokens_input: 12500,
     tokens_output: 3200,
     cost_usd: 0.1425,
