@@ -41,23 +41,28 @@ export async function GET(request: Request) {
 
       const plan = (profile?.plan ?? "free") as PlanName;
 
-      // ── Free plan: check freeze (90+ days) and weekly limit ──
+      // ── Free plan cadence ──
       if (plan === "free") {
-        // Check if frozen (90+ days on free)
-        if (profile?.free_since) {
-          const daysFree = (Date.now() - new Date(profile.free_since).getTime()) / (1000 * 60 * 60 * 24);
-          if (daysFree >= 90) {
-            console.log(`[cron/sync-gsc] Site ${site.id}: frozen (${Math.floor(daysFree)} days on free)`);
-            // Pause site if not already
-            if (site.status !== "paused") {
-              await admin.from("sites").update({ status: "paused" }).eq("id", site.id);
-            }
-            skipped++;
-            continue;
-          }
-        }
+        // DISABLED in the public version: the 90-day freeze existed as a
+        // cost backstop for abandoned free accounts on the path to a paid
+        // tier. With payments disabled there is no tier to migrate to, so
+        // freezing would just dead-end every account. The mechanism is kept
+        // (commented) because it worked as designed in production.
+        //
+        // if (profile?.free_since) {
+        //   const daysFree = (Date.now() - new Date(profile.free_since).getTime()) / (1000 * 60 * 60 * 24);
+        //   if (daysFree >= 90) {
+        //     console.log(`[cron/sync-gsc] Site ${site.id}: frozen (${Math.floor(daysFree)} days on free)`);
+        //     if (site.status !== "paused") {
+        //       await admin.from("sites").update({ status: "paused" }).eq("id", site.id);
+        //     }
+        //     skipped++;
+        //     continue;
+        //   }
+        // }
 
-        // Free: only sync weekly (7+ days since last sync)
+        // Weekly sync cadence STAYS for free accounts — this is a deliberate
+        // cost control (GSC API quota + processing), independent of the freeze.
         if (site.last_sync_at) {
           const daysSinceSync = (Date.now() - new Date(site.last_sync_at).getTime()) / (1000 * 60 * 60 * 24);
           if (daysSinceSync < 7) {
