@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { Github } from "lucide-react";
 import { COMPARISON_NAV_ITEMS } from "@/lib/comparison-nav";
+
+const GITHUB_URL = "https://github.com/levimbraga/serpvive";
 
 const LINKS = {
   Product: [
@@ -29,6 +32,7 @@ const LINKS = {
     { label: "Cookie Policy", href: "/cookie-policy" },
   ],
   Connect: [
+    { label: "GitHub", href: GITHUB_URL },
     { label: "Twitter/X", href: "https://x.com/levimbraga" },
     { label: "Email", href: "mailto:levi@serpvive.com" },
   ],
@@ -78,11 +82,21 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-12 pt-6 border-t border-[#1E293B]">
+        {/* Copyright + source */}
+        <div className="mt-12 pt-6 border-t border-[#1E293B] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-[13px] text-[#475569]">
             &copy; 2026 SerpVive. All rights reserved.
           </p>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View the SerpVive source code on GitHub"
+            className="inline-flex items-center gap-2 text-[13px] text-[#64748B] hover:text-[#F1F5F9] no-underline transition-colors group"
+          >
+            <Github size={18} strokeWidth={1.5} className="flex-shrink-0" />
+            <span>Source on GitHub</span>
+          </a>
         </div>
       </div>
     </footer>
