@@ -11,7 +11,7 @@ const BLOCKS = [
   {
     icon: TrendingDown,
     title: "Detects the moment traffic drops",
-    body: "Each page gets a Decay Score. Your blog gets a Health Score (0\u2013100). When something drops, you know immediately \u2014 plus weekly email alerts.",
+    body: "Each page gets a Decay Score. Your blog gets a Health Score (0\u2013100). When something drops, it surfaces on your dashboard the next time the engine runs.",
     hero: false,
   },
   {

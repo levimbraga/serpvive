@@ -56,7 +56,7 @@ const FEATURES = [
   {
     icon: Mail,
     title: "Weekly Digest",
-    desc: "Email summary of what needs attention",
+    desc: "Email summary of what needs attention — not enabled in this public version",
     accent: "blue" as const,
   },
 ];

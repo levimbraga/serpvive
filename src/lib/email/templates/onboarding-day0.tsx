@@ -59,7 +59,7 @@ export default function OnboardingDay0({
             ) : (
               <Text style={body}>
                 <strong style={{ color: "#16A34A" }}>Good news — your content looks healthy!</strong>{" "}
-                We&apos;ll keep monitoring and alert you if anything changes.
+                We&apos;ll keep tracking your pages — check your dashboard to see how they&apos;re doing.
               </Text>
             )}
 

@@ -181,7 +181,7 @@ export default async function DemoPage({ params }: Props) {
               Want a fresh analysis?
             </h2>
             <p className="text-sm text-[#6B7280] mb-6">
-              SerpVive monitors your entire blog automatically, detecting decline and telling you exactly what to fix.
+              SerpVive tracks your entire blog automatically, scoring decline and showing you what to fix.
             </p>
             <Link
               href="/signup"

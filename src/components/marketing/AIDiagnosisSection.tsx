@@ -17,7 +17,7 @@ const USE_CASES = [
   {
     icon: Zap,
     title: "Full monitoring (GSC connected)",
-    desc: "Health Score, decay alerts, AI diagnosis, automatic result tracking",
+    desc: "Health Score, decay detection, AI diagnosis, automatic result tracking",
   },
   {
     icon: FileText,

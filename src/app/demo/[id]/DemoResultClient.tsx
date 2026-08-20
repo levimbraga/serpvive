@@ -49,8 +49,8 @@ export default function DemoResultClient({ url, keyword, diagnosis, brief, creat
 
       {/* Inline CTA — between analysis and methodology */}
       <div className="border-l-2 border-[#3B82F6]/30 pl-4 my-6 text-sm text-[#6B7280]">
-        This is one page. SerpVive monitors your entire blog automatically —
-        detecting decline, diagnosing why, and telling you exactly what to fix.
+        This is one page. SerpVive tracks your entire blog automatically —
+        scoring decline, diagnosing why, and showing you what to fix.
         <a
           href="/signup"
           onClick={() => posthog.capture("demo_inline_cta_clicked", { demo_id: demoId })}

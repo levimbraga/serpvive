@@ -665,16 +665,24 @@ export default function SettingsClient({
             </select>
           </div>
 
-          {/* Digest day */}
-          <div className="flex items-center justify-between py-3">
+          {/* Digest day — the digest cron is gated to paid plans, so with
+              payments disabled no digest is ever sent. The control stays
+              visible but inert rather than disappearing, so the behaviour is
+              legible instead of mysterious. */}
+          <div className="flex items-start justify-between py-3">
             <span className="text-sm text-[#6B7280] flex items-center gap-1.5">
               <Calendar size={14} strokeWidth={1.5} />
-              Weekly digest day
+              <span className="flex flex-col">
+                Weekly digest day
+                <span className="text-xs text-[#9CA3AF]">
+                  Not sent in this public version
+                </span>
+              </span>
             </span>
             <select
               value={currentDigestDay}
               onChange={(e) => handleDigestDayChange(e.target.value)}
-              disabled={emailOff}
+              disabled
               className="h-8 px-2 text-sm text-[#111827] border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer disabled:opacity-50"
             >
               {DIGEST_DAYS.map((d) => (

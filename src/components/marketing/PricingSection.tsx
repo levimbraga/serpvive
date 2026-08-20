@@ -372,7 +372,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What if my blog has no decaying posts?",
-    a: "Great! Your Health Score will reflect that. You\u2019ll still get daily monitoring so you catch decline early \u2014 before it costs you traffic.",
+    a: "Great! Your Health Score will reflect that. Monitoring keeps running \u2014 weekly on the free tier \u2014 so decline shows up on your dashboard early.",
   },
   {
     q: "How does the free plan work?",

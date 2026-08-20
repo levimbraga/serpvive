@@ -77,7 +77,7 @@ export default function AutoDiagnosisReady({
             <Hr style={divider} />
 
             <Text style={footer}>
-              This was your free AI diagnosis from SerpVive. Upgrade to run more analyses on all your pages.
+              This diagnosis was run automatically when your site finished importing. Your account includes more — run them on the pages that matter most.
             </Text>
           </Section>
         </Container>

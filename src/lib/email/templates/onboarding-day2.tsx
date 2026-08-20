@@ -72,11 +72,11 @@ export default function OnboardingDay2({
             ) : (
               <>
                 <Text style={body}>
-                  Your content is looking good! SerpVive is monitoring your pages daily for traffic drops.
+                  Your content is looking good. SerpVive keeps re-scoring your pages on every sync so traffic drops show up early.
                 </Text>
                 <Text style={body}>
-                  If any page starts losing traffic, we&apos;ll detect it early and show you exactly what to fix
-                  with AI-powered diagnostics.
+                  If any page starts losing traffic, it will surface on your
+                  dashboard, where an AI diagnosis can tell you exactly what to fix.
                 </Text>
                 <Section style={ctaSection}>
                   <Button style={ctaButton} href={dashboardUrl}>

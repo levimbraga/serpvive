@@ -10,12 +10,6 @@ type OnboardingDay3Props = {
   dashboardUrl: string;
 };
 
-const PLANS = [
-  { name: "Starter", price: "$29/mo", features: "1 site · 100 pages · 10 diagnoses/mo" },
-  { name: "Pro", price: "$69/mo", features: "3 sites · 1,000 pages · 40 diagnoses/mo" },
-  { name: "Agency", price: "$129/mo", features: "10 sites · 5,000 pages · 120 diagnoses/mo" },
-];
-
 export default function OnboardingDay3({
   userName,
   siteDomain,
@@ -26,7 +20,7 @@ export default function OnboardingDay3({
   return (
     <Html>
       <Head />
-      <Preview>{`Unlock AI diagnoses for ${siteDomain}`}</Preview>
+      <Preview>{`Your decay report for ${siteDomain}`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
@@ -51,40 +45,29 @@ export default function OnboardingDay3({
                 </Section>
 
                 <Text style={body}>
-                  Your free diagnosis gave you a taste of what SerpVive can do.
-                  Upgrade to run <strong>unlimited AI diagnoses</strong> and get actionable
-                  refresh briefs for every decaying page.
+                  Each diagnosis tells you <strong>why</strong> a page is losing
+                  traffic — what the pages outranking it cover that yours
+                  doesn&apos;t — and gives you a refresh brief you can act on.
+                  Your account includes a set number of them; run one on the
+                  page that matters most.
                 </Text>
               </>
             ) : (
               <Text style={body}>
-                Your content is looking healthy! Upgrade to get proactive AI monitoring
-                with <strong>automatic diagnoses</strong> when decay is detected — so you
-                can fix issues before they cost you traffic.
+                Your content is looking healthy. SerpVive keeps monitoring in
+                the background and will flag pages as they start to decay, so
+                you can fix issues before they cost you traffic.
               </Text>
             )}
 
             <Section style={ctaSection}>
               <Button
                 style={{ ...ctaButton, backgroundColor: "#3B82F6" }}
-                href={`${dashboardUrl.replace(/\/dashboard.*/, "")}/settings`}
+                href={dashboardUrl}
               >
-                Upgrade Now
+                Open your dashboard
               </Button>
             </Section>
-
-            <Hr style={divider} />
-
-            <Text style={plansTitle}>Choose a plan:</Text>
-
-            {PLANS.map((plan) => (
-              <Section key={plan.name} style={planRow}>
-                <Text style={planName}>
-                  {plan.name} — <strong>{plan.price}</strong>
-                </Text>
-                <Text style={planFeatures}>{plan.features}</Text>
-              </Section>
-            ))}
 
             <Hr style={divider} />
 
@@ -181,32 +164,6 @@ const ctaButton: React.CSSProperties = {
 const divider: React.CSSProperties = {
   borderColor: "#E5E7EB",
   margin: "24px 0",
-};
-
-const plansTitle: React.CSSProperties = {
-  fontSize: "14px",
-  fontWeight: "bold",
-  color: "#111827",
-  margin: "0 0 12px",
-};
-
-const planRow: React.CSSProperties = {
-  backgroundColor: "#F9FAFB",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "8px",
-};
-
-const planName: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#111827",
-  margin: "0 0 2px",
-};
-
-const planFeatures: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#6B7280",
-  margin: "0",
 };
 
 const footer: React.CSSProperties = {

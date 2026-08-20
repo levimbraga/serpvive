@@ -12,12 +12,12 @@ export default function DemoBottomCTA({ demoId }: { demoId: string }) {
             Want this for your entire blog?
           </h2>
           <p className="text-[#4B5563] mb-8 max-w-md mx-auto">
-            SerpVive monitors your blog automatically, detects pages losing traffic, and tells you exactly WHY and WHAT to fix — with AI.
+            SerpVive tracks your blog automatically, scores every page for traffic loss, and shows you WHY a page is losing and WHAT to fix — with AI.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto mb-8 text-left">
             {[
-              "Automatic daily monitoring",
+              "Automatic monitoring, weekly on the free tier",
               "AI diagnosis with competitor analysis",
               "Micro-drafts so you write without researching",
               "Before/after proof that fixes worked",
