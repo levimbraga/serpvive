@@ -91,6 +91,8 @@ export async function POST(request: Request) {
             diagnosis: result.diagnosis,
             refresh_brief: result.brief,
             serp_snapshot: result.serpSnapshot,
+            // Recorded so the global spend cap counts demos too
+            cost_usd: result.totalCostUsd,
           })
           .eq("id", demoId);
 
