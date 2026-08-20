@@ -235,7 +235,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
                 <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-3">
                   <p className="text-sm text-[#92400E]">
                     {plan === "free"
-                      ? "This public version has a free usage cap (1 standalone URL analysis per account). Paid plans are not enabled."
+                      ? `This public version has a free usage cap (${diagnosesLimit} AI analyses per account, shared with Search Console diagnoses). Paid plans are not enabled.`
                       : `You've used all ${diagnosesLimit} diagnoses this month.`
                     }
                   </p>
@@ -254,7 +254,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
               <div className="flex items-center gap-1.5 text-xs text-[#9CA3AF]">
                 <Info size={12} strokeWidth={1.5} />
                 <span>
-                  Uses 1 AI diagnosis ({remaining}/{diagnosesLimit} remaining). Takes 3–5 min.
+                  Uses 1 AI analysis ({remaining}/{diagnosesLimit} remaining, shared with Search Console diagnoses). Takes 3–5 min.
                 </span>
               </div>
               <p className="text-[10px] text-[#D1D5DB] leading-relaxed">

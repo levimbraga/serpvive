@@ -753,18 +753,18 @@ export default function SettingsClient({
           <div className="flex items-center justify-between text-sm">
             <span className="text-[#6B7280] flex items-center gap-1.5">
               <BarChart3 size={14} strokeWidth={1.5} className="text-[#7C3AED]" />
-              AI Diagnoses
+              AI Analyses
             </span>
             <span className="text-[#111827] tabular-nums">
-              {plan === "free" ? "3 per account (lifetime cap)" : `${diagnosesUsed} / ${diagnosesLimit}`}
+              {diagnosesUsed} / {diagnosesLimit}
             </span>
           </div>
-          {plan !== "free" && (
-            <>
-              <Progress value={usagePercent} className="h-2" />
-              <p className="text-xs text-[#9CA3AF]">Resets monthly</p>
-            </>
-          )}
+          <Progress value={usagePercent} className="h-2" />
+          <p className="text-xs text-[#9CA3AF]">
+            {plan === "free"
+              ? "Lifetime cap per account — Search Console diagnoses and standalone URL analyses share this allowance"
+              : "Resets monthly"}
+          </p>
         </div>
 
         {hasStripeCustomer && (

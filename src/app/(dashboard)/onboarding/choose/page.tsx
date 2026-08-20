@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Zap, BarChart3, ArrowRight, Eye } from "lucide-react";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import ReferralSourcePrompt from "@/components/onboarding/ReferralSourcePrompt";
-import { FREE_LIFETIME_DIAGNOSES, FREE_LIFETIME_URL_ANALYSES } from "@/lib/constants";
+import { FREE_LIFETIME_ANALYSES } from "@/lib/constants";
 
 // A finished public analysis anyone can read without spending any allowance.
 const SAMPLE_DEMO_URL = "/demo/7aJVgyy6";
@@ -58,7 +58,7 @@ export default async function OnboardingChoosePage() {
             missing, and a refresh brief. No Google account, no setup.
           </p>
           <p className="text-xs text-[#6B7280] mb-6">
-            {FREE_LIFETIME_URL_ANALYSES} analyses included · takes ~3 minutes each
+            {FREE_LIFETIME_ANALYSES} AI analyses included (shared with Search Console) · takes ~3 minutes each
           </p>
           <span className="inline-flex items-center gap-2 text-sm font-medium text-[#3B82F6] group-hover:gap-3 transition-all">
             Analyze now <ArrowRight size={16} strokeWidth={1.5} />
@@ -82,7 +82,7 @@ export default async function OnboardingChoosePage() {
             running on its own.
           </p>
           <p className="text-xs text-[#6B7280] mb-6">
-            {FREE_LIFETIME_DIAGNOSES} AI diagnoses included · requires a site you own in Search Console
+            Same {FREE_LIFETIME_ANALYSES} AI analyses · requires a site you own in Search Console
           </p>
           <span className="inline-flex items-center gap-2 text-sm font-medium text-[#3B82F6] group-hover:gap-3 transition-all">
             Connect GSC <ArrowRight size={16} strokeWidth={1.5} />
