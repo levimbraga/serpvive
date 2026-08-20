@@ -59,7 +59,7 @@ These are the decisions I can defend, because each one has a traceable reason �
 
 ### Where AI is deliberately not used
 
-Decay score, velocity, seasonality, and health score are pure math, in [`src/lib/engine/`](src/lib/engine/). The decay score is `(peak_clicks − current_clicks) / peak_clicks × 100` over a 16-month window, with a noise filter for low-traffic pages. The project has an explicit rule, written before the first line of code: **never use an LLM where deterministic math works.** The LLM is reserved for the one step that genuinely needs judgment — explaining *why* a page is losing, given the SERP, the competitors' content, and the page itself. Detection is free, instant, and reproducible; diagnosis costs ~$0.22 and takes minutes. Keeping them separate is what makes the product economically viable.
+Decay score, velocity, seasonality, and health score are pure math, in [`src/lib/engine/`](src/lib/engine/). The decay score is `(peak_clicks − current_clicks) / peak_clicks × 100` over a 16-month window, with a noise filter for low-traffic pages. The project has an explicit rule, written before the first line of code: **never use an LLM where deterministic math works.** The LLM is reserved for the one step that genuinely needs judgment — explaining *why* a page is losing, given the SERP, the competitors' content, and the page itself. Detection is free, instant, and reproducible; diagnosis costs roughly a fifth of a dollar and takes minutes (measured on the previous model generation — see [Measured numbers](#measured-numbers)). Keeping them separate is what makes the product economically viable.
 
 ### A four-provider fallback chain, ordered by blast radius
 
