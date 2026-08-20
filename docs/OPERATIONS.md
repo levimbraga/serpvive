@@ -53,10 +53,13 @@ select
 
 Separate from the global cap, and defined in [`src/lib/constants.ts`](../src/lib/constants.ts):
 
-- `FREE_LIFETIME_DIAGNOSES` — 10 GSC-based diagnoses per account, lifetime
-- `FREE_LIFETIME_URL_ANALYSES` — 3 standalone URL analyses per account, lifetime
+- `FREE_LIFETIME_ANALYSES` — 10 AI analyses per account, lifetime, **shared**: a GSC diagnosis and a standalone URL analysis draw from the same pool.
 
-Both are counted from table rows (`diagnoses`, `external_analyses`), never from a counter column. Changing the constants changes the limit everywhere, including the UI copy.
+It was previously two separate pools (10 GSC + 3 standalone) on the theory that a standalone URL, requiring no proof of site ownership, is the cheaper abuse vector and deserved a tighter cap. Two pools turned out to be indefensible in the UI — the sidebar counted one of them and the settings page named the other, so the number a free user saw was never the number that stopped them. One pool, one number.
+
+Usage is counted from table rows (`diagnoses` + `external_analyses`), never from a counter column. Changing the constant changes the limit everywhere, including the UI copy.
+
+One subtlety worth knowing before you touch the count: a standalone analysis whose URL belongs to a connected GSC site writes to **both** tables. Those `external_analyses` rows carry a `page_id`, and [`countFreeAnalysesUsed`](../src/lib/limits.ts) excludes them, so one user action costs exactly one credit. Any new counting code must go through that function rather than adding up the two tables by hand.
 
 ---
 
