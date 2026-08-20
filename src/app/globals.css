@@ -200,7 +200,9 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   LANDING PAGE STYLES — copied verbatim from serpvive-landing-v4-centered.html
+   LANDING PAGE STYLES — ported verbatim from the static HTML mockup the
+   landing was designed in (see commit "rebuild landing page pixel-perfect
+   from v3 HTML reference"; the mockup itself is no longer in the tree)
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Landing page CSS variables (scoped to .landing wrapper) */
