@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import PageDetailClient from "@/components/pages/PageDetailClient";
-import { isAdmin, FREE_LIFETIME_DIAGNOSES } from "@/lib/constants";
+import { isAdmin, type PlanName } from "@/lib/constants";
+import { getUsage } from "@/lib/limits";
 
 export const metadata: Metadata = {
   title: "Page Detail — SerpVive",
@@ -72,22 +73,15 @@ export default async function PageDetailPage({
   const latestDiagnosis = allDiagnoses[0] ?? null;
   const previousDiagnoses = allDiagnoses.slice(1, 11); // Up to 10 history items
 
-  // Free plan: lifetime cap of 3 diagnoses, counted from diagnoses rows
-  // (mirrors /api/diagnose). Paid plans keep the monthly counter.
+  // Free plan: shared lifetime pool counted from rows (mirrors /api/diagnose,
+  // and includes standalone URL analyses). Paid plans keep the monthly counter.
   const rawPlan = isAdmin(user.email) ? "agency" : ((profileRes.data?.plan ?? "free") as string);
-  let diagnosesUsed = profileRes.data?.diagnoses_used_this_month ?? 0;
-  let diagnosesLimit =
-    isAdmin(user.email) ? 120 :
-    ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[rawPlan] ?? 0;
-
-  if (rawPlan === "free") {
-    const { count } = await supabase
-      .from("diagnoses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
-    diagnosesUsed = count ?? 0;
-    diagnosesLimit = FREE_LIFETIME_DIAGNOSES;
-  }
+  const { used: diagnosesUsed, limit: diagnosesLimit } = await getUsage(
+    supabase,
+    user.id,
+    rawPlan as PlanName,
+    profileRes.data?.diagnoses_used_this_month ?? 0,
+  );
 
   return (
     <PageDetailClient

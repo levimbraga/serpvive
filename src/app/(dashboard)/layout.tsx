@@ -5,7 +5,8 @@ import { touchLastSeen, wakeDormantSites, DORMANT_AFTER_DAYS } from "@/lib/activ
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
 import { PostHogIdentify } from "@/lib/posthog/identify";
-import { PLAN_LIMITS, type PlanName, isAdmin, FREE_LIFETIME_DIAGNOSES } from "@/lib/constants";
+import { type PlanName, isAdmin } from "@/lib/constants";
+import { getUsage } from "@/lib/limits";
 
 export default async function DashboardLayout({
   children,
@@ -34,20 +35,17 @@ export default async function DashboardLayout({
 
   const profile = profileRes.data;
   const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
-  let diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const sites = sitesRes.data ?? [];
-  let diagnosesLimit: number = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
 
-  // Free plan: lifetime allowance, counted from diagnoses rows so the sidebar
-  // reads "X/10" from the first visit rather than after the first run.
-  if (plan === "free") {
-    const { count } = await supabase
-      .from("diagnoses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
-    diagnosesUsed = count ?? 0;
-    diagnosesLimit = FREE_LIFETIME_DIAGNOSES;
-  }
+  // Free plan: shared lifetime allowance counted from rows — standalone URL
+  // analyses included, which is why the sidebar now moves after one of those
+  // instead of only after a GSC diagnosis.
+  const { used: diagnosesUsed, limit: diagnosesLimit } = await getUsage(
+    supabase,
+    user.id,
+    plan,
+    profile?.diagnoses_used_this_month ?? 0,
+  );
   // Records the visit for the inactivity pause; at most one write per day.
   const lastSeenAt = profile?.last_seen_at as string | undefined;
   await touchLastSeen(supabase, user.id, lastSeenAt);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
+import { getUsage } from "@/lib/limits";
 import SettingsClient from "@/components/settings/SettingsClient";
 
 export const metadata: Metadata = {
@@ -25,6 +26,16 @@ export default async function SettingsPage() {
   const plan = (isAdmin(user.email) ? "agency" : (profile.plan ?? "free")) as PlanName;
   const limits = PLAN_LIMITS[plan];
 
+  // Plan & Usage showed a bare "3 per account" label for free plans — a number
+  // from the retired standalone-URL pool, disconnected from actual usage. Read
+  // the same shared count every other surface reads.
+  const usage = await getUsage(
+    supabase,
+    user.id,
+    plan,
+    profile.diagnoses_used_this_month ?? 0,
+  );
+
   // Fetch user's sites
   const { data: sites } = await supabase
     .from("sites")
@@ -41,8 +52,8 @@ export default async function SettingsPage() {
       fullName={profile.full_name}
       plan={plan}
       planStatus={profile.plan_status ?? "active"}
-      diagnosesUsed={profile.diagnoses_used_this_month ?? 0}
-      diagnosesLimit={limits.diagnoses_per_month}
+      diagnosesUsed={usage.used}
+      diagnosesLimit={usage.limit}
       hasStripeCustomer={!!profile.stripe_customer_id}
       hadPaidSubscription={!!profile.stripe_subscription_id}
       sites={sites ?? []}
