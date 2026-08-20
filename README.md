@@ -4,7 +4,7 @@ SerpVive is a content decay monitor for blogs: it connects to Google Search Cons
 
 > ### How this was built, and what it is
 >
-> **Vibecoded with Claude Code** — 299 commits, 298 of them co-authored by a Claude model (every commit but the first). Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
+> **Vibecoded with Claude Code** — 303 commits, 302 of them co-authored by a Claude model (every commit but the first). Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
 >
 > **What was mine:** the specification and architecture came before the code — the initial commit contains 11 documents, including the full SQL schema in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). [`CLAUDE.md`](CLAUDE.md) is the operating manual the assistant worked under, published here in Portuguese exactly as it was used: it locks the stack ("never suggest alternatives unless asked"), forbids `any`, requires Zod on every boundary and RLS on every table, and bans the LLM from anything deterministic math can compute. Nearly 300 commits later the project still matches its day-one architecture doc. Mine too are the decisions that came out of things breaking in production: the four-provider fallback chain ordered by blast radius, the brief generator skipping the strongest model because it timed out, Firecrawl replacing Cheerio with Cheerio kept as fallback, and the four-step ladder for malformed JSON.
 >
@@ -100,6 +100,8 @@ Opening a repository with live AI behind it means someone else's curiosity spend
 - **Globally:** `AI_SPEND_CAP_USD` sums every recorded AI cost across diagnoses, external analyses and demos, and refuses new calls past the ceiling. It is deliberately approximate — a run's cost is only known after it finishes — and deliberately **fails open**: if the lookup errors the call proceeds, because a budget guard that becomes a single point of failure has traded a few dollars for an outage.
 - **`AI_DISABLED`** stops every AI call at the one funnel they all pass through, without touching the dashboard, ingestion, scoring or email.
 
+How to actually operate any of this — flip the kill switch, read the accumulated spend (there is no UI for it), generate a demo, wake a dormant account — is in [`docs/OPERATIONS.md`](docs/OPERATIONS.md), along with the items that were still open when the project was paused.
+
 ### Inactivity pause: the cost nobody bills you for
 
 Turning the free freeze off exposed a second problem that has nothing to do with money. An abandoned account keeps ingesting Search Console data forever; the API is free, but Postgres is not infinite — one site in this deployment already holds ~22k rows in `page_queries` alone. Storage, not spend, is what an abandoned account actually consumes.
@@ -112,7 +114,7 @@ Content fetching started with Cheerio (free, but blind to JavaScript-rendered pa
 
 ## Built with AI assistance
 
-This project was vibecoded with Claude Code, and that is the method, not a footnote: **299 commits, 298 of them co-authored by Claude models** — every commit except the first (the trailers are in the git log).
+This project was vibecoded with Claude Code, and that is the method, not a footnote: **303 commits, 302 of them co-authored by Claude models** — every commit except the first (the trailers are in the git log).
 
 What that looked like in practice:
 
