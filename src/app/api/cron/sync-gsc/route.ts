@@ -5,6 +5,7 @@ import { refreshAccessToken, getSearchAnalyticsByPageAndDate, getTopQueriesByPag
 export const maxDuration = 300; // 5 minutes
 import { isContentUrl } from "@/lib/engine/url-filter";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants";
+import { DORMANT_AFTER_DAYS } from "@/lib/activity";
 
 export async function GET(request: Request) {
   if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -35,11 +36,28 @@ export async function GET(request: Request) {
       // Get user profile to check plan
       const { data: profile } = await admin
         .from("profiles")
-        .select("plan, free_since")
+        .select("plan, free_since, last_seen_at")
         .eq("id", site.user_id)
         .single();
 
       const plan = (profile?.plan ?? "free") as PlanName;
+
+      // ── Inactivity pause ──
+      // Nobody has opened this account in DORMANT_AFTER_DAYS: stop ingesting.
+      // Storage, not money, is the constraint here — the GSC API is free but
+      // page_queries grows without bound. Data is kept; the next login flips
+      // these sites back to active automatically.
+      if (profile?.last_seen_at) {
+        const daysIdle = (Date.now() - new Date(profile.last_seen_at).getTime()) / 86_400_000;
+        if (daysIdle >= DORMANT_AFTER_DAYS) {
+          console.log(`[cron/sync-gsc] Site ${site.id}: dormant (${Math.floor(daysIdle)} days idle)`);
+          if (site.status !== "dormant") {
+            await admin.from("sites").update({ status: "dormant" }).eq("id", site.id);
+          }
+          skipped++;
+          continue;
+        }
+      }
 
       // ── Free plan cadence ──
       if (plan === "free") {

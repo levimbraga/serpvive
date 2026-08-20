@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { wakeDormantSites } from "@/lib/activity";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\s/g, "");
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!.replace(/\s/g, "");
@@ -67,6 +68,10 @@ export async function GET(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
+    // Coming back is the only thing required to resume: any site paused for
+    // inactivity wakes up here, with no setting to find and nothing to buy.
+    await wakeDormantSites(supabase, user.id);
+
     const { data: site } = await supabase
       .from("sites")
       .select("id")
