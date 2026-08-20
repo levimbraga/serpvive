@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_URL_ANALYSES, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_ANALYSES, isAdmin } from "@/lib/constants";
+import { countFreeAnalysesUsed } from "@/lib/limits";
 import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -65,18 +66,15 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: lifetime cap on standalone URL analyses. This is the cheapest
-  // abuse vector (no site ownership required), so it is tighter than the GSC
-  // allowance. Counted from external_analyses rows, not a counter column.
+  // Free plan: one shared lifetime pool with GSC diagnoses — a standalone
+  // analysis and a GSC diagnosis cost the same, so they draw from the same
+  // allowance. Counted from table rows, not a counter column.
   if (plan === "free") {
-    const { count: lifetimeCount } = await admin
-      .from("external_analyses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
+    const lifetimeCount = await countFreeAnalysesUsed(admin, user.id);
 
-    if ((lifetimeCount ?? 0) >= FREE_LIFETIME_URL_ANALYSES) {
+    if (lifetimeCount >= FREE_LIFETIME_ANALYSES) {
       return NextResponse.json(
-        { error: `This public version has a free usage cap (${FREE_LIFETIME_URL_ANALYSES} standalone URL analyses per account). Paid plans are not enabled.`, code: "free_cap_reached" },
+        { error: `This public version has a free usage cap (${FREE_LIFETIME_ANALYSES} AI analyses per account, shared between standalone URLs and Search Console pages). Paid plans are not enabled.`, code: "free_cap_reached" },
         { status: 403 },
       );
     }
@@ -101,7 +99,7 @@ export async function POST(request: Request) {
   }
 
   // Increment usage BEFORE running (prevents race condition) — paid plans only;
-  // free is capped by external_analyses row count
+  // free is capped by the shared row count above
   if (plan !== "free") {
     await admin
       .from("profiles")
@@ -188,6 +186,9 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         url,
+        // Set only when a `diagnoses` row was written for this same run, so the
+        // shared free count can skip this row and charge exactly one credit.
+        page_id: savedToPage ? pageId : null,
         keyword,
         diagnosis: result.diagnosis,
         refresh_brief: result.brief,

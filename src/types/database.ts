@@ -151,6 +151,12 @@ export type ExternalAnalysis = {
   id: string;
   user_id: string;
   url: string;
+  /**
+   * Set when this run also wrote a `diagnoses` row (the URL belonged to a
+   * connected GSC site). Rows with a page_id are skipped by the shared free
+   * usage count so one run costs one credit — see `src/lib/limits.ts`.
+   */
+  page_id: string | null;
   keyword: string;
   diagnosis: Record<string, unknown>;
   refresh_brief: Record<string, unknown> | null;

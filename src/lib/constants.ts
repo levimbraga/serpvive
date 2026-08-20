@@ -8,17 +8,16 @@ export const PLAN_LIMITS = {
 export type PlanName = keyof typeof PLAN_LIMITS;
 
 /**
- * Public-version free-tier caps. Lifetime per account, not monthly — counted
- * from table rows (diagnoses / external_analyses), never from a counter column.
+ * Public-version free-tier cap. Lifetime per account, not monthly — and a
+ * single shared pool: a GSC diagnosis and a standalone URL analysis both draw
+ * from the same allowance, because both cost the same real API money.
  *
- * The two numbers differ on purpose. A GSC diagnosis requires connecting
- * Google Search Console and owning a site with real history: a high barrier
- * that is self-limiting, so it can afford to be generous. A standalone URL
- * analysis requires proving nothing at all, which makes it the cheap abuse
- * vector — so it stays tighter despite costing the same per run.
+ * Counted from table rows (`diagnoses` + unlinked `external_analyses`), never
+ * from a counter column: counters drift, rows don't. See
+ * `countFreeAnalysesUsed` in `src/lib/limits.ts` — the single place that
+ * knows how to add those two tables up without double-counting.
  */
-export const FREE_LIFETIME_DIAGNOSES = 10;
-export const FREE_LIFETIME_URL_ANALYSES = 3;
+export const FREE_LIFETIME_ANALYSES = 10;
 
 /** Max AI diagnoses per hour per plan (rate limit, not monthly quota). */
 export const RATE_LIMITS_PER_HOUR: Record<PlanName, number> = {

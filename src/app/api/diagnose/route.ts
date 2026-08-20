@@ -4,7 +4,8 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_DIAGNOSES, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_ANALYSES, isAdmin } from "@/lib/constants";
+import { countFreeAnalysesUsed } from "@/lib/limits";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -80,20 +81,18 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: lifetime cap, counted from the diagnoses table itself (counter
-  // columns can drift; rows don't). The welcome auto-diagnosis writes a row
-  // like any other run, so it counts against the same allowance. Each run
-  // costs real API money, so the public version caps instead of gating behind
-  // upgrades — paid plans are not enabled.
+  // Free plan: one shared lifetime pool, counted from table rows (counter
+  // columns can drift; rows don't). Standalone URL analyses draw from the same
+  // allowance — same pipeline, same cost. The welcome auto-diagnosis writes a
+  // row like any other run, so it counts too. Each run costs real API money, so
+  // the public version caps instead of gating behind upgrades — paid plans are
+  // not enabled.
   if (plan === "free") {
-    const { count: lifetimeCount } = await admin
-      .from("diagnoses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
+    const lifetimeCount = await countFreeAnalysesUsed(admin, user.id);
 
-    if ((lifetimeCount ?? 0) >= FREE_LIFETIME_DIAGNOSES) {
+    if (lifetimeCount >= FREE_LIFETIME_ANALYSES) {
       return NextResponse.json(
-        { error: `This public version has a free usage cap (${FREE_LIFETIME_DIAGNOSES} AI diagnoses per account). Paid plans are not enabled.`, code: "free_cap_reached" },
+        { error: `This public version has a free usage cap (${FREE_LIFETIME_ANALYSES} AI analyses per account, shared between Search Console pages and standalone URLs). Paid plans are not enabled.`, code: "free_cap_reached" },
         { status: 403 },
       );
     }
