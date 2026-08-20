@@ -4,9 +4,9 @@ SerpVive is a content decay monitor for blogs: it connects to Google Search Cons
 
 > ### How this was built, and what it is
 >
-> **Vibecoded with Claude Code** — 283 commits, 282 of them co-authored by a Claude model. Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
+> **Vibecoded with Claude Code** — 299 commits, 298 of them co-authored by a Claude model (every commit but the first). Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
 >
-> **What was mine:** the specification and architecture came before the code — the initial commit contains 11 documents, including the full SQL schema in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). [`CLAUDE.md`](CLAUDE.md) is the operating manual the assistant worked under, published here in Portuguese exactly as it was used: it locks the stack ("never suggest alternatives unless asked"), forbids `any`, requires Zod on every boundary and RLS on every table, and bans the LLM from anything deterministic math can compute. 283 commits later the project still matches its day-one architecture doc. And the decisions that came out of things breaking in production: the four-provider fallback chain ordered by blast radius, the brief generator skipping the strongest model because it timed out, Firecrawl replacing Cheerio with Cheerio kept as fallback, the four-step ladder for malformed JSON, and the rule that no LLM touches anything deterministic math can compute.
+> **What was mine:** the specification and architecture came before the code — the initial commit contains 11 documents, including the full SQL schema in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). [`CLAUDE.md`](CLAUDE.md) is the operating manual the assistant worked under, published here in Portuguese exactly as it was used: it locks the stack ("never suggest alternatives unless asked"), forbids `any`, requires Zod on every boundary and RLS on every table, and bans the LLM from anything deterministic math can compute. Nearly 300 commits later the project still matches its day-one architecture doc. Mine too are the decisions that came out of things breaking in production: the four-provider fallback chain ordered by blast radius, the brief generator skipping the strongest model because it timed out, Firecrawl replacing Cheerio with Cheerio kept as fallback, and the four-step ladder for malformed JSON.
 >
 > **What is not done:** no automated tests, no CI, no paying users, monetization switched off, alerting never delivered, and the quality of the AI diagnoses never systematically evaluated.
 >
@@ -27,7 +27,7 @@ Bloggers and SEO consultants find decaying content by exporting Search Console d
 ```mermaid
 flowchart LR
     subgraph Ingestion
-        GSC[Google Search Console API<br/>OAuth 2.0, daily cron]
+        GSC[Google Search Console API<br/>OAuth 2.0, cron: weekly on free]
     end
     subgraph Engine["Scoring engine — deterministic, no AI"]
         SCORE[Decay score<br/>peak vs. current clicks]
@@ -51,7 +51,7 @@ flowchart LR
     VALIDATE --> OUT[Diagnosis + refresh brief<br/>tokens & cost logged per call]
 ```
 
-Postgres (Supabase) with Row Level Security on every table; 27 SQL migrations, 13 tables. Deployed on Vercel with cron jobs for ingestion, scoring, and result measurement.
+Postgres (Supabase) with Row Level Security on every table; 29 SQL migrations, 13 tables. Deployed on Vercel with cron jobs for ingestion, scoring, and result measurement.
 
 ## Engineering decisions
 
@@ -112,12 +112,12 @@ Content fetching started with Cheerio (free, but blind to JavaScript-rendered pa
 
 ## Built with AI assistance
 
-This project was vibecoded with Claude Code, and that is the method, not a footnote: **283 commits, 282 of them co-authored by Claude models** (the trailers are in the git log).
+This project was vibecoded with Claude Code, and that is the method, not a footnote: **299 commits, 298 of them co-authored by Claude models** — every commit except the first (the trailers are in the git log).
 
 What that looked like in practice:
 
 - **Specification before code.** The initial commit contains 11 project documents — product spec, architecture with the full SQL schema, scope, backend algorithms, design system — written before the first feature.
-- **The stack was locked against drift.** The repo's `CLAUDE.md` instructs the assistant to never suggest stack alternatives unless asked, so 283 commits later the project still matches its day-one architecture doc.
+- **The stack was locked against drift.** The repo's `CLAUDE.md` instructs the assistant to never suggest stack alternatives unless asked, so nearly 300 commits later the project still matches its day-one architecture doc.
 - **Constraints were encoded as rules**, not re-argued per session: strict TypeScript with no `any`, Zod on every API boundary, RLS on every table, and the no-LLM-where-math-works rule above.
 
 The honest caveat: because every commit was a pair session, the git history cannot separate which lines were human-typed and which were model-generated. What I can defend is every decision in the section above — each has a reason I can reconstruct, and several exist only because something broke and had to be understood.
@@ -137,7 +137,7 @@ Only measured values — nothing estimated. Every AI call logs `tokens_input`, `
 | Cross-provider fallback observed | 1 episode: Gemini hit its API quota mid-brief, the chain fell through to OpenAI and completed | prior generation | pipeline log, demo generation (Aug 2026) |
 | Real pages monitored | 188 | model-independent | `pages` table (demo site excluded) |
 | GSC query rows ingested | 42,784 | model-independent | `page_queries` table |
-| Database migrations / tables | 27 / 13 | model-independent | `supabase/migrations/` |
+| Database migrations / tables | 29 / 13 | model-independent | `supabase/migrations/` |
 | LLM providers in the fallback chain | 4 | current config | `src/lib/ai/chain.ts` |
 
 On the ~213 s: a diagnosis is asynchronous background work, not a request-response path — the pipeline searches Google live, crawls the user's page plus up to 3 ranking competitors, and generates up to 8,192 output tokens before validation. The latency buys grounding.
@@ -147,7 +147,7 @@ Not measured, and therefore not claimed: diagnosis quality, uptime, error rates,
 ## Current status and limitations
 
 - **Pre-launch personal project.** It ran in production on my own sites; it has no paying users. The three external accounts that ever signed up logged in once each and never returned. *What I'd do first: get five real SEO practitioners through the full flow and watch where they stall.*
-- **Monetization is designed and integrated but disabled in this public version.** Stripe checkout, billing portal, and webhooks are in the codebase and deliberately switched off; the pricing page shows the planned tiers with purchasing disabled. Free usage is capped rather than gated behind upgrades — 3 AI diagnoses and 1 standalone URL analysis per account, lifetime, because each run costs real API money — and an `AI_DISABLED` env var can kill all AI calls at the single choke point every call funnels through.
+- **Monetization is designed and integrated but disabled in this public version.** Stripe checkout, billing portal, and webhooks are in the codebase and deliberately switched off; the pricing page shows the planned tiers with purchasing disabled. Free usage is capped rather than gated behind upgrades — 10 AI diagnoses and 3 standalone URL analyses per account, lifetime, because each run costs real API money — and an `AI_DISABLED` env var can kill all AI calls at the single choke point every call funnels through.
 - **Alerting is detected and logged but never delivered — the email path was never implemented. The product detects decay; it does not tell you.** The `batch-alert` cron finds pages that crossed into critical and writes them to the log with a comment saying Resend integration will come later. It never came. *What I'd do first: send the alert. The detection, the recipient list and the email infrastructure all already exist — only the call connecting them is missing.*
 - **Weekly digests are implemented and functional, but gated to paid plans. With payments disabled every account is free, so no digest is ever sent in this public version.** The digest template, the scheduling cron and the per-user day preference all work; the query that selects recipients filters `plan != 'free'`, which now matches nobody.
 - **No automated tests and no CI.** This is the project's biggest gap. Deploys rely on `tsc --noEmit`, ESLint, and manual browser testing. *What I'd do first: unit-test the pure functions with the highest blast radius — the JSON repair ladder and the decay scorer — then a CI gate running `tsc` + ESLint on every push.*
