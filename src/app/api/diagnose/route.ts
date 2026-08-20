@@ -4,7 +4,7 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_DIAGNOSES, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -80,11 +80,11 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: lifetime cap of 3 AI diagnoses per account, counted from the
-  // diagnoses table itself (counter columns can drift; rows don't). Each run
-  // costs real API money, so the public version caps instead of gating
-  // behind upgrades — paid plans are not enabled.
-  const FREE_LIFETIME_DIAGNOSES = 3;
+  // Free plan: lifetime cap, counted from the diagnoses table itself (counter
+  // columns can drift; rows don't). The welcome auto-diagnosis writes a row
+  // like any other run, so it counts against the same allowance. Each run
+  // costs real API money, so the public version caps instead of gating behind
+  // upgrades — paid plans are not enabled.
   if (plan === "free") {
     const { count: lifetimeCount } = await admin
       .from("diagnoses")
@@ -224,6 +224,9 @@ function getUserFriendlyError(message: string): string {
 
   if (lower.includes("ai_disabled") || lower.includes("kill switch") || lower.includes("disabled via ai_disabled")) {
     return "AI analysis is temporarily disabled in this public version.";
+  }
+  if (lower.includes("spend cap")) {
+    return "AI analysis is paused: this public version has a spending cap and it has been reached.";
   }
   if (lower.includes("page not found")) {
     return "This page could not be found. It may have been removed from your site.";

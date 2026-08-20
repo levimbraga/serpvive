@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
-import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin, FREE_LIFETIME_URL_ANALYSES } from "@/lib/constants";
 import AnalyzeUrlClient from "@/components/pages/AnalyzeUrlClient";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default async function AnalyzeUrlPage() {
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
     diagnosesUsed = count ?? 0;
-    diagnosesLimit = 1;
+    diagnosesLimit = FREE_LIFETIME_URL_ANALYSES;
   }
 
   return (

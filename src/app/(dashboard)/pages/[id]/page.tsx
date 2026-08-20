@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import PageDetailClient from "@/components/pages/PageDetailClient";
-import { isAdmin } from "@/lib/constants";
+import { isAdmin, FREE_LIFETIME_DIAGNOSES } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Page Detail — SerpVive",
@@ -86,7 +86,7 @@ export default async function PageDetailPage({
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
     diagnosesUsed = count ?? 0;
-    diagnosesLimit = 3;
+    diagnosesLimit = FREE_LIFETIME_DIAGNOSES;
   }
 
   return (

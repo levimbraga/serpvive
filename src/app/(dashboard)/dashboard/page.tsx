@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { PLAN_LIMITS, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, isAdmin, FREE_LIFETIME_DIAGNOSES } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { getActiveSiteId } from "@/lib/active-site";
 import HealthScoreRing from "@/components/dashboard/HealthScoreRing";
@@ -59,8 +59,20 @@ export default async function DashboardPage() {
   const site = siteRes.data;
 
   const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
-  const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
-  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+  // Free plan: usage is the lifetime diagnoses row count (the welcome
+  // auto-diagnosis is a row like any other, so it counts) — shown as "X of N"
+  // from the first visit, before any run has happened.
+  let diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
+  let diagnosesLimit: number = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+
+  if (plan === "free") {
+    const { count } = await supabase
+      .from("diagnoses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    diagnosesUsed = count ?? 0;
+    diagnosesLimit = FREE_LIFETIME_DIAGNOSES;
+  }
   const tz = profile?.timezone ?? "UTC";
 
   // No active site → show simplified dashboard with analyze CTA

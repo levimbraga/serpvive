@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_URL_ANALYSES, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -65,10 +65,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: lifetime cap of 1 standalone URL analysis per account.
-  // This is the cheapest abuse vector (no site ownership required), so the
-  // cap is the tightest. Counted from external_analyses rows, not a counter.
-  const FREE_LIFETIME_URL_ANALYSES = 1;
+  // Free plan: lifetime cap on standalone URL analyses. This is the cheapest
+  // abuse vector (no site ownership required), so it is tighter than the GSC
+  // allowance. Counted from external_analyses rows, not a counter column.
   if (plan === "free") {
     const { count: lifetimeCount } = await admin
       .from("external_analyses")
@@ -77,7 +76,7 @@ export async function POST(request: Request) {
 
     if ((lifetimeCount ?? 0) >= FREE_LIFETIME_URL_ANALYSES) {
       return NextResponse.json(
-        { error: `This public version has a free usage cap (${FREE_LIFETIME_URL_ANALYSES} standalone URL analysis per account). Paid plans are not enabled.`, code: "free_cap_reached" },
+        { error: `This public version has a free usage cap (${FREE_LIFETIME_URL_ANALYSES} standalone URL analyses per account). Paid plans are not enabled.`, code: "free_cap_reached" },
         { status: 403 },
       );
     }
@@ -241,6 +240,13 @@ export async function POST(request: Request) {
     if (err instanceof Error && err.name === "AiDisabledError") {
       return NextResponse.json(
         { error: "AI analysis is temporarily disabled in this public version." },
+        { status: 503 },
+      );
+    }
+
+    if (err instanceof Error && err.name === "AiSpendCapExceededError") {
+      return NextResponse.json(
+        { error: "AI analysis is paused: this public version has a spending cap and it has been reached." },
         { status: 503 },
       );
     }

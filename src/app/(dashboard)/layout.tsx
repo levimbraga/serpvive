@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { getActiveSiteId } from "@/lib/active-site";
+import { touchLastSeen, wakeDormantSites, DORMANT_AFTER_DAYS } from "@/lib/activity";
 import Sidebar from "@/components/layout/Sidebar";
 import DashboardHeader from "@/components/layout/DashboardHeader";
 import { PostHogIdentify } from "@/lib/posthog/identify";
-import { PLAN_LIMITS, type PlanName, isAdmin } from "@/lib/constants";
+import { PLAN_LIMITS, type PlanName, isAdmin, FREE_LIFETIME_DIAGNOSES } from "@/lib/constants";
 
 export default async function DashboardLayout({
   children,
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
   const [profileRes, sitesRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("plan, diagnoses_used_this_month")
+      .select("plan, diagnoses_used_this_month, last_seen_at")
       .eq("id", user.id)
       .single(),
     supabase
@@ -33,9 +34,37 @@ export default async function DashboardLayout({
 
   const profile = profileRes.data;
   const plan = (isAdmin(user.email) ? "agency" : (profile?.plan ?? "free")) as PlanName;
-  const diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
+  let diagnosesUsed = profile?.diagnoses_used_this_month ?? 0;
   const sites = sitesRes.data ?? [];
-  const diagnosesLimit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+  let diagnosesLimit: number = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+
+  // Free plan: lifetime allowance, counted from diagnoses rows so the sidebar
+  // reads "X/10" from the first visit rather than after the first run.
+  if (plan === "free") {
+    const { count } = await supabase
+      .from("diagnoses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    diagnosesUsed = count ?? 0;
+    diagnosesLimit = FREE_LIFETIME_DIAGNOSES;
+  }
+  // Records the visit for the inactivity pause; at most one write per day.
+  const lastSeenAt = profile?.last_seen_at as string | undefined;
+  await touchLastSeen(supabase, user.id, lastSeenAt);
+
+  // Password logins never touch /callback, so the wake-up also runs here —
+  // but only when the gap is long enough for sites to have gone dormant, so
+  // the common page load costs nothing extra.
+  if (lastSeenAt) {
+    // Server component rendered per request — Date.now() is a request
+    // timestamp, not client-render state; the purity rule doesn't apply.
+    // eslint-disable-next-line react-hooks/purity
+    const daysAway = (Date.now() - new Date(lastSeenAt).getTime()) / 86_400_000;
+    if (daysAway >= DORMANT_AFTER_DAYS) {
+      await wakeDormantSites(supabase, user.id);
+    }
+  }
+
   const activeSiteId = await getActiveSiteId(supabase, user.id);
   const activeSite = sites.find((s) => s.id === activeSiteId);
   const hasFreeDiagnosis = !!(activeSite as { has_free_diagnosis?: boolean } | undefined)?.has_free_diagnosis;

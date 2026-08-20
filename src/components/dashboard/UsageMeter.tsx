@@ -79,8 +79,10 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
       );
     }
 
-    // Completed or used — show upgrade
+    // Completed or used — show the real lifetime allowance
     if (hasGsc) {
+      const remaining = Math.max(0, limit - used);
+      const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
       return (
         <div data-tour="usage-meter" className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center justify-between mb-3">
@@ -88,18 +90,21 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
               <Zap size={18} strokeWidth={1.5} className="text-[#7C3AED]" />
               <span className="text-sm font-medium text-[#111827]">AI Diagnoses</span>
             </div>
-            <span className="text-xs text-[#9CA3AF] capitalize">{plan} plan</span>
+            <span className="text-sm font-semibold text-[#111827] tabular-nums">
+              {used} of {limit}
+            </span>
           </div>
-          <p className="text-sm text-[#6B7280] mb-3">
-            Free accounts include 3 AI diagnoses (lifetime). Paid plans are not
-            enabled in this public version.
+          <div className="h-2 w-full rounded-full bg-[#F3F4F6] mb-2 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-[#7C3AED] transition-[width] duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="text-xs text-[#9CA3AF]">
+            {remaining > 0
+              ? `${remaining} left — lifetime allowance for this public version.`
+              : "Lifetime allowance used. This public version has a free usage cap."}
           </p>
-          <Link
-            href="/settings"
-            className="block w-full text-center text-sm font-medium text-white bg-[#7C3AED] hover:bg-[#6D28D9] rounded-lg py-2 transition-colors"
-          >
-            View plan details
-          </Link>
         </div>
       );
     }
