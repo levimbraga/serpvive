@@ -50,7 +50,8 @@ export default async function OnboardingChoosePage() {
           </h2>
           <p className="text-sm text-[#4B5563] mb-6">
             Paste any public HTTPS URL and get an AI diagnosis with
-            actionable recommendations. No setup required.
+            actionable recommendations. No setup required — free accounts
+            include 1 standalone analysis.
           </p>
           <span className="inline-flex items-center gap-2 text-sm font-medium text-[#3B82F6] group-hover:gap-3 transition-all">
             Analyze now <ArrowRight size={16} strokeWidth={1.5} />

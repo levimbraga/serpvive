@@ -34,7 +34,6 @@ export default function WelcomeCard({
   freeDiagPageId,
   dismissed: initialDismissed,
   userHasUsedFreeDiagnosis = false,
-  plan = "free",
 }: WelcomeCardProps) {
   const router = useRouter();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -186,7 +185,7 @@ export default function WelcomeCard({
             : "Get your first AI diagnosis — free, on us"
           }
           detail={
-            isSubsequentSite ? (plan === "free" ? "Upgrade for AI diagnoses" : "Pick a page to analyze")
+            isSubsequentSite ? "Pick a page to analyze"
             : diagStep === "done" ? "Your first diagnosis is ready!"
             : diagStep === "running" ? "Generating your free diagnosis..."
             : autoDiagStatus === "failed" ? "Pick any page to analyze manually"
@@ -266,23 +265,13 @@ export default function WelcomeCard({
       {/* Subsequent site (free diagnosis already used): show plan-appropriate action */}
       {isSubsequentSite && engineStep === "done" && (
         <div className="flex items-center gap-3">
-          {plan === "free" ? (
-            <Link
-              href="/settings"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-colors"
-            >
-              Upgrade for AI diagnoses
-              <ArrowRight size={16} strokeWidth={1.5} />
-            </Link>
-          ) : (
-            <Link
-              href="/pages"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
-            >
-              <Sparkles size={16} strokeWidth={1.5} />
-              Pick a page to analyze
-            </Link>
-          )}
+          <Link
+            href="/pages"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-semibold transition-colors"
+          >
+            <Sparkles size={16} strokeWidth={1.5} />
+            Pick a page to analyze
+          </Link>
           <button onClick={handleDismiss} className="text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
             Dismiss
           </button>

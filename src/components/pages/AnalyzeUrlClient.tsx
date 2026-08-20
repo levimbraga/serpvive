@@ -85,7 +85,8 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const remaining = diagnosesLimit - diagnosesUsed;
-  const canAnalyze = plan !== "free" && remaining > 0;
+  // Free plan gets 1 lifetime standalone analysis (server passes the row count)
+  const canAnalyze = remaining > 0;
 
   useEffect(() => {
     return () => {
@@ -234,16 +235,10 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
                 <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg p-3">
                   <p className="text-sm text-[#92400E]">
                     {plan === "free"
-                      ? "Upgrade to a paid plan to run AI analyses."
-                      : `You've used all ${diagnosesLimit} diagnoses this month. Upgrade for more.`
+                      ? "This public version has a free usage cap (1 standalone URL analysis per account). Paid plans are not enabled."
+                      : `You've used all ${diagnosesLimit} diagnoses this month.`
                     }
                   </p>
-                  <Link
-                    href="/settings"
-                    className="inline-block mt-2 text-sm font-medium text-[#D97706] hover:text-[#92400E]"
-                  >
-                    Upgrade plan &rarr;
-                  </Link>
                 </div>
               ) : (
                 <button

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import PageDetailClient from "@/components/pages/PageDetailClient";
-import { getAdminEmail, isAdmin } from "@/lib/constants";
+import { isAdmin } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Page Detail — SerpVive",
@@ -72,6 +72,23 @@ export default async function PageDetailPage({
   const latestDiagnosis = allDiagnoses[0] ?? null;
   const previousDiagnoses = allDiagnoses.slice(1, 11); // Up to 10 history items
 
+  // Free plan: lifetime cap of 3 diagnoses, counted from diagnoses rows
+  // (mirrors /api/diagnose). Paid plans keep the monthly counter.
+  const rawPlan = isAdmin(user.email) ? "agency" : ((profileRes.data?.plan ?? "free") as string);
+  let diagnosesUsed = profileRes.data?.diagnoses_used_this_month ?? 0;
+  let diagnosesLimit =
+    isAdmin(user.email) ? 120 :
+    ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[rawPlan] ?? 0;
+
+  if (rawPlan === "free") {
+    const { count } = await supabase
+      .from("diagnoses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    diagnosesUsed = count ?? 0;
+    diagnosesLimit = 3;
+  }
+
   return (
     <PageDetailClient
       page={page}
@@ -79,15 +96,11 @@ export default async function PageDetailPage({
       latestDiagnosis={latestDiagnosis}
       previousDiagnoses={previousDiagnoses}
       latestRefresh={refreshRes.data}
-      plan={isAdmin(user.email) ? "agency" : ((profileRes.data?.plan ?? "free") as string)}
-      diagnosesUsed={profileRes.data?.diagnoses_used_this_month ?? 0}
-      diagnosesLimit={
-        isAdmin(user.email) ? 120 :
-        ({ free: 0, starter: 10, pro: 40, agency: 120 } as Record<string, number>)[profileRes.data?.plan ?? "free"] ?? 0
-      }
+      plan={rawPlan}
+      diagnosesUsed={diagnosesUsed}
+      diagnosesLimit={diagnosesLimit}
       timeZone={profileRes.data?.timezone ?? "UTC"}
-      isAdmin={user.email === getAdminEmail()}
-      hasFreeDiagnosis={!!(site as { has_free_diagnosis?: boolean }).has_free_diagnosis}
+      isAdmin={isAdmin(user.email)}
       autoDiagStatus={(site as { auto_diagnosis_status?: string }).auto_diagnosis_status ?? "pending"}
       mergedFrom={mergedFromRes.data ? { ...mergedFromRes.data, mergedAt: page.merged_at ?? "" } : null}
       sitePages={(sitePagesRes.data ?? []).map((p) => ({ id: p.id, path: p.path, url: p.url }))}

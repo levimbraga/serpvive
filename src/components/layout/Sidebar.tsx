@@ -62,6 +62,10 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
 
   function handleSiteChange(siteId: string) {
     if (siteId === activeSiteId) return;
+    // Writing document.cookie inside a user-event handler is intentional
+    // (site switch persists via cookie, then hard-navigates). The compiler's
+    // immutability rule can't see that this is an event handler side effect.
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `active_site_id=${siteId};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
     // Hard navigate to dashboard to ensure fresh data for the new site
     window.location.assign("/dashboard");
@@ -190,7 +194,7 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
             <Link href="/settings" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">
-              Upgrade for AI diagnoses
+              Free cap: 3 AI diagnoses
             </Link>
           </div>
         ) : (

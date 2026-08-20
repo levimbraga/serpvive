@@ -25,6 +25,23 @@ export class FallbackExhaustedError extends Error {
   }
 }
 
+// ── Emergency kill switch ──
+// Every AI call in the app funnels through runWithFallback(), so a single
+// env var (AI_DISABLED=true on Vercel + redeploy) shuts down all paid AI
+// calls — diagnoses, briefs, external analyses, demos — without touching
+// the rest of the app (dashboard, GSC sync, scoring engine, emails).
+
+export class AiDisabledError extends Error {
+  constructor() {
+    super("AI calls are disabled via AI_DISABLED env var");
+    this.name = "AiDisabledError";
+  }
+}
+
+function isAiDisabled(): boolean {
+  return process.env.AI_DISABLED === "true";
+}
+
 // ── Configuration ──
 
 const DEFAULT_TIMEOUT_MS = 120_000; // 2 minutes per attempt
@@ -61,6 +78,11 @@ export async function runWithFallback(
   messages: AIMessage[],
   options: AICallOptions,
 ): Promise<FallbackResult> {
+  if (isAiDisabled()) {
+    console.warn("[AI Fallback] Blocked by AI_DISABLED kill switch");
+    throw new AiDisabledError();
+  }
+
   if (providers.length === 0) {
     throw new FallbackExhaustedError([]);
   }

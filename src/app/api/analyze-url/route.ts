@@ -65,36 +65,53 @@ export async function POST(request: Request) {
     );
   }
 
+  // Free plan: lifetime cap of 1 standalone URL analysis per account.
+  // This is the cheapest abuse vector (no site ownership required), so the
+  // cap is the tightest. Counted from external_analyses rows, not a counter.
+  const FREE_LIFETIME_URL_ANALYSES = 1;
   if (plan === "free") {
-    return NextResponse.json(
-      { error: "Upgrade to a paid plan to run AI analyses." },
-      { status: 403 },
-    );
+    const { count: lifetimeCount } = await admin
+      .from("external_analyses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if ((lifetimeCount ?? 0) >= FREE_LIFETIME_URL_ANALYSES) {
+      return NextResponse.json(
+        { error: `This public version has a free usage cap (${FREE_LIFETIME_URL_ANALYSES} standalone URL analysis per account). Paid plans are not enabled.`, code: "free_cap_reached" },
+        { status: 403 },
+      );
+    }
   }
 
-  if (profile.plan_status === "canceled" && !isAdmin(user.email)) {
+  if (plan !== "free" && profile.plan_status === "canceled" && !isAdmin(user.email)) {
     return NextResponse.json(
       { error: "Subscription canceled. Resubscribe to use AI analyses." },
       { status: 403 },
     );
   }
 
-  const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-  if (profile.diagnoses_used_this_month >= limit) {
-    return NextResponse.json(
-      { error: `Monthly analysis limit reached (${limit}/${limit}). Upgrade for more.`, code: "limit_reached" },
-      { status: 429 },
-    );
+  // Monthly limit (paid plans only — free uses the lifetime cap above)
+  if (plan !== "free") {
+    const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
+    if (profile.diagnoses_used_this_month >= limit) {
+      return NextResponse.json(
+        { error: `Monthly analysis limit reached (${limit}/${limit}).`, code: "limit_reached" },
+        { status: 429 },
+      );
+    }
   }
 
-  // Increment usage BEFORE running (prevents race condition)
-  await admin
-    .from("profiles")
-    .update({
-      diagnoses_used_this_month: profile.diagnoses_used_this_month + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+  // Increment usage BEFORE running (prevents race condition) — paid plans only;
+  // free is capped by external_analyses row count
+  if (plan !== "free") {
+    await admin
+      .from("profiles")
+      .update({
+        diagnoses_used_this_month: profile.diagnoses_used_this_month + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+  }
 
   try {
     // Check if the URL belongs to a connected GSC site
@@ -176,7 +193,9 @@ export async function POST(request: Request) {
         diagnosis: result.diagnosis,
         refresh_brief: result.brief,
         serp_snapshot: result.serpSnapshot,
-        model_used: "claude-opus-4-6",
+        // Record the model that actually served the request — a hardcoded ID
+        // here silently mislabels every run that used the fallback chain.
+        model_used: result.modelUsed,
         tokens_input: result.tokensInput,
         tokens_output: result.tokensOutput,
         cost_usd: result.totalCostUsd,
@@ -201,11 +220,13 @@ export async function POST(request: Request) {
       },
     });
   } catch (err) {
-    // Rollback usage on failure
-    await admin
-      .from("profiles")
-      .update({ diagnoses_used_this_month: profile.diagnoses_used_this_month })
-      .eq("id", user.id);
+    // Rollback usage on failure (paid-plan counter only; free never incremented)
+    if (plan !== "free") {
+      await admin
+        .from("profiles")
+        .update({ diagnoses_used_this_month: profile.diagnoses_used_this_month })
+        .eq("id", user.id);
+    }
 
     const message = err instanceof Error ? err.message : String(err);
     console.error("[api/analyze-url] Pipeline error:", message);
@@ -216,6 +237,13 @@ export async function POST(request: Request) {
       properties: { url, keyword, error: message },
     });
     await getPostHogServer().flush();
+
+    if (err instanceof Error && err.name === "AiDisabledError") {
+      return NextResponse.json(
+        { error: "AI analysis is temporarily disabled in this public version." },
+        { status: 503 },
+      );
+    }
 
     return NextResponse.json(
       { error: "Something went wrong during the analysis. Your diagnosis credit was not consumed — please try again." },

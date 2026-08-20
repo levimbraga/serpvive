@@ -129,16 +129,6 @@ type RefreshRecord = {
   result_calculated_at: string | null;
 };
 
-const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
-  healthy:  { color: "#16A34A", bg: "#F0FDF4", label: "Healthy" },
-  warning:  { color: "#D97706", bg: "#FFFBEB", label: "Warning" },
-  critical: { color: "#DC2626", bg: "#FEF2F2", label: "Critical" },
-  dead:     { color: "#6B7280", bg: "#F9FAFB", label: "Dead" },
-  new:      { color: "#2563EB", bg: "#EFF6FF", label: "New" },
-  unknown:    { color: "#9CA3AF", bg: "#F9FAFB", label: "Unknown" },
-  redirected: { color: "#9CA3AF", bg: "#F9FAFB", label: "Redirected" },
-};
-
 const SEVERITY_CONFIG: Record<string, { color: string; border: string }> = {
   high:   { color: "#DC2626", border: "border-l-[#DC2626]" },
   medium: { color: "#D97706", border: "border-l-[#D97706]" },
@@ -169,7 +159,6 @@ export default function PageDetailClient({
   diagnosesLimit,
   timeZone,
   isAdmin = false,
-  hasFreeDiagnosis = true,
   autoDiagStatus = "pending",
   mergedFrom = null,
   sitePages = [],
@@ -184,7 +173,6 @@ export default function PageDetailClient({
   diagnosesLimit: number;
   timeZone: string;
   isAdmin?: boolean;
-  hasFreeDiagnosis?: boolean;
   autoDiagStatus?: string;
   mergedFrom?: { id: string; url: string; path: string; mergedAt: string } | null;
   sitePages?: { id: string; path: string; url: string }[];
@@ -237,10 +225,10 @@ export default function PageDetailClient({
   const [mergeError, setMergeError] = useState("");
 
   const isNew = page.status === "new";
-  const statusCfg = STATUS_CONFIG[page.status] ?? STATUS_CONFIG["unknown"]!;
   const isFree = plan === "free";
   const engineNotReady = isFree && (autoDiagStatus === "pending" || autoDiagStatus === "engine_running" || autoDiagStatus === "diagnosing");
-  const atLimit = engineNotReady || (isFree && hasFreeDiagnosis) || (!isFree && diagnosesUsed >= diagnosesLimit);
+  // Free and paid both compare used vs limit now (free: 3 lifetime, server-counted)
+  const atLimit = engineNotReady || diagnosesUsed >= diagnosesLimit;
 
   function handleExport(format: "md" | "json") {
     if (!diagnosis) return;
@@ -1042,7 +1030,7 @@ export default function PageDetailClient({
                       <button
                         onClick={() => setExpandedEvidence(prev => {
                           const next = new Set(prev);
-                          next.has(i) ? next.delete(i) : next.add(i);
+                          if (next.has(i)) next.delete(i); else next.add(i);
                           return next;
                         })}
                         className="flex items-center gap-1 mt-2 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
@@ -1307,7 +1295,7 @@ export default function PageDetailClient({
                                     onClick={() => setExpandedPrevEvidence(prevSet => {
                                       const key = `${prev.id}-${i}`;
                                       const next = new Set(prevSet);
-                                      next.has(key) ? next.delete(key) : next.add(key);
+                                      if (next.has(key)) next.delete(key); else next.add(key);
                                       return next;
                                     })}
                                     className="flex items-center gap-1 mt-1.5 text-xs text-[#6B7280] hover:text-[#4B5563] transition-colors"
@@ -1364,9 +1352,7 @@ export default function PageDetailClient({
             {isFree
               ? engineNotReady
                 ? "Run the Decay Engine first to unlock AI diagnosis."
-                : hasFreeDiagnosis
-                  ? "Upgrade to a paid plan to run more AI diagnoses."
-                  : "This will use your 1 free diagnosis."
+                : `Free cap: ${diagnosesUsed} of ${diagnosesLimit} lifetime AI diagnoses used. Paid plans are not enabled in this public version.`
               : `Uses 1 of your ${diagnosesLimit} monthly diagnoses (${diagnosesUsed} used)`
             }
           </p>

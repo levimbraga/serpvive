@@ -91,13 +91,14 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
             <span className="text-xs text-[#9CA3AF] capitalize">{plan} plan</span>
           </div>
           <p className="text-sm text-[#6B7280] mb-3">
-            Upgrade to run unlimited AI diagnoses on any page.
+            Free accounts include 3 AI diagnoses (lifetime). Paid plans are not
+            enabled in this public version.
           </p>
           <Link
             href="/settings"
             className="block w-full text-center text-sm font-medium text-white bg-[#7C3AED] hover:bg-[#6D28D9] rounded-lg py-2 transition-colors"
           >
-            Upgrade plan
+            View plan details
           </Link>
         </div>
       );

@@ -7,7 +7,6 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, isAdmin } from "@/lib/constants";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
-import { FallbackExhaustedError } from "@/lib/ai/fallback-chain";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getPostHogServer } from "@/lib/posthog/server";
 
@@ -67,7 +66,10 @@ export async function POST(request: Request) {
   }
 
   const plan = (isAdmin(user.email) ? "agency" : profile.plan) as PlanName;
-  const isFreeDiagnosis = plan === "free" && !site.has_free_diagnosis;
+  const isFreePlan = plan === "free";
+  // First-ever diagnosis on this site still flips has_free_diagnosis (the flag
+  // the auto-diagnosis one-shot and the dashboard UI key off).
+  const isFirstFreeDiagnosis = isFreePlan && !site.has_free_diagnosis;
 
   // Rate limit per plan
   const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
@@ -78,12 +80,23 @@ export async function POST(request: Request) {
     );
   }
 
-  // Free plan: allow 1 manual diagnosis if has_free_diagnosis is false
-  if (plan === "free" && site.has_free_diagnosis) {
-    return NextResponse.json(
-      { error: "You've used your free diagnosis. Upgrade for unlimited AI diagnoses." },
-      { status: 403 },
-    );
+  // Free plan: lifetime cap of 3 AI diagnoses per account, counted from the
+  // diagnoses table itself (counter columns can drift; rows don't). Each run
+  // costs real API money, so the public version caps instead of gating
+  // behind upgrades — paid plans are not enabled.
+  const FREE_LIFETIME_DIAGNOSES = 3;
+  if (plan === "free") {
+    const { count: lifetimeCount } = await admin
+      .from("diagnoses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if ((lifetimeCount ?? 0) >= FREE_LIFETIME_DIAGNOSES) {
+      return NextResponse.json(
+        { error: `This public version has a free usage cap (${FREE_LIFETIME_DIAGNOSES} AI diagnoses per account). Paid plans are not enabled.`, code: "free_cap_reached" },
+        { status: 403 },
+      );
+    }
   }
 
   // Block if subscription canceled (paid plans only — admin bypasses)
@@ -94,12 +107,12 @@ export async function POST(request: Request) {
     );
   }
 
-  // Check monthly limit (paid plans only — free uses has_free_diagnosis gate)
+  // Check monthly limit (paid plans only — free uses the lifetime cap above)
   if (plan !== "free") {
     const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
     if (profile.diagnoses_used_this_month >= limit) {
       return NextResponse.json(
-        { error: `Diagnosis limit reached (${limit}/${limit}). Upgrade your plan for more.` },
+        { error: `Monthly diagnosis limit reached (${limit}/${limit}).` },
         { status: 429 },
       );
     }
@@ -126,8 +139,9 @@ export async function POST(request: Request) {
     }
   }
 
-  // Increment usage BEFORE running (prevents race condition) — skip for free plan
-  if (!isFreeDiagnosis) {
+  // Increment usage BEFORE running (prevents race condition) — the monthly
+  // counter is a paid-plan concept; free uses the lifetime row count instead
+  if (!isFreePlan) {
     await admin
       .from("profiles")
       .update({
@@ -141,7 +155,7 @@ export async function POST(request: Request) {
     const result = await runDiagnosisPipeline(admin, pageId, user.id, "manual", parsed.data.keywordOverride);
 
     // Mark free diagnosis as used on success
-    if (isFreeDiagnosis) {
+    if (isFirstFreeDiagnosis) {
       await admin
         .from("sites")
         .update({ has_free_diagnosis: true })
@@ -176,7 +190,7 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     // Rollback usage on failure — user shouldn't lose a diagnosis credit
-    if (!isFreeDiagnosis) {
+    if (!isFreePlan) {
       await admin
         .from("profiles")
         .update({
@@ -208,6 +222,9 @@ export async function POST(request: Request) {
 function getUserFriendlyError(message: string): string {
   const lower = message.toLowerCase();
 
+  if (lower.includes("ai_disabled") || lower.includes("kill switch") || lower.includes("disabled via ai_disabled")) {
+    return "AI analysis is temporarily disabled in this public version.";
+  }
   if (lower.includes("page not found")) {
     return "This page could not be found. It may have been removed from your site.";
   }
