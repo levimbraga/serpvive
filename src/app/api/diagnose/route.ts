@@ -4,11 +4,10 @@ import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const maxDuration = 300; // 5 minutes
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { PLAN_LIMITS, RATE_LIMITS_PER_HOUR, FREE_LIFETIME_ANALYSES, isAdmin } from "@/lib/constants";
-import { countFreeAnalysesUsed } from "@/lib/limits";
+import { isAdmin } from "@/lib/constants";
+import { checkUsage } from "@/lib/limits";
 import type { PlanName } from "@/lib/constants";
 import { runDiagnosisPipeline } from "@/lib/ai/pipeline";
-import { checkRateLimit } from "@/lib/rate-limit";
 import { getPostHogServer } from "@/lib/posthog/server";
 
 const DiagnoseInputSchema = z.object({
@@ -72,49 +71,20 @@ export async function POST(request: Request) {
   // the auto-diagnosis one-shot and the dashboard UI key off).
   const isFirstFreeDiagnosis = isFreePlan && !site.has_free_diagnosis;
 
-  // Rate limit per plan
-  const hourlyLimit = RATE_LIMITS_PER_HOUR[plan] ?? 3;
-  if (!checkRateLimit(`diagnose:${user.id}`, hourlyLimit, 3_600_000)) {
-    return NextResponse.json(
-      { error: "You're analyzing too fast. Please wait a few minutes before running another diagnosis.", code: "slow_down" },
-      { status: 429 },
-    );
-  }
+  // Rate limit, free lifetime pool, canceled subscription and monthly quota, in
+  // that order — see checkUsage. Everything here runs before a cent is spent.
+  const refusal = await checkUsage(admin, {
+    userId: user.id,
+    email: user.email,
+    plan,
+    planStatus: profile.plan_status,
+    monthlyUsed: profile.diagnoses_used_this_month,
+    action: "diagnose",
+  });
 
-  // Free plan: one shared lifetime pool, counted from table rows (counter
-  // columns can drift; rows don't). Standalone URL analyses draw from the same
-  // allowance — same pipeline, same cost. The welcome auto-diagnosis writes a
-  // row like any other run, so it counts too. Each run costs real API money, so
-  // the public version caps instead of gating behind upgrades — paid plans are
-  // not enabled.
-  if (plan === "free") {
-    const lifetimeCount = await countFreeAnalysesUsed(admin, user.id);
-
-    if (lifetimeCount >= FREE_LIFETIME_ANALYSES) {
-      return NextResponse.json(
-        { error: `This public version has a free usage cap (${FREE_LIFETIME_ANALYSES} AI analyses per account, shared between Search Console pages and standalone URLs). Paid plans are not enabled.`, code: "free_cap_reached" },
-        { status: 403 },
-      );
-    }
-  }
-
-  // Block if subscription canceled (paid plans only — admin bypasses)
-  if (plan !== "free" && profile.plan_status === "canceled" && !isAdmin(user.email)) {
-    return NextResponse.json(
-      { error: "Subscription canceled. Resubscribe to use AI diagnoses." },
-      { status: 403 },
-    );
-  }
-
-  // Check monthly limit (paid plans only — free uses the lifetime cap above)
-  if (plan !== "free") {
-    const limit = PLAN_LIMITS[plan]?.diagnoses_per_month ?? 0;
-    if (profile.diagnoses_used_this_month >= limit) {
-      return NextResponse.json(
-        { error: `Monthly diagnosis limit reached (${limit}/${limit}).` },
-        { status: 429 },
-      );
-    }
+  if (refusal) {
+    const { status, ...body } = refusal;
+    return NextResponse.json(body, { status });
   }
 
   // Check for concurrent diagnosis — prevent user from running 2 at once
