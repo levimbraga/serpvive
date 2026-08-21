@@ -171,7 +171,10 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
             <div className="flex items-center gap-2 mb-2">
               <Zap size={13} strokeWidth={1.5} className={usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#64748B]"} />
               <span className={`text-[13px] font-medium tabular-nums ${usagePercent >= 80 ? "text-[#F59E0B]" : "text-[#94A3B8]"}`}>
-                {diagnosesUsed}/{diagnosesLimit} diagnoses
+                {/* Free draws GSC diagnoses and standalone URL analyses from one
+                    shared pool, so "diagnoses" would name only half of what the
+                    number counts. Paid plans really are a diagnosis quota. */}
+                {diagnosesUsed}/{diagnosesLimit} {plan === "free" ? "analyses" : "diagnoses"}
               </span>
             </div>
             <div className="h-1.5 bg-[#1E293B] rounded-full overflow-hidden">
