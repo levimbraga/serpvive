@@ -60,6 +60,9 @@ Signup → "How did you hear about us?" (optional dropdown) → Stripe Checkout 
 - Output: structured JSON with causes, evidence, severity, E-E-A-T analysis
 - Prompt calibrated: SEO expert tone, banned hedging phrases, sandwich/refocus, chain-of-thought reasoning field
 - Limits: 1 lifetime (Free), 10/mo (Starter), 40/mo (Pro), 120/mo (Agency)
+  - *Plano comercial, com Stripe ligado.* Na versão pública em produção os pagamentos estão
+    desligados e o Free roda 10 análises AI vitalícias numa pool única, compartilhada com as
+    análises de URL avulsas (`FREE_LIFETIME_ANALYSES`). Ver README e docs/OPERATIONS.md.
 - Loading state: 4 progressive steps with timer
 
 ### Refresh Brief with Micro-Drafts

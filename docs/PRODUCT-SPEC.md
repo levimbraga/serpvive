@@ -52,6 +52,8 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 
 ## Pricing
 
+> **Escopo:** esta seção descreve o plano comercial com Stripe ligado. A versão pública em produção tem pagamentos desligados e roda um cap diferente — 10 análises AI por conta, vitalícias, numa pool única compartilhada entre diagnósticos GSC e análises de URL avulsas (`FREE_LIFETIME_ANALYSES` em `src/lib/constants.ts`). Para o comportamento que está no ar, a fonte é o [README](../README.md) e [docs/OPERATIONS.md](./OPERATIONS.md), não este documento.
+
 | | Free | Starter | Pro | Agency | Enterprise |
 |--|------|---------|-----|--------|------------|
 | **Preço** | **$0** | **$29/mês** | **$69/mês** | **$129/mês** | **Custom** |

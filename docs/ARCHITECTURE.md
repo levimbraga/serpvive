@@ -297,6 +297,13 @@ ADMIN_EMAIL=
 ```
 
 ## Plan Limits Constants
+
+> **Escopo:** o bloco abaixo é o desenho comercial (inclui um plano `trial` que foi removido e um
+> `diagnoses_lifetime: 1` que nunca chegou a rodar). O `PLAN_LIMITS` real em
+> `src/lib/constants.ts` não tem `trial` nem `diagnoses_lifetime`: na versão pública, com
+> pagamentos desligados, o Free é governado por `FREE_LIFETIME_ANALYSES` — 10 análises AI
+> vitalícias numa pool única, compartilhada entre diagnósticos GSC e análises de URL avulsas.
+> `PLAN_LIMITS.free.diagnoses_per_month` continua 0 porque esse campo descreve os planos pagos.
 ```typescript
 export const PLAN_LIMITS = {
   free:    { sites: 1, pages: 100, diagnoses_per_month: 0, diagnoses_lifetime: 1, team_members: 1, monitoring: 'weekly' },
