@@ -81,11 +81,13 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
   const [diagnosis, setDiagnosis] = useState<DiagnosisData | null>(null);
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const remaining = diagnosesLimit - diagnosesUsed;
-  // Free plan gets 1 lifetime standalone analysis (server passes the row count)
+  // Free plan draws standalone analyses and GSC diagnoses from one shared
+  // lifetime pool; the server passes the row count and the limit for the plan.
   const canAnalyze = remaining > 0;
 
   useEffect(() => {
@@ -104,6 +106,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
     setElapsedSeconds(0);
     setDiagnosis(null);
     setBrief(null);
+    setWarning(null);
 
     // Start timer
     timerRef.current = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
@@ -129,7 +132,8 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
 
       setDiagnosis(json.data.diagnosis);
       setBrief(json.data.brief);
-      setAnalysisId(json.data.analysisId);
+      setAnalysisId(json.data.analysisId ?? null);
+      setWarning(json.data.warning ?? null);
       setStatus("done");
       router.refresh();
     } catch (err) {
@@ -291,7 +295,7 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[#3B82F6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
             Page Analysis
           </span>
-          {analysisId && (
+          {analysisId ? (
             <Link
               href={`/pages/analyze/${analysisId}`}
               className="text-xs text-[#6B7280] hover:text-[#3B82F6] transition-colors flex items-center gap-1"
@@ -299,12 +303,17 @@ export default function AnalyzeUrlClient({ diagnosesUsed, diagnosesLimit, plan }
               Saved — view permalink
               <ArrowLeft size={10} strokeWidth={1.5} className="rotate-180" />
             </Link>
-          )}
+          ) : warning ? (
+            <span className="text-xs text-[#D97706]">Not saved</span>
+          ) : null}
         </div>
         <p className="text-sm font-medium text-[#111827] truncate" style={{ fontFamily: "var(--font-mono, monospace)" }}>
           {url}
         </p>
         <p className="text-xs text-[#6B7280] mt-1">Keyword: {keyword}</p>
+        {warning && (
+          <p className="text-xs text-[#D97706] mt-2">{warning}</p>
+        )}
       </div>
 
       {/* Diagnosis Card */}

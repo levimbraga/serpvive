@@ -8,6 +8,7 @@ import type { PlanName } from "@/lib/constants";
 import { runExternalPipeline } from "@/lib/ai/pipeline";
 import { getPostHogServer } from "@/lib/posthog/server";
 import { validateUrl } from "@/lib/url-validator";
+import { getUserFriendlyError } from "@/lib/ai/user-errors";
 
 export const maxDuration = 300; // 5 minutes
 
@@ -113,7 +114,7 @@ export async function POST(request: Request) {
       } else {
         // Create the page
         const urlObj = new URL(url);
-        const { data: newPage } = await admin
+        const { data: newPage, error: pageErr } = await admin
           .from("pages")
           .insert({
             site_id: matchingSite.id,
@@ -127,11 +128,14 @@ export async function POST(request: Request) {
           .select("id")
           .single();
 
+        if (pageErr) {
+          console.error("[api/analyze-url] Could not create page row:", pageErr.message);
+        }
         pageId = newPage?.id ?? null;
       }
 
       if (pageId) {
-        await admin.from("diagnoses").insert({
+        const { error: diagErr } = await admin.from("diagnoses").insert({
           page_id: pageId,
           user_id: user.id,
           diagnosis: result.diagnosis,
@@ -145,17 +149,25 @@ export async function POST(request: Request) {
           triggered_by: "manual",
         });
 
+        if (diagErr) {
+          // Not fatal — the standalone record below is what this endpoint
+          // returns. But it must not pass silently: an unwritten `diagnoses`
+          // row means the run is invisible to the page history and to the
+          // shared free count.
+          console.error("[api/analyze-url] Could not save diagnosis row:", diagErr.message);
+        }
+
         await admin.from("pages").update({
           last_diagnosis_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq("id", pageId);
 
-        savedToPage = true;
+        savedToPage = !diagErr;
       }
     }
 
     // Also save as external analysis (always, for the /pages/analyze view)
-    const { data: externalRecord } = await admin
+    const { data: externalRecord, error: externalErr } = await admin
       .from("external_analyses")
       .insert({
         user_id: user.id,
@@ -177,20 +189,41 @@ export async function POST(request: Request) {
       .select("id")
       .single();
 
-    getPostHogServer().capture({
-      distinctId: user.id,
-      event: "external_analysis_completed",
-      properties: { url, keyword, cost_usd: result.totalCostUsd, saved_to_page: savedToPage },
-    });
-    await getPostHogServer().flush();
+    if (externalErr) {
+      // The analysis itself succeeded and has already been paid for, so this
+      // still returns the result — but a failed insert means no permalink and
+      // no credit counted, and it used to vanish into an ignored destructure.
+      // The most likely cause is a schema drift on `page_id`: see
+      // supabase/migrations/20260820_link_external_analyses_to_pages.sql.
+      console.error("[api/analyze-url] Could not save external analysis:", externalErr.message);
+    }
+
+    // Analytics must never sink a completed analysis — the pipeline already
+    // treats its own tracking as non-blocking, and this call sits after the
+    // expensive work with nothing left to roll back.
+    try {
+      getPostHogServer().capture({
+        distinctId: user.id,
+        event: "external_analysis_completed",
+        properties: { url, keyword, cost_usd: result.totalCostUsd, saved_to_page: savedToPage },
+      });
+      await getPostHogServer().flush();
+    } catch (trackErr) {
+      console.error("[api/analyze-url] PostHog tracking failed (non-blocking):", trackErr);
+    }
 
     return NextResponse.json({
       data: {
-        analysisId: externalRecord?.id,
+        analysisId: externalRecord?.id ?? null,
         pageId: savedToPage ? pageId : null,
         diagnosis: result.diagnosis,
         brief: result.brief,
         processingTimeMs: result.processingTimeMs,
+        // Present only when the result could not be persisted, so the user
+        // knows to copy what's on screen instead of expecting it in history.
+        ...(externalErr
+          ? { warning: "This analysis could not be saved to your history — it won't be here after you leave the page." }
+          : {}),
       },
     });
   } catch (err) {
@@ -205,12 +238,16 @@ export async function POST(request: Request) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[api/analyze-url] Pipeline error:", message);
 
-    getPostHogServer().capture({
-      distinctId: user.id,
-      event: "external_analysis_failed",
-      properties: { url, keyword, error: message },
-    });
-    await getPostHogServer().flush();
+    try {
+      getPostHogServer().capture({
+        distinctId: user.id,
+        event: "external_analysis_failed",
+        properties: { url, keyword, error: message },
+      });
+      await getPostHogServer().flush();
+    } catch (trackErr) {
+      console.error("[api/analyze-url] PostHog tracking failed (non-blocking):", trackErr);
+    }
 
     if (err instanceof Error && err.name === "AiDisabledError") {
       return NextResponse.json(
@@ -226,8 +263,11 @@ export async function POST(request: Request) {
       );
     }
 
+    // Say what actually broke. This route reported every failure with the same
+    // generic sentence, so a page too short to analyze, an AI outage and a
+    // malformed model response were indistinguishable to the user.
     return NextResponse.json(
-      { error: "Something went wrong during the analysis. Your diagnosis credit was not consumed — please try again." },
+      { error: getUserFriendlyError(message), code: "analysis_failed" },
       { status: 500 },
     );
   }
