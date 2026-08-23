@@ -53,9 +53,9 @@ select
 
 Separate from the global cap, and defined in [`src/lib/constants.ts`](../src/lib/constants.ts):
 
-- `FREE_LIFETIME_ANALYSES` — 10 AI analyses per account, lifetime, **shared**: a GSC diagnosis and a standalone URL analysis draw from the same pool.
+- `FREE_LIFETIME_ANALYSES` — 3 AI analyses per account, lifetime, **shared**: a GSC diagnosis and a standalone URL analysis draw from the same pool.
 
-It was previously two separate pools (10 GSC + 3 standalone) on the theory that a standalone URL, requiring no proof of site ownership, is the cheaper abuse vector and deserved a tighter cap. Two pools turned out to be indefensible in the UI — the sidebar counted one of them and the settings page named the other, so the number a free user saw was never the number that stopped them. One pool, one number.
+It was previously two separate pools (10 GSC + 3 standalone) on the theory that a standalone URL, requiring no proof of site ownership, is the cheaper abuse vector and deserved a tighter cap. Two pools turned out to be indefensible in the UI — the sidebar counted one of them and the settings page named the other, so the number a free user saw was never the number that stopped them. One pool, one number. That single pool started at 10 and was tightened to 3: each run is a real Opus call plus a SERP fetch, and ten of those per signup is a bill, not a demo.
 
 Usage is counted from table rows (`diagnoses` + `external_analyses`), never from a counter column. Changing the constant changes the limit everywhere, including the UI copy.
 

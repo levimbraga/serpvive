@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { FREE_LIFETIME_ANALYSES } from "@/lib/constants";
 
 type SiteItem = {
   id: string;
@@ -190,14 +191,14 @@ export default function Sidebar({ diagnosesUsed, diagnosesLimit, plan = "free", 
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#2563EB]" />
             <Link href="/pages" className="text-[12px] text-[#2563EB] hover:text-[#3B82F6] transition-colors no-underline font-medium">
-              1 free diagnosis available
+              {FREE_LIFETIME_ANALYSES} free analyses available
             </Link>
           </div>
         ) : autoDiagStatus === "completed" || (hasGsc && hasFreeDiagnosis) ? (
           <div className="flex items-center gap-2">
             <Zap size={13} strokeWidth={1.5} className="text-[#64748B]" />
             <Link href="/settings" className="text-[12px] text-[#64748B] hover:text-[#94A3B8] transition-colors no-underline">
-              Free cap: 3 AI diagnoses
+              Free cap: {FREE_LIFETIME_ANALYSES} AI analyses
             </Link>
           </div>
         ) : (

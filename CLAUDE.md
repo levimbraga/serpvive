@@ -151,6 +151,13 @@ export const PLAN_LIMITS = {
   agency:  { sites: 10, pages: 5000, diagnoses_per_month: 120, team_members: 10 },
 };
 
+// Cap do plano Free na versão pública (pagamentos desligados). Vitalício por
+// conta, NÃO mensal, e uma pool única: diagnóstico GSC e análise de URL avulsa
+// consomem a mesma quota. Este é o número que a UI inteira mostra — mudar aqui
+// muda em todo lugar. `PLAN_LIMITS.free.diagnoses_per_month` segue 0 porque
+// esse campo descreve só os planos pagos.
+export const FREE_LIFETIME_ANALYSES = 3;
+
 export const DECAY_THRESHOLDS = {
   healthy_max: 15,
   warning_max: 30,

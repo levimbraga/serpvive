@@ -55,8 +55,12 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
       );
     }
 
-    // Auto failed — show free diagnosis available
+    // Auto failed — show what is still available. The count comes from the
+    // shared lifetime pool, not a hardcoded 1: the welcome diagnosis is one
+    // draw from the same allowance, so hardcoding it here would understate the
+    // allowance the moment the cap changes.
     if (autoDiagStatus === "failed" && hasGsc && !hasFreeDiagnosis) {
+      const freeLeft = Math.max(0, limit - used);
       return (
         <div data-tour="usage-meter" className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center justify-between mb-3">
@@ -67,13 +71,13 @@ export default function UsageMeter({ used, limit, plan, hasGsc, hasFreeDiagnosis
             <span className="text-xs text-[#9CA3AF] capitalize">{plan} plan</span>
           </div>
           <p className="text-sm text-[#374151] mb-3">
-            You have <strong className="text-[#2563EB]">1 free AI diagnosis</strong>. Pick any page to analyze.
+            You have <strong className="text-[#2563EB]">{freeLeft} free AI {freeLeft === 1 ? "diagnosis" : "diagnoses"}</strong>. Pick any page to analyze.
           </p>
           <Link
             href="/pages"
             className="block w-full text-center text-sm font-medium text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-lg py-2 transition-colors"
           >
-            Use your free diagnosis
+            {freeLeft === 1 ? "Use your free diagnosis" : "Run a free diagnosis"}
           </Link>
         </div>
       );

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import { Reveal } from "@/hooks/useReveal";
+import { FREE_LIFETIME_ANALYSES } from "@/lib/constants";
 
 const PLANS = [
   {
@@ -17,7 +18,7 @@ const PLANS = [
     features: [
       "1 site",
       "100 pages monitored",
-      "3 AI diagnoses (lifetime cap)",
+      `${FREE_LIFETIME_ANALYSES} AI diagnoses (lifetime cap)`,
       "Weekly monitoring",
       "Health Score + decay detection",
     ],
@@ -376,7 +377,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: "Connect Google Search Console, see your Health Score, and get 3 AI diagnoses (lifetime cap). In this public version every account runs on the free tier \u2014 payments are intentionally disabled.",
+    a: `Connect Google Search Console, see your Health Score, and get ${FREE_LIFETIME_ANALYSES} AI diagnoses (lifetime cap). In this public version every account runs on the free tier \u2014 payments are intentionally disabled.`,
   },
   {
     q: "What happens if I cancel?",

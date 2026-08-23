@@ -1,6 +1,7 @@
 // Last verified: March 2026. Verify competitor pricing quarterly.
 
 import { COMPARISON_NAV_ITEMS } from "./comparison-nav";
+import { FREE_LIFETIME_ANALYSES } from "./constants";
 
 export type FeatureRow = {
   feature: string;
@@ -241,7 +242,7 @@ Cost: Semrush Pro ($140) + SerpVive Pro ($69) = $209/month for complete content 
       {
         question: "Is SerpVive really free?",
         answer:
-          "Yes. The free plan includes 1 site, 100 pages monitored weekly, a Health Score dashboard, and 1 AI diagnosis to try. No credit card required. Paid plans start at $29/month for more diagnoses and features.",
+          `Yes. The free plan includes 1 site, 100 pages monitored weekly, a Health Score dashboard, and ${FREE_LIFETIME_ANALYSES} AI analyses to try. No credit card required. Paid plans start at $29/month for more diagnoses and features.`,
       },
       {
         question:
@@ -719,7 +720,7 @@ The honest take: if you're on Frase Professional and the Content Opportunities f
     ],
 
     pricing: [
-      { plan: "Free", competitor: "Free forever (entire product)", serpvive: "Free forever (1 site, 100 pages, 1 AI diagnosis)" },
+      { plan: "Free", competitor: "Free forever (entire product)", serpvive: `Free forever (1 site, 100 pages, ${FREE_LIFETIME_ANALYSES} AI analyses)` },
       { plan: "Entry paid", competitor: "No paid plans", serpvive: "Starter: $29/mo" },
       { plan: "Mid paid", competitor: "No paid plans", serpvive: "Pro: $69/mo" },
       { plan: "Top paid", competitor: "No paid plans", serpvive: "Agency: $129/mo" },
@@ -797,7 +798,7 @@ This is the right answer for a lot of teams. If your content decay workflow is "
 
 SerpVive has four tiers:
 
-- **Free:** 1 site, 100 pages, weekly monitoring, Health Score, 1 AI diagnosis to try
+- **Free:** 1 site, 100 pages, weekly monitoring, Health Score, ${FREE_LIFETIME_ANALYSES} AI analyses to try
 - **Starter ($29/mo):** 1 site, 100 pages, 10 AI diagnoses per month
 - **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses per month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses per month

@@ -17,7 +17,7 @@ export type PlanName = keyof typeof PLAN_LIMITS;
  * `countFreeAnalysesUsed` in `src/lib/limits.ts` — the single place that
  * knows how to add those two tables up without double-counting.
  */
-export const FREE_LIFETIME_ANALYSES = 10;
+export const FREE_LIFETIME_ANALYSES = 3;
 
 /** Max AI diagnoses per hour per plan (rate limit, not monthly quota). */
 export const RATE_LIMITS_PER_HOUR: Record<PlanName, number> = {

@@ -52,14 +52,14 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 
 ## Pricing
 
-> **Escopo:** esta seção descreve o plano comercial com Stripe ligado. A versão pública em produção tem pagamentos desligados e roda um cap diferente — 10 análises AI por conta, vitalícias, numa pool única compartilhada entre diagnósticos GSC e análises de URL avulsas (`FREE_LIFETIME_ANALYSES` em `src/lib/constants.ts`). Para o comportamento que está no ar, a fonte é o [README](../README.md) e [docs/OPERATIONS.md](./OPERATIONS.md), não este documento.
+> **Escopo:** esta seção descreve o plano comercial com Stripe ligado. A versão pública em produção tem pagamentos desligados e roda um cap diferente — 3 análises AI por conta, vitalícias, numa pool única compartilhada entre diagnósticos GSC e análises de URL avulsas (`FREE_LIFETIME_ANALYSES` em `src/lib/constants.ts`). Para o comportamento que está no ar, a fonte é o [README](../README.md) e [docs/OPERATIONS.md](./OPERATIONS.md), não este documento.
 
 | | Free | Starter | Pro | Agency | Enterprise |
 |--|------|---------|-----|--------|------------|
 | **Preço** | **$0** | **$29/mês** | **$69/mês** | **$129/mês** | **Custom** |
 | Sites | 1 | 1 | 3 | 10 | Custom |
 | Páginas monitoradas | 100 | 100 | 1,000 | 5,000 | Custom |
-| Diagnósticos AI | 1 lifetime | 10/mês | 40/mês | 120/mês | Custom |
+| Diagnósticos AI | 3 lifetime | 10/mês | 40/mês | 120/mês | Custom |
 | Monitoramento | Semanal | Diário | Diário | Diário | Diário |
 | Health Score + decay | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Email digest | ❌ | Semanal | Semanal | Semanal/site | Custom |
@@ -71,7 +71,7 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 
 - **Annual toggle:** Save 17% (2 months free)
 - **Trial (paid plans):** 7 dias com cartão de crédito
-- **Free plan:** 1 diagnosis lifetime, weekly monitoring, limited engine (no velocity, no seasonal, no cannibalization)
+- **Free plan:** 3 AI analyses lifetime (pool única, compartilhada com análises de URL avulsas), weekly monitoring, limited engine (no velocity, no seasonal, no cannibalization)
 - **Overage:** Hard block com CTA de upgrade
 - Self-service checkout via Stripe. Enterprise = "Contact Us."
 - Primeiro diagnóstico gratuito e automático pra todos (free e trial)
@@ -79,7 +79,7 @@ Todo conteúdo morre. A gente avisa quando começa a morrer, explica por que, di
 ### Free Plan Strategy
 O free plan é um funil de conversão, não freemium:
 - User vê Health Score + decay list toda semana (dor crescente)
-- Só tem 1 diagnose AI (experimenta o valor)
+- Só tem 3 análises AI vitalícias (experimenta o valor)
 - Cada semana os posts pioram e ele não pode diagnosticar mais
 - Conversão natural: dor aumenta com o tempo
 - Condições: weekly cron (não daily), engine limitado, features locked visíveis no dashboard

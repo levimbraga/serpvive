@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage, { H2, P, UL, LI, Strong, A } from "@/components/marketing/LegalPage";
+import { FREE_LIFETIME_ANALYSES } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Terms of Service — SerpVive",
@@ -49,7 +50,7 @@ export default function TermsOfServicePage() {
       <H2 id="plans-pricing">Plans & Pricing</H2>
       <P>SerpVive offers the following plans:</P>
       <UL>
-        <LI><Strong>Free:</Strong> 1 site, 100 pages, 1 AI diagnosis, weekly monitoring.</LI>
+        <LI><Strong>Free:</Strong> 1 site, 100 pages, {FREE_LIFETIME_ANALYSES} AI analyses (lifetime cap per account, shared between Search Console diagnoses and standalone URL analyses), weekly monitoring.</LI>
         <LI><Strong>Starter ($29/mo):</Strong> 1 site, 100 pages, 10 AI diagnoses/month, daily monitoring.</LI>
         <LI><Strong>Pro ($69/mo):</Strong> 3 sites, 1,000 pages, 40 AI diagnoses/month, daily monitoring.</LI>
         <LI><Strong>Agency ($129/mo):</Strong> 10 sites, 5,000 pages, 120 AI diagnoses/month, daily monitoring.</LI>

@@ -17,7 +17,7 @@
 ```
 Signup → "How heard?" dropdown → Conectar GSC → Selecionar site 
 → Importando → Engine roda (weekly mode) → Dashboard com Health Score
-→ 1 diagnose gratuita disponível
+→ 3 análises AI gratuitas disponíveis (pool vitalícia, compartilhada com análises de URL avulsas)
 ```
 
 ### Paid Plans (com cartão):
@@ -148,7 +148,7 @@ Signup → "How heard?" dropdown → Stripe Checkout (7-day trial)
 - 📄 Pages
 - ⚙️ Settings
 - ❓ Help
-- Usage meter visual (3/10 diagnoses)
+- Usage meter visual (1/3 analyses no Free — o número vem de `FREE_LIFETIME_ANALYSES`)
 
 ### Copy rules:
 - Falar como humano, não como software
