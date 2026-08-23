@@ -121,7 +121,12 @@ export type PipelineResult = {
 
 export type ExternalPipelineResult = {
   diagnosis: DiagnosisResult;
-  brief: RefreshBriefResult;
+  /**
+   * Null when brief generation failed. The diagnosis is the expensive half and
+   * is already paid for by then, so a failed brief degrades the result instead
+   * of discarding it — same contract as `runDiagnosisPipeline`.
+   */
+  brief: RefreshBriefResult | null;
   serpSnapshot: { keyword: string; results: unknown[]; fetched_at: string };
   tokensInput: number;
   tokensOutput: number;
@@ -457,23 +462,34 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
   const diagDurationMs = Date.now() - diagStart;
   console.log(`[DEMO ${elapsed()}] Diagnosis complete (model: ${diagResult.modelUsed}, ${diagDurationMs}ms)`);
 
-  // Step 5: AI brief — truncate content since diagnosis already analyzed it
-  const briefStart = Date.now();
-  console.log(`[DEMO ${elapsed()}] Starting AI brief (userContent: ${userContentStr.length} chars → 5000, competitors: ${competitorsStr.length} chars → 3000)`);
-  const briefResult = await generateBrief({
-    url,
-    diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
-    userContent: userContentStr.slice(0, 12000),
-    competitors: competitorsStr.slice(0, 8000),
-    noGscData: true,
-  });
-  const briefDurationMs = Date.now() - briefStart;
-  console.log(`[DEMO ${elapsed()}] Brief complete (${briefDurationMs}ms)`);
+  // Step 5: AI brief — truncate content since diagnosis already analyzed it.
+  // Non-fatal: the diagnosis above already cost real money and is a complete
+  // result on its own, so a failed brief must not throw away the whole run.
+  // This mirrors runDiagnosisPipeline, which saves the diagnosis before the
+  // brief for exactly this reason.
+  let briefResult: Awaited<ReturnType<typeof generateBrief>> | null = null;
+  let briefDurationMs = 0;
+  try {
+    const briefStart = Date.now();
+    console.log(`[DEMO ${elapsed()}] Starting AI brief (userContent: ${userContentStr.length} chars → 5000, competitors: ${competitorsStr.length} chars → 3000)`);
+    briefResult = await generateBrief({
+      url,
+      diagnosisJson: JSON.stringify(diagResult.diagnosis, null, 2),
+      userContent: userContentStr.slice(0, 12000),
+      competitors: competitorsStr.slice(0, 8000),
+      noGscData: true,
+    });
+    briefDurationMs = Date.now() - briefStart;
+    console.log(`[DEMO ${elapsed()}] Brief complete (${briefDurationMs}ms)`);
+  } catch (briefErr) {
+    briefDurationMs = Date.now() - startTime;
+    console.error(`[DEMO ${elapsed()}] Brief generation failed (diagnosis kept):`, briefErr);
+  }
 
-  const totalCostUsd = diagResult.costUsd + briefResult.costUsd;
+  const totalCostUsd = diagResult.costUsd + (briefResult?.costUsd ?? 0);
   const processingTimeMs = Date.now() - startTime;
-  const tokensInput = diagResult.tokensInput + briefResult.tokensInput;
-  const tokensOutput = diagResult.tokensOutput + briefResult.tokensOutput;
+  const tokensInput = diagResult.tokensInput + (briefResult?.tokensInput ?? 0);
+  const tokensOutput = diagResult.tokensOutput + (briefResult?.tokensOutput ?? 0);
 
   // Track in PostHog
   trackDiagnosis({
@@ -484,7 +500,7 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
     userPageMethod: userContent?.fetchMethod ?? "failed",
     competitorMethods: competitorContents.map((c) => c?.fetchMethod ?? "failed"),
     diagnosisModel: diagResult.modelUsed,
-    briefModel: briefResult.modelUsed,
+    briefModel: briefResult?.modelUsed ?? "failed",
     causesCount: diagResult.diagnosis.causes.length,
     topicCoveragePercent: diagResult.diagnosis.topic_coverage.percentage,
     fetchDurationMs,
@@ -497,7 +513,7 @@ If the content was truncated during fetch, note it: 'Content may have been trunc
 
   return {
     diagnosis: diagResult.diagnosis,
-    brief: briefResult.brief,
+    brief: briefResult?.brief ?? null,
     serpSnapshot: {
       keyword,
       results: serpResults,
