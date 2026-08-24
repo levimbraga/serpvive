@@ -731,7 +731,7 @@ export default function SettingsClient({
             { icon: FileText, label: "Pages", value: limits.pages.toLocaleString() },
             // Free has no monthly quota — PLAN_LIMITS.free.diagnoses_per_month is 0
             // because that field describes the paid tiers. Printing that 0 next to
-            // the "X / 10" usage row below reads as "free cannot diagnose", which
+            // the usage row below reads as "free cannot diagnose", which
             // is the opposite of true. Free shows its lifetime pool instead.
             plan === "free"
               ? { icon: Zap, label: "Analyses (lifetime)", value: FREE_LIFETIME_ANALYSES, accent: true }

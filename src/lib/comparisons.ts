@@ -182,7 +182,7 @@ The **Pro plan ($139.95/month)** includes 500 keywords to track, 10,000 results 
 The **Guru plan ($249.95/month)** adds the Content Marketing Toolkit, historical data, and more limits. Required for serious content audit work.
 
 SerpVive pricing reflects its focus:
-- **Free:** 1 site, 100 pages, weekly monitoring, Health Score
+- **Free:** 1 site, 100 pages, weekly monitoring, Health Score, ${FREE_LIFETIME_ANALYSES} AI analyses (lifetime)
 - **Starter ($29/month):** 1 site, 100 pages, 10 AI diagnoses/month
 - **Pro ($69/month):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/month):** 10 sites, 5,000 pages, 120 AI diagnoses/month
@@ -384,7 +384,7 @@ For content teams already producing content, SerpVive at $69/month provides moni
 - **Peace of Mind ($359/mo):** Unlimited articles, dedicated support. For agencies.
 
 SerpVive's pricing tiers are based on monitoring scale:
-- **Free:** 1 site, 100 pages, weekly monitoring
+- **Free:** 1 site, 100 pages, weekly monitoring, ${FREE_LIFETIME_ANALYSES} AI analyses (lifetime)
 - **Starter ($29/mo):** 1 site, 100 pages, 10 AI diagnoses/month
 - **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses/month
@@ -580,7 +580,7 @@ The difference: Frase gives you tools. SerpVive gives you answers.
 
 **Frase:** Content Opportunities is now available on all plans. Starter ($49/month) includes 1 domain and 50 audit pages. Professional ($129/month) scales to 5 domains and 250 audit pages.
 
-**SerpVive:** Decay monitoring is available on every plan, including the free tier. AI diagnosis starts at $29/month (Starter). Free plan monitors 1 site with 100 pages.
+**SerpVive:** Decay monitoring is available on every plan, including the free tier, which also includes ${FREE_LIFETIME_ANALYSES} AI analyses for the lifetime of the account. Beyond those, AI diagnosis starts at $29/month (Starter). Free plan monitors 1 site with 100 pages.
 
 If content decay monitoring is your primary need, SerpVive's free plan gives you monitoring at zero cost. Frase Starter ($49/month) gives you monitoring + content creation tools. Where SerpVive adds unique value is the AI diagnosis depth and micro-drafts, which Frase does not offer at any price.`,
 
@@ -591,7 +591,7 @@ If content decay monitoring is your primary need, SerpVive's free plan gives you
 - **Scale ($299/mo):** 100 articles, 10 domains, 1,000 audit pages, AI Visibility tracking (5 platforms), 5 seats.
 
 SerpVive's pricing is focused entirely on monitoring:
-- **Free:** 1 site, 100 pages, weekly monitoring, Health Score
+- **Free:** 1 site, 100 pages, weekly monitoring, Health Score, ${FREE_LIFETIME_ANALYSES} AI analyses (lifetime)
 - **Starter ($29/mo):** 1 site, 100 pages, 10 AI diagnoses/month
 - **Pro ($69/mo):** 3 sites, 1,000 pages, 40 AI diagnoses/month
 - **Agency ($129/mo):** 10 sites, 5,000 pages, 120 AI diagnoses/month

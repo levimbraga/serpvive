@@ -26,9 +26,9 @@ export default async function SettingsPage() {
   const plan = (isAdmin(user.email) ? "agency" : (profile.plan ?? "free")) as PlanName;
   const limits = PLAN_LIMITS[plan];
 
-  // Plan & Usage showed a bare "3 per account" label for free plans — a number
-  // from the retired standalone-URL pool, disconnected from actual usage. Read
-  // the same shared count every other surface reads.
+  // Plan & Usage used to print a bare per-account number for free plans, taken
+  // from the retired standalone-URL pool and disconnected from actual usage.
+  // Read the same shared count every other surface reads.
   const usage = await getUsage(
     supabase,
     user.id,
