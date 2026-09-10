@@ -113,7 +113,161 @@ Note that `dormant` is deliberately a different status from `paused`. `paused` b
 
 ---
 
-## 5. Open items — unresolved when the project was paused
+## 5. Running on Vercel's Hobby plan
+
+In September 2026 this deployment moved from Vercel Pro ($20/month) to the free
+Hobby plan. The product had no users and no revenue; the crons spend no AI money
+(the only automatic AI trigger is auto-diagnosis on import, which a human starts).
+
+### ⚠️ Hobby is non-commercial only — a paying user makes it ineligible
+
+Vercel's [fair use guidelines](https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage),
+quoted from the [Hobby plan docs](https://vercel.com/docs/plans/hobby):
+
+> the Hobby plan restricts users to non-commercial, personal use only
+
+Today that is defensible: payments are switched off, there is no revenue, and
+this is a personal portfolio project. **The day a paying user exists, Hobby stops
+being eligible and the deployment must go back to Pro.** This is a licensing
+constraint, not a technical one — nothing will break, no warning will fire, and
+Vercel may pause the deployment rather than bill for it. Do not discover this
+after taking someone's money.
+
+Re-enabling Stripe and going back to Pro are the same decision. Treat them as one.
+
+### What is scheduled, and what was unscheduled
+
+Hobby allows **100 cron jobs per project** (the old 2-job cap is gone — see the
+[changelog](https://vercel.com/changelog/cron-jobs-now-support-100-per-project-on-every-plan)),
+but restricts frequency to **once per day**, with **±59 minutes** of scheduling
+jitter. Slots were never the constraint; the trimming below was about not leaving
+work scheduled that does nothing.
+
+| Cron | Status | Reasoning |
+|---|---|---|
+| `sync-gsc` | 3AM daily | The heart. Nothing else has a data source without it. |
+| `run-engine` | 9AM daily | Moved from 4AM — see the jitter note below. |
+| `measure-results` | 6AM Sunday | Reads only. 1 refresh in the database, 0 pending. |
+| `cleanup-demos` | 2AM Sunday | Was daily. 3 demos exist in total; daily was pointless. |
+| `onboarding-emails` | 10AM daily | **Deliberately kept.** It is the only disabled-looking cron that is not dead code: it filters `plan = 'free'` with no paid-plan gate, so it would genuinely fire for a real signup. Turning it off is a product decision, and it was not taken. |
+| `batch-alert` | **unscheduled** | Never delivered anything. Its final loop is `console.log` with a comment saying Resend integration comes later; it never came. Re-enable it **only together with** the email call that is missing — otherwise it just writes to a log nobody reads. |
+| `send-digests` | **unscheduled** | Filters `.neq("plan", "free")`. With payments disabled every account is free, so the recipient query matches zero rows by construction. **Re-enable when paid plans exist** — the template, the scheduler and the per-user digest day all work. |
+| `apply-plan-changes` | unscheduled | Already had no entry before this change. Belongs to the paid-plan lifecycle. |
+
+**To reactivate any of them:** add the entry back to `vercel.json`. The routes were
+never deleted. `batch-alert` and `send-digests` are waiting on a feature, not on a
+schedule — read their rows above before assuming a cron line is all they need.
+
+### ⚠️ Why run-engine moved from 4AM to 9AM
+
+On Pro, cron times are exact and the 3AM→4AM gap was a real hour. **On Hobby each
+job fires anywhere inside its hour**, so `sync-gsc` could start at 3:59 and
+`run-engine` at 4:00 — the engine reading a sync still in flight. Nine o'clock
+gives roughly four hours of margin against worst-case drift on both sides.
+
+**Do not "fix" this by merging the two routes into one.** That trades a data race
+for a timeout — see the duration ceiling below.
+
+### ⚠️ run-engine uses ~210s of a 300s ceiling that cannot be raised
+
+Measured 2026-09-10 against 3 sites and 136 pages, from `last_engine_run_at`:
+
+```
+site 1 → 04:01:10    site 2 → 04:03:13    site 3 → 04:03:32
+```
+
+Cron fires at 4:00, so the run takes **about 210 seconds — roughly 70% of the
+limit.** On Hobby the maximum function duration is **300s, and 300s is also the
+maximum**: Pro can be configured up to 800s, Hobby cannot be raised at all
+([functions limits](https://vercel.com/docs/functions/limitations)). Both heavy
+routes already declare `maxDuration = 300`, which is legal — but there is no
+headroom left to buy.
+
+**The cause is `src/lib/engine/run-engine.ts`:** it loops over pages and issues
+roughly three sequential Postgres round-trips per page (the `page_queries` reads
+around lines 83 and 98, plus the per-page `pages` update near line 143). At 136
+pages that is ~400 sequential queries. The cost scales with page count, not with
+site count.
+
+**This is the number to watch.** It is I/O wait rather than CPU, so it barely
+touches the 4 CPU-hrs/month Active CPU allowance — the risk is purely the wall
+clock. If page count grows meaningfully, the run will hit
+`FUNCTION_INVOCATION_TIMEOUT` and stop silently. The fix, when it is needed, is to
+batch those per-page queries rather than to raise the ceiling, because on Hobby
+the ceiling cannot move.
+
+### The cheapest lever on that 300s ceiling: delete techtools-blog.com
+
+`techtools-blog.com` is **not a broken site — it is a fictitious one.** It comes
+from [`src/scripts/seed-demo.ts`](../src/scripts/seed-demo.ts) (`DEMO_DOMAIN`),
+which seeds a site with 20 pages and a year of daily metrics to demonstrate what
+decay looks like. The domain does not exist, the Search Console property
+`sc-domain:techtools-blog.com` does not exist, and its GSC refresh token can never
+authenticate.
+
+**So `token_error = true` on that site is correct and permanent, by design.** Do
+not treat it as an incident. `last_sync_at` equals `created_at` (2026-03-22)
+because it has never synced and never will; `sync-gsc` retries the refresh daily
+and fails daily, which is noise in the log and nothing more.
+
+It holds 20 of the ~136 tracked pages, so it accounts for **roughly 15% of the
+run-engine duration** described above. **If the 300s ceiling ever becomes a real
+problem, deleting this site is the cheapest lever available** — more effective per
+minute of work than any code change, because it removes ~60 sequential Postgres
+round-trips from every run:
+
+```sql
+delete from public.sites where domain = 'techtools-blog.com';
+```
+
+The cascade takes its pages, metrics, queries and diagnosis with it. **This is
+recoverable** — the seed script is idempotent ("deletes and recreates the demo
+site on each run"), so `npx tsx src/scripts/seed-demo.ts` brings it all back.
+
+Reviewed 2026-09-10 and deliberately left in place: the account's `last_seen_at`
+puts it past the 60-day dormancy threshold around **2026-10-18**, after which
+`sync-gsc` skips it and the daily failure stops on its own.
+
+### ⚠️ You will not find cron logs in the Vercel panel
+
+**Hobby retains runtime logs for 1 hour** (Pro retains 1 day). Every cron in this
+project runs overnight UTC. By any hour you are likely to be looking, **their logs
+are already gone** — the panel will show nothing at all.
+
+**Nothing is broken when that happens.** An empty log view is the expected state,
+not evidence of a failed cron. The CLI is not a way around it either: the Vercel
+API token for this project is scoped to the team rather than to a personal
+account, so `vercel logs` fails with "User not found". Reaching runtime logs would
+require generating a new token under **Account Settings → Tokens**, not Team
+Settings.
+
+**To actually see a cron run, invoke it yourself and read the response:**
+
+```bash
+curl -i -H "Authorization: Bearer $CRON_SECRET" \
+  https://serpvive.com/api/cron/run-engine
+```
+
+Every cron route returns a structured JSON summary (`{ data: { processed,
+skipped, errors, total } }` and equivalents), so the response body tells you what
+the scheduled run would have done. `CRON_SECRET` is in the Vercel environment
+variables. Substitute any of the five paths in `vercel.json`.
+
+**To confirm the scheduled runs are happening**, query the database rather than
+hunting for logs — these columns are the durable record:
+
+```sql
+select domain, last_sync_at, last_engine_run_at, token_error from public.sites;
+```
+
+### Limits that are not a concern
+
+Roughly 190 cron invocations per month against **1,000,000** included; bandwidth
+is irrelevant for a site with no traffic. Neither is worth monitoring.
+
+---
+
+## 6. Open items — unresolved when the project was paused
 
 These are not bugs to find later; they are known gaps that nobody closed.
 
@@ -141,4 +295,8 @@ Email confirmation is enabled, and outgoing mail uses Supabase's built-in mailer
 | Change per-account limits | `src/lib/constants.ts`, then deploy |
 | Add a showcase demo | `POST /api/admin/demo` as admin, then extend `expires_at` |
 | Wake a dormant account | Log into it, or the SQL in §4 |
-| Know what is unfinished | §5, plus "Current status and limitations" in the [README](../README.md) |
+| Know what is unfinished | §6, plus "Current status and limitations" in the [README](../README.md) |
+| Know why a cron is not scheduled | §5 — the table says what each one is waiting on |
+| Know if Hobby is still an eligible plan | §5 — non-commercial use only |
+| Find the log of a cron run | You cannot — §5. Call the route with `CRON_SECRET` instead |
+| Understand `token_error` on techtools-blog.com | §5 — it is seeded fixture data, not an incident |

@@ -267,13 +267,23 @@ src/
 ```
 
 ## Cron Jobs (vercel.json)
+
+Five scheduled jobs. Every schedule is daily or weekly because the deployment
+runs on Vercel's Hobby plan, which rejects anything more frequent than once per
+day and fires within a ±59 minute window of the stated hour. See
+[OPERATIONS.md §5](OPERATIONS.md) for what was unscheduled and why.
+
 | Cron | Schedule | What it does |
 |------|----------|-------------|
-| sync-gsc | 3AM UTC daily | Pull new GSC data for all active sites (paid = daily, free = weekly/Sunday only) |
-| run-engine | 4AM UTC daily | Run decay scoring, velocity, classification. Skip sites that already ran today (engine_last_run_at). Free plan: limited engine (no velocity, no seasonal, no cannibalization). |
-| batch-alert | 5AM UTC daily | Identify new critical posts and flag for user (alert only, NO auto-diagnosis) |
+| cleanup-demos | 2AM UTC Sunday | Hard-delete demos that are **both** older than 90 days **and** past `expires_at` |
+| sync-gsc | 3AM UTC daily | Pull the last 3 days of GSC data for all active sites. The daily schedule is a polling tick, not the real cadence: free accounts are throttled to one real sync per 7 days by a `last_sync_at` check inside the route, and dormant sites are skipped. With payments disabled every account is free, so 6 days out of 7 this exits in about a second. |
 | measure-results | 6AM UTC Sunday | Measure refresh results (28+ days after) |
-| send-digests | 9AM UTC Monday | Send weekly email digest (paid plans only) |
+| run-engine | 9AM UTC daily | Run decay scoring, velocity, classification for every synced site. Must stay well clear of `sync-gsc`: on Hobby both jobs drift up to 59 minutes, so a 1-hour gap can collapse to nothing and the engine would read a half-written sync. |
+| onboarding-emails | 10AM UTC daily | Day-2 and day-3 onboarding emails for new free accounts |
+
+**Unscheduled but still in the codebase:** `batch-alert`, `send-digests` and
+`apply-plan-changes`. The routes are intact and reachable; they simply have no
+entry in `vercel.json`.
 
 **Engine also runs IMMEDIATELY** after import completes for new sites via `runEngineForSite()`. This is separate from the cron. After engine, triggers `maybeTriggerAutoDiagnosis()` for first-time sites.
 
