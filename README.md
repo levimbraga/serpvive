@@ -192,7 +192,7 @@ Apply the SQL migrations in `supabase/migrations/` to your Supabase project (in 
 | `NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST` | No | Product analytics and exception capture |
 | `AI_SPEND_CAP_USD` | No | Global ceiling on total AI spend; unset means no cap |
 | `AI_DISABLED` | No | Set to `true` to stop all AI calls without touching the rest of the app |
-| `STRIPE_*` (7 variables) | No | **Disabled in this version** — the app boots and runs without them |
+| `STRIPE_*` (8 variables) | No | **Disabled in this version** — the app boots and runs without them |
 
 ## Stack
 
