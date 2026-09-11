@@ -125,7 +125,13 @@ const RETRY_SAME_PROVIDER = 0; // No retry on same provider — fall through to 
 const RETRY_DELAY_MS = 2_000; // Brief pause before retry
 
 // ── Error classification ──
-// TODO: User implements this — see conversation for guidance
+// Permanent failures — a retry cannot fix them, so the chain breaks out of the
+// provider instead of spending its retry budget. Matching on substrings is
+// crude, but the three providers do not share an error taxonomy and their SDKs
+// surface status codes inconsistently, so the message is the only thing always
+// present. "not set" catches a provider whose key check fires inside call():
+// getDiagnosisChain() should have excluded it already, so reaching here means
+// the two disagree about what is configured.
 
 function isNonRetryable(error: string): boolean {
   const lower = error.toLowerCase();
