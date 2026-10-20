@@ -48,7 +48,7 @@ flowchart LR
     Engine -->|decaying pages| Evidence
     Evidence --> CHAIN
     CHAIN --> VALIDATE
-    VALIDATE --> OUT[Diagnosis + refresh brief<br/>tokens & cost logged per call]
+    VALIDATE --> OUT[Diagnosis + refresh brief<br/>tokens & cost logged per saved diagnosis]
 ```
 
 Postgres (Supabase). The original tables are defined in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and the 30 SQL migrations only add to them. RLS on the original tables was configured in the Supabase dashboard, so those policies are not in the repository. Deployed on Vercel with cron jobs for ingestion, scoring, and result measurement.
