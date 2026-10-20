@@ -127,7 +127,7 @@ The honest caveat: because every commit was a pair session, the git history cann
 
 ## Measured numbers
 
-Only measured values — nothing estimated. Every AI call logs `tokens_input`, `tokens_output`, `cost_usd`, and `processing_time_ms` to the database, which is where these come from.
+Only measured values — nothing estimated. Every saved diagnosis records `tokens_input`, `tokens_output`, `cost_usd`, and `processing_time_ms` in the database, which is where these come from. A call that fails records nothing.
 
 **Which configuration these describe:** the cost and latency figures were measured on the **previous model generation** (Claude Opus 4.6 / Sonnet 4.6, March–August 2026). The chain now points at the current generation — Opus 5 → Sonnet 5 → Gemini 3.7 Flash → GPT-5.6 Terra — and **has not been re-measured**. The numbers below are real and their source is the database; they just belong to the configuration the code no longer runs.
 
