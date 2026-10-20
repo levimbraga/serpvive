@@ -161,7 +161,7 @@ Not measured, and therefore not claimed: diagnosis quality, uptime, error rates,
 
 ## Local setup
 
-Prerequisites: Node 20+, a [Supabase](https://supabase.com) project, and API keys for the services below.
+Prerequisites: Node 20.9 or newer, a [Supabase](https://supabase.com) project, and API keys for the services below.
 
 ```bash
 git clone https://github.com/levimbraga/serpvive.git
