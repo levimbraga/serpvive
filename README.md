@@ -185,7 +185,8 @@ npm run dev
 | `SERPER_API_KEY` | Yes | Live Google SERP results |
 | `FIRECRAWL_API_KEY` | No | JS-rendered page extraction (falls back to Cheerio if unset) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` | Yes | Custom OAuth 2.0 flow for Google Search Console |
-| `RESEND_API_KEY` | No | Transactional email and digests |
+| `RESEND_API_KEY` | Yes | Transactional email. The email module creates its client when it loads and throws without a key, so every route that imports it fails to load, the Search Console import among them |
+| `UNSUBSCRIBE_SECRET` | No | Key for the HMAC in unsubscribe links. If unset, the code falls back to the service role key, and then to a fixed string |
 | `CRON_SECRET` | Yes | Bearer token guarding all cron endpoints |
 | `NEXT_PUBLIC_APP_URL` | Yes | Absolute URL base for redirects and emails |
 | `ADMIN_EMAIL` | Yes | Admin account for demo management |
