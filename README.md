@@ -4,7 +4,7 @@ SerpVive is a content decay monitor for blogs: it connects to Google Search Cons
 
 > ### How this was built, and what it is
 >
-> **Vibecoded with Claude Code** — 313 commits, 312 of them co-authored by a Claude model (every commit but the first). Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
+> **Vibecoded with Claude Code.** Over 300 commits, and every one after the initial commit lists a Claude model as coauthor. Every commit was a pair session, so the git history cannot separate a human-typed line from a model-generated one, and I won't pretend otherwise.
 >
 > **What was mine:** the specification and architecture came before the code — the initial commit contains 11 documents, including the full SQL schema in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). [`CLAUDE.md`](CLAUDE.md) is the operating manual the assistant worked under, published here in Portuguese exactly as it was used: it locks the stack ("never suggest alternatives unless asked"), forbids `any`, requires Zod on every boundary and RLS on every table, and bans the LLM from anything deterministic math can compute. Over 300 commits later the project still matches its day-one architecture doc. Mine too are the decisions that came out of things breaking in production: the four-provider fallback chain ordered by blast radius, the brief generator skipping the strongest model because it timed out, Firecrawl replacing Cheerio with Cheerio kept as fallback, and the four-step ladder for malformed JSON.
 >
@@ -115,7 +115,7 @@ Content fetching started with Cheerio (free, but blind to JavaScript-rendered pa
 
 ## Built with AI assistance
 
-This project was vibecoded with Claude Code, and that is the method, not a footnote: **313 commits, 312 of them co-authored by Claude models** — every commit except the first (the trailers are in the git log).
+This project was vibecoded with Claude Code, and that is the method, not a footnote: **over 300 commits, every one after the initial commit with a Claude model credited as coauthor** (the trailers are in the git log).
 
 What that looked like in practice:
 
