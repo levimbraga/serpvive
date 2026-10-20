@@ -51,7 +51,7 @@ flowchart LR
     VALIDATE --> OUT[Diagnosis + refresh brief<br/>tokens & cost logged per call]
 ```
 
-Postgres (Supabase) with Row Level Security on every table; 29 SQL migrations, 13 tables. Deployed on Vercel with cron jobs for ingestion, scoring, and result measurement.
+Postgres (Supabase). The original tables are defined in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and the 30 SQL migrations only add to them. RLS on the original tables was configured in the Supabase dashboard, so those policies are not in the repository. Deployed on Vercel with cron jobs for ingestion, scoring, and result measurement.
 
 ## Engineering decisions
 
@@ -140,7 +140,7 @@ Only measured values — nothing estimated. Every AI call logs `tokens_input`, `
 | Cross-provider fallback observed | 1 episode: Gemini hit its API quota mid-brief, the chain fell through to OpenAI and completed | prior generation | pipeline log, demo generation (Aug 2026) |
 | Real pages monitored | 188 | model-independent | `pages` table (demo site excluded) |
 | GSC query rows ingested | 42,784 | model-independent | `page_queries` table |
-| Database migrations / tables | 29 / 13 | model-independent | `supabase/migrations/` |
+| Database migrations | 30 | model-independent | `supabase/migrations/` |
 | LLM providers in the fallback chain | 4 | current config | `src/lib/ai/chain.ts` |
 
 On the ~213 s: a diagnosis is asynchronous background work, not a request-response path — the pipeline searches Google live, crawls the user's page plus up to 3 ranking competitors, and generates up to 8,192 output tokens before validation. The latency buys grounding.
@@ -200,7 +200,7 @@ Apply the SQL migrations in `supabase/migrations/` to your Supabase project (in 
 |---|---|
 | Framework | Next.js (App Router), React, TypeScript strict |
 | UI | Tailwind CSS, shadcn/ui, Recharts, Lucide |
-| Database | PostgreSQL via Supabase — Auth, Row Level Security on all tables |
+| Database | PostgreSQL via Supabase: Auth, Row Level Security (policies for the original tables configured in the dashboard, not in the repository) |
 | AI | Anthropic SDK (Claude Opus / Sonnet), Google Gemini and OpenAI as fallbacks |
 | Validation | Zod on every API input and every AI output |
 | External data | Google Search Console API, Serper.dev, Firecrawl, Cheerio |
