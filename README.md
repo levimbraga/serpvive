@@ -86,7 +86,7 @@ LLMs return broken JSON in predictable ways, so the pipeline repairs before it r
 
 ### Prompt-injection sanitization — found by an audit, not by foresight
 
-All external text (scraped pages, competitor content, GSC queries) is sanitized before entering a prompt, and all model output is sanitized for XSS vectors before being stored or rendered ([`src/lib/ai/sanitize.ts`](src/lib/ai/sanitize.ts)). Honest provenance: I did not design this in from the start. An AI-assisted security audit flagged unsanitized external content in prompts as the project's top vulnerability — a competitor could embed hidden instructions in their own HTML — and this module is the fix.
+All external text (scraped pages, competitor content, GSC queries) is sanitized before entering a prompt, and all model output is sanitized for XSS vectors before being stored or rendered ([`src/lib/ai/sanitize.ts`](src/lib/ai/sanitize.ts)). Honest provenance: I did not design this in from the start. An AI-assisted security audit flagged unsanitized external content in prompts as the project's top vulnerability — a competitor could embed hidden instructions in their own HTML — and this module is a mitigation for it, with the limits described under Current status and limitations.
 
 ### Cost control that actually fired: the 90-day free freeze
 
