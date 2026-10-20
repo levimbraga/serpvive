@@ -10,7 +10,7 @@ SerpVive is a content decay monitor for blogs: it connects to Google Search Cons
 >
 > **What is not done:** no automated tests, no CI, no paying users, monetization switched off, alerting never delivered, and the quality of the AI diagnoses never systematically evaluated.
 >
-> **Status: paused since April 2026.** My current focus is OrmaOS, an observability monitor for asynchronous jobs, which I am writing without AI generating the code.
+> **Status: product development paused in April 2026.** The commits from August and September 2026 prepared this public release: payments switched off, cost caps, the model update, an inactivity pause and these docs. My current focus is Ormaos (ormaos.com), a planned open source tool, not yet released, to record and show what happens inside a Python execution.
 >
 > The prompts are published on purpose. What would defend this product is the continuous pipeline and the historical data it accumulates per site — not the text of a prompt, which anyone can read and nobody can run without the rest.
 
