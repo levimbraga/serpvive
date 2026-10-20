@@ -171,7 +171,7 @@ cp .env.example .env.local   # fill in the values below
 npm run dev
 ```
 
-Apply the SQL migrations in `supabase/migrations/` to your Supabase project (in filename order), then open `http://localhost:3000`.
+**The database is not reproducible from this repository yet.** The migrations in `supabase/migrations/` assume tables that were created in the Supabase dashboard, from the schema in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), before migrations were tracked. Applied to a fresh project, the first migration fails because the `pages` table does not exist.
 
 ### Environment variables
 
